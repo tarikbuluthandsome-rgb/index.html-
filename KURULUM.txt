@@ -1,0 +1,98 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HukukAI Pro — Backend Kurulum Rehberi
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─ ADIM 1: Resend API Anahtarını İptal Et ────────┐
+│                                                   │
+│  Eski anahtar (re_Ekcht6...) ifşa oldu!          │
+│  1. resend.com'a giriş yap                        │
+│  2. API Keys > eski anahtarı sil                  │
+│  3. Yeni anahtar oluştur                          │
+│  4. .env içine yaz                                │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 2: MongoDB Atlas ─────────────────────────┐
+│                                                   │
+│  1. mongodb.com/atlas > ücretsiz hesap aç         │
+│  2. Free tier cluster oluştur (M0)                │
+│  3. Database Access > kullanıcı ekle              │
+│     Username: hukukai  Password: güçlü_şifre      │
+│  4. Network Access > IP Whitelist                 │
+│     "Allow Access from Anywhere" seç (0.0.0.0/0) │
+│  5. Connect > Drivers > Connection String kopyala │
+│  6. MONGODB_URI'ye yapıştır                       │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 3: Master Şifre Hash'i Üret ─────────────┐
+│                                                   │
+│  CMD'yi aç, 47-SON klasörüne git:                 │
+│                                                   │
+│  cd Desktop\47-SON                                │
+│  node -e "const b=require('bcryptjs'); b.hash('YENİ_ŞİFREN',12).then(h=>console.log(h))"
+│                                                   │
+│  Çıkan hash'i kopyala → MASTER_PASSWORD_HASH'e    │
+│  yaz                                              │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 4: JWT Secret Üret ───────────────────────┐
+│                                                   │
+│  CMD'de:                                          │
+│  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+│                                                   │
+│  Çıkan değeri JWT_SECRET'e yaz                    │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 5: Dosyaları 47-SON'a Kopyala ───────────┐
+│                                                   │
+│  47-SON klasörü şu hale gelmeli:                  │
+│                                                   │
+│  47-SON/                                          │
+│  ├── index.html          (mevcut, güncellendi)    │
+│  ├── vercel.json         (YENİ - bu paketten)     │
+│  ├── package.json        (YENİ - bu paketten)     │
+│  ├── .env.example        (referans - paylaşma)    │
+│  ├── api/                                         │
+│  │   ├── auth.js         (YENİ - bu paketten)     │
+│  │   ├── email.js        (YENİ - bu paketten)     │
+│  │   └── dilekce.js      (YENİ - bu paketten)     │
+│  └── lib/                                         │
+│      ├── mongodb.js      (YENİ - bu paketten)     │
+│      └── models.js       (YENİ - bu paketten)     │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 6: Vercel'e Deploy Et ────────────────────┐
+│                                                   │
+│  CMD'de 47-SON klasöründeyken:                    │
+│                                                   │
+│  npm install                                      │
+│  npx vercel                                       │
+│                                                   │
+│  İlk kez sorarsa: existing project > hukukai-pro  │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 7: Vercel'e .env Değişkenlerini Ekle ────┐
+│                                                   │
+│  vercel.com > hukukai-pro > Settings >            │
+│  Environment Variables                            │
+│                                                   │
+│  .env.example'daki tüm değerleri tek tek ekle    │
+│  (MONGODB_URI, JWT_SECRET, MASTER_PASSWORD_HASH, │
+│   RESEND_API_KEY, TELEGRAM_BOT_TOKEN, vb.)        │
+│                                                   │
+│  Sonra: npx vercel --prod                         │
+└───────────────────────────────────────────────────┘
+
+┌─ ADIM 8: Test Et ───────────────────────────────┐
+│                                                   │
+│  Tarayıcıdan:                                     │
+│  https://hukukai-pro.vercel.app/api/auth?action=list-users
+│                                                   │
+│  401 hatası dönüyorsa → API çalışıyor!            │
+└───────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ÖNEMLİ: .env ve .env.example dosyalarını
+  git'e ASLA commit etme!
+  .gitignore içinde .env* satırı olduğundan
+  emin ol.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
