@@ -13,8 +13,3 @@
 }
 ```
 
-**Kaydet** (Ctrl+S) → kapat → sonra:
-```
-git add .
-git commit -m "vercel duzeltildi"
-git push
