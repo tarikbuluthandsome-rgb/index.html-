@@ -4925,6 +4925,12 @@ function addViolation() {
     showNotification('İhlal kaydedildi!', 'warning');
 }
 
+function loadViolationList() {
+    violationList = JSON.parse(localStorage.getItem('violationList') || '[]');
+    renderViolationList();
+    updateViolationBadge();
+}
+
 function renderViolationList() {
     const list = document.getElementById('violationList');
     if (!list) return;
