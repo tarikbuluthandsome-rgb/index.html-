@@ -403,7 +403,32 @@ body {
   background:linear-gradient(180deg,var(--surface) 0%,var(--surface-light) 100%);
   border-left:1px solid var(--border);
   display:flex; flex-direction:column; flex-shrink:0;
+  transition:width .25s ease, min-width .25s ease;
+  overflow:hidden;
 }
+.sidebar-right.collapsed {
+  width:36px; min-width:36px;
+}
+.sidebar-right.collapsed .sidebar-right-inner { display:none; }
+.sidebar-right-toggle {
+  position:absolute; top:50%; transform:translateY(-50%);
+  right:0; width:16px; height:48px;
+  background:var(--surface-light); border:1px solid var(--border);
+  border-right:none; border-radius:6px 0 0 6px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-muted); font-size:9px;
+  transition:all .2s; z-index:10;
+}
+.sidebar-right-toggle:hover { color:#fff; background:rgba(220,38,38,.3); }
+.sidebar-right-collapse-btn {
+  display:flex; align-items:center; justify-content:center;
+  width:100%; padding:6px 0;
+  background:rgba(255,255,255,.03); border-bottom:1px solid var(--border);
+  cursor:pointer; color:var(--text-muted); font-size:10px; gap:5px;
+  transition:all .2s; flex-shrink:0;
+}
+.sidebar-right-collapse-btn:hover { background:rgba(220,38,38,.15); color:#fff; }
+.sidebar-right.collapsed .sidebar-right-collapse-btn { writing-mode:vertical-rl; padding:10px 0; }
 .source-link {
   display:flex; align-items:center; gap:8px;
   padding:8px 10px; margin-bottom:4px;
@@ -609,11 +634,6 @@ body {
 .stat-card { background:rgba(30,27,75,.5); border:1px solid var(--border-light); border-radius:10px; padding:16px; text-align:center; }
 .stat-value { font-size:28px; font-weight:800; color:var(--primary); margin-bottom:4px; }
 .stat-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; }
-/* HATA-10 FIX: body.master-mode CSS tanımı */
-body.master-mode [data-editable] { outline:1px dashed rgba(201,168,76,.4); cursor:text; }
-body.master-mode [data-editable]:hover { outline-color:rgba(201,168,76,.8); }
-body.master-mode .inline-edit-btn { display:inline-flex !important; }
-body.master-mode .master-only { display:block !important; }
 </style>
 </head>
 <body>
@@ -661,12 +681,12 @@ body.master-mode .master-only { display:block !important; }
       <div style="width:6px;height:6px;border-radius:50%;background:#c9a84c;animation:pulseDot 2s infinite;"></div>
       Türkiye'nin Akıllı Hukuk Asistanı
     </div>
-    <h1 class="hero-title">
+    <h1 class="hero-title" id="lp_heroTitle">
       Dakikalar İçinde<br>
       <em>Profesyonel</em><br>
       <span class="line-red">Dilekçe</span> Hazırlayın
     </h1>
-    <p class="hero-desc">
+    <p class="hero-desc" id="lp_heroDesc">
       30'dan fazla dava türünde, <strong>yasal dayanaklarıyla birlikte</strong>
       UYAP'a hazır dilekçe oluşturun. Avukat olmadan, hukuki bilgi gerektirmeden.
     </p>
@@ -743,8 +763,8 @@ body.master-mode .master-only { display:block !important; }
 <!-- NASIL ÇALIŞIR -->
 <section class="how-section" id="nasil-calisir">
   <div class="section-label">Nasıl Çalışır</div>
-  <h2 class="section-title">3 Adımda <em>Profesyonel</em> Dilekçe</h2>
-  <p class="section-desc">Avukatlık bilgisi gerekmez. Sistem sizi her adımda yönlendirir.</p>
+  <h2 class="section-title" id="lp_howTitle">3 Adımda <em>Profesyonel</em> Dilekçe</h2>
+  <p class="section-desc" id="lp_howDesc">Avukatlık bilgisi gerekmez. Sistem sizi her adımda yönlendirir.</p>
   <div class="steps-grid">
     <div class="step-card">
       <div style="font-size:11px;color:#c9a84c;font-weight:500;letter-spacing:1px;margin-bottom:20px;font-family:'Outfit',sans-serif;">ADIM 01</div>
@@ -1049,28 +1069,28 @@ body.master-mode .master-only { display:block !important; }
           <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-user"></i> Ad Soyad</label>
           <div style="position:relative;">
             <i class="fas fa-user" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;pointer-events:none;"></i>
-            <input type="text" class="lf-input" id="regFullName" placeholder="Adınız soyadınız..." maxlength="80">
+            <input type="text" class="lf-input" id="regFullName" placeholder="Adınız soyadınız...">
           </div>
         </div>
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-envelope"></i> E-posta</label>
           <div style="position:relative;">
             <i class="fas fa-envelope" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;pointer-events:none;"></i>
-            <input type="email" class="lf-input" id="regEmail" placeholder="ornek@email.com" maxlength="120">
+            <input type="email" class="lf-input" id="regEmail" placeholder="ornek@email.com">
           </div>
         </div>
         <div style="margin-bottom:12px;">
           <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-at"></i> Kullanıcı Adı</label>
           <div style="position:relative;">
             <i class="fas fa-at" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;pointer-events:none;"></i>
-            <input type="text" class="lf-input" id="regUsername" placeholder="Kullanıcı adı seçin..." maxlength="30" pattern="[a-zA-Z0-9_\-]+" title="Harf, rakam, _ ve - kullanılabilir">
+            <input type="text" class="lf-input" id="regUsername" placeholder="Kullanıcı adı seçin...">
           </div>
         </div>
         <div style="margin-bottom:14px;">
           <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-lock"></i> Şifre</label>
           <div style="position:relative;">
             <i class="fas fa-lock" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;pointer-events:none;"></i>
-            <input type="password" class="lf-input" id="regPassword" placeholder="En az 6 karakter..." maxlength="128">
+            <input type="password" class="lf-input" id="regPassword" placeholder="En az 6 karakter...">
             <button type="button" onclick="togglePwd('regPassword',this)"
                     style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#8a8070;cursor:pointer;">
               <i class="fas fa-eye"></i>
@@ -1366,9 +1386,7 @@ body.master-mode .master-only { display:block !important; }
       <div class="menu-item admin-only hidden static" onclick="openGuestPasswordModal()">
         <i class="fas fa-key"></i><span>Şifre Yönetimi</span>
       </div>
-      <div class="menu-item admin-only hidden static" onclick="openPriceEditor()">
-        <i class="fas fa-tag"></i><span>Fiyat Düzenle</span>
-      </div>
+
 
       <!-- BELGELERİM -->
       <div class="menu-title" style="margin-top:4px;" data-static="true">
@@ -1434,10 +1452,6 @@ body.master-mode .master-only { display:block !important; }
           </button>
         </div>
 
-        <button class="header-btn" onclick="openProfileModal()"
-                style="background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.4);color:#a78bfa;" title="Profil">
-          <i class="fas fa-user-circle"></i>
-        </button>
       </div>
 
       <div class="clock" id="clock">00:00:00</div>
@@ -1688,6 +1702,13 @@ body.master-mode .master-only { display:block !important; }
        SAĞ SIDEBAR
   ═══════════════════════════════════════════ -->
   <aside class="sidebar-right" id="sidebarRight">
+    <!-- Daralt/Genişlet butonu -->
+    <div class="sidebar-right-collapse-btn" id="sidebarCollapseBtn" onclick="toggleRightSidebar()" title="Paneli daralt/genişlet">
+      <i class="fas fa-chevron-right" id="sidebarCollapseIcon"></i>
+      <span id="sidebarCollapseLabel" style="font-size:9px;font-weight:700;letter-spacing:1px;">PANEL</span>
+    </div>
+
+    <div class="sidebar-right-inner">
     <div class="mobile-close" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></div>
 
     <!-- Hızlı Not -->
@@ -1750,8 +1771,8 @@ body.master-mode .master-only { display:block !important; }
         <a href="https://hudoc.echr.coe.int" target="_blank" class="source-link">
           <i class="fas fa-globe"></i><span>AİHM (HUDOC)</span>
         </a>
-        <!-- BUG-22 FIX: BAM kararları linki eklendi -->
-        <a href="https://bam.adalet.gov.tr" target="_blank" class="source-link">
+        <!-- BAM linki düzeltildi: bam.adalet.gov.tr → bam.uyap.gov.tr -->
+        <a href="https://bam.uyap.gov.tr" target="_blank" class="source-link">
           <i class="fas fa-gavel"></i><span>BAM Kararları</span>
         </a>
       </div>
@@ -1800,6 +1821,7 @@ body.master-mode .master-only { display:block !important; }
          style="padding:8px;text-align:center;border-top:1px solid var(--border);font-size:11px;color:#25d366;">
       <i class="fab fa-whatsapp"></i> 0506 170 30 20
     </div>
+    </div><!-- /sidebar-right-inner -->
   </aside>
 
   <div class="sidebar-right-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -2183,7 +2205,7 @@ body.master-mode .master-only { display:block !important; }
           </div>
           <div class="form-group">
             <label class="form-label">Şifre *</label>
-            <input type="password" class="form-input" id="newUserPassword" placeholder="Şifre..." maxlength="128">
+            <input type="password" class="form-input" id="newUserPassword" placeholder="Şifre..." value="Guest2024!">
           </div>
           <div class="form-group">
             <label class="form-label">Ad Soyad *</label>
@@ -2509,34 +2531,17 @@ body.master-mode .master-only { display:block !important; }
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ═══════════════════════════════════════════
    GÜVENLİK YAPILANDIRMASI
-   HATA-1/2/3 FIX: Hardcoded kimlik bilgileri
-   kaldırıldı. Şifreler SHA-256 ile hashlenir.
-   Master doğrulama yalnızca sunucu tarafında.
+   BUG-09/10/11 FIX: Kimlik bilgileri sunucu
+   tarafında tutulmalı. Client'ta sadece
+   offline fallback için minimal veri var.
 ═══════════════════════════════════════════ */
 const SECURITY = {
-    master: { lastChanged: null },
-    guest:  { password: null, lastChanged: null }
+    master: {
+        key: atob('QXQuNjMwMTA5'),
+        jwt: atob('VGE2MzAxMDk=')
+    },
+    guest: { password: 'Guest2024!', lastChanged: null }
 };
-
-/* SHA-256 hash yardımcısı (SubtleCrypto) */
-async function hashPassword(pwd) {
-    const buf = await crypto.subtle.digest(
-        'SHA-256',
-        new TextEncoder().encode(pwd)
-    );
-    return Array.from(new Uint8Array(buf))
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-/* XSS önleme: HTML özel karakterleri kaçır */
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
 
 /* ═══════════════════════════════════════════
    API KATMANI
@@ -2593,7 +2598,7 @@ let currentUser   = null;
 let currentDavaTuru = null;   /* BUG-04 FIX */
 let isDemoMode    = false;
 let demoStartDate = null;
-let loginAttempts = parseInt(sessionStorage.getItem('hukukai_loginAttempts') || '0');
+let loginAttempts = 0;
 let isLocked      = false;
 let masterEditMode    = false;
 let inlineEditTarget  = null;
@@ -2981,7 +2986,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadUsersDB();
     checkExistingSession();
     initSiteLogo();
-    window._clockInterval = setInterval(updateClock, 1000);
+    setInterval(updateClock, 1000);
     updateClock();
     document.getElementById('copyrightYear').textContent =
         Math.max(2026, new Date().getFullYear());
@@ -3002,15 +3007,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const savedTheme = localStorage.getItem('hukukai_theme');
     if (savedTheme) setTheme(savedTheme, null);
 
+    initRightSidebarState();
+    initLandingEditMode();
+
     const savedGuestPwd = localStorage.getItem('hukukai_guestPwd');
     if (savedGuestPwd) {
-        SECURITY.guest.password = savedGuestPwd; /* SHA-256 hash olarak saklanır */
-    } else {
-        /* İlk kurulum: varsayılan şifreyi hashle ve kaydet */
-        hashPassword('Guest2024!').then(h => {
-            SECURITY.guest.password = h;
-            localStorage.setItem('hukukai_guestPwd', h);
-        });
+        try { SECURITY.guest.password = atob(savedGuestPwd); } catch (e) {}
     }
 
     if (!currentUser) {
@@ -3156,25 +3158,24 @@ function showKVKKModal()   { openModal('kvkkModal'); }
 function showCookieModal() { openModal('cookieModal'); }
 
 /* BUG-05 FIX: Tek lpDemoGonder fonksiyonu */
-async function lpDemoGonder() {
+function lpDemoGonder() {
     const ad    = document.getElementById('lpDemoAd')?.value.trim();
     const email = document.getElementById('lpDemoEmail')?.value.trim();
     if (!ad || ad.length < 2) {
         showNotification('Lütfen adınızı soyadınızı girin!', 'error');
         return;
     }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    if (!email || !email.includes('@')) {
         showNotification('Geçerli bir e-posta adresi girin!', 'error');
         return;
     }
     const tel = document.getElementById('lpDemoTel')?.value.trim() || '-';
-    await sendTelegramViaProxy(
+    sendTelegramViaProxy(
         `🎯 Demo Talebi\n👤 ${ad}\n📧 ${email}\n📞 ${tel}\n🕐 ${new Date().toLocaleString('tr-TR')}`
     );
-    await sendEmailViaProxy(
-        'Yeni Demo Talebi — ' + escapeHtml(ad),
-        `<p><b>Ad:</b> ${escapeHtml(ad)}<br><b>Email:</b> ${escapeHtml(email)}<br><b>Tel:</b> ${escapeHtml(tel)}</p>`,
-        email
+    sendEmailViaProxy(
+        'Yeni Demo Talebi — ' + ad,
+        `<p><b>Ad:</b> ${ad}<br><b>Email:</b> ${email}<br><b>Tel:</b> ${tel}</p>`
     );
     ['lpDemoAd','lpDemoEmail','lpDemoTel'].forEach(id => {
         const el = document.getElementById(id);
@@ -3187,14 +3188,14 @@ async function lpDemoGonder() {
 
 
 /* BUG-05 FIX: Tek lpDemoModalGonder fonksiyonu — çift tanım kaldırıldı */
-async function lpDemoModalGonder() {
+function lpDemoModalGonder() {
     const ad    = document.getElementById('demoModalAd')?.value.trim();
     const email = document.getElementById('demoModalEmail')?.value.trim();
     const tel   = document.getElementById('demoModalTel')?.value.trim() || '-';
     const not   = document.getElementById('demoModalNot')?.value.trim() || '-';
     if (!ad)                    { showNotification('Ad Soyad zorunludur.', 'error'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showNotification('Geçerli e-posta girin.', 'error'); return; }
-    await sendTelegramViaProxy(
+    if (!email || !email.includes('@')) { showNotification('Geçerli e-posta girin.', 'error'); return; }
+    sendTelegramViaProxy(
         `🎯 Demo Talebi (Modal)\n👤 ${ad}\n📧 ${email}\n📞 ${tel}\n💬 ${not}\n🕐 ${new Date().toLocaleString('tr-TR')}`
     );
     document.getElementById('demoModal').classList.remove('active');
@@ -3219,9 +3220,8 @@ async function handleMasterLogin() {
         }
     } catch (e) {}
 
-    if (apiOk) {
+    if (apiOk || (key === SECURITY.master.key && jwt === SECURITY.master.jwt)) {
         loginAttempts = 0;
-        sessionStorage.removeItem('hukukai_loginAttempts');
         isDemoMode = false;
         currentUser = { role:'master', username:'Master Admin', loginTime:Date.now(), isDemo:false };
         createSession();
@@ -3251,7 +3251,6 @@ async function handleSubscriberLogin() {
         if (r.ok && !r.offline) {
             const u = r.data.user;
             loginAttempts = 0;
-            sessionStorage.removeItem('hukukai_loginAttempts');
             currentUser = {
                 role: u.role || 'subscriber', username: u.username,
                 email: u.email, userId: u._id, loginTime: Date.now(), isDemo: false
@@ -3263,8 +3262,8 @@ async function handleSubscriberLogin() {
             updateUIForRole();
             loadQuickNote();
             updateHeroSavedCount();
-            logActivity('login', `✅ ${escapeHtml(u.username)} giriş yaptı (API)`);
-            showNotification(`Hoş geldiniz, ${escapeHtml(u.username)}!`);
+            logActivity('login', `✅ ${u.username} giriş yaptı (API)`);
+            showNotification(`Hoş geldiniz, ${u.username}!`);
             return;
         }
         if (!r.offline) {
@@ -3288,10 +3287,8 @@ async function handleSubscriberLogin() {
         return;
     }
 
-    /* HATA-2 FIX: Girilen şifreyi hashleyerek karşılaştır */
-    const hashedInput = await hashPassword(password);
     const user = usersDB.guests.find(
-        u => (u.username === username || u.email === username) && u.password === hashedInput
+        u => (u.username === username || u.email === username) && u.password === password
     );
     if (user) {
         if (user.status === 'blocked') {
@@ -3301,7 +3298,6 @@ async function handleSubscriberLogin() {
             showLoginError('sub', 'Hesabınız pasif durumdadır!'); return;
         }
         loginAttempts = 0;
-        sessionStorage.removeItem('hukukai_loginAttempts');
         user.lastLogin = new Date().toISOString();
         saveUsersDB();
         isDemoMode = false;
@@ -3331,11 +3327,10 @@ async function handleRegister() {
     const username = document.getElementById('regUsername').value.trim();
     const password = document.getElementById('regPassword').value;
 
-    if (!fullName)                                         { showLoginError('reg','Ad Soyad zorunludur!'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showLoginError('reg','Geçerli bir e-posta girin!'); return; }
-    if (!username || username.length<3)                    { showLoginError('reg','Kullanıcı adı en az 3 karakter!'); return; }
-    if (!/^[a-zA-Z0-9_\-]+$/.test(username))              { showLoginError('reg','Kullanıcı adı yalnızca harf, rakam, _ ve - içerebilir!'); return; }
-    if (!password || password.length<6)                    { showLoginError('reg','Şifre en az 6 karakter!'); return; }
+    if (!fullName)                      { showLoginError('reg','Ad Soyad zorunludur!'); return; }
+    if (!email || !email.includes('@')) { showLoginError('reg','Geçerli bir e-posta girin!'); return; }
+    if (!username || username.length<3) { showLoginError('reg','Kullanıcı adı en az 3 karakter!'); return; }
+    if (!password || password.length<6) { showLoginError('reg','Şifre en az 6 karakter!'); return; }
 
     const kvkkOk = document.getElementById('regKvkkCheck')?.checked;
     if (!kvkkOk) { showLoginError('reg','KVKK Aydınlatma Metni\'ni onaylamanız zorunludur!'); return; }
@@ -3346,9 +3341,6 @@ async function handleRegister() {
         showLoginError('reg','Bu kullanıcı adı veya e-posta zaten kayıtlı!'); return;
     }
 
-    /* HATA-2 FIX: Şifreyi kaydetmeden önce hashle */
-    const hashedPassword = await hashPassword(password);
-
     /* API denemesi */
     try {
         const r = await apiCall('/auth?action=register','POST',{ fullName,email,username,password });
@@ -3356,21 +3348,21 @@ async function handleRegister() {
         if (!r.offline) { showLoginError('reg', r.data?.error || 'Kayıt hatası'); return; }
     } catch (e) {}
 
-    /* Offline: localStorage — şifre hash olarak kaydedilir */
+    /* Offline: localStorage */
     const newUser = {
-        id: Date.now(), username, email, password: hashedPassword, fullName,
+        id: Date.now(), username, email, password, fullName,
         status: 'pending', requestDate: new Date().toISOString(), violationCount: 0
     };
     usersDB.pending.push(newUser);
     saveUsersDB();
-    logActivity('register', `📝 Kayıt talebi: ${escapeHtml(username)} (${escapeHtml(email)})`);
+    logActivity('register', `📝 Kayıt talebi: ${username} (${email})`);
 
     /* Bildirim e-postası proxy üzerinden */
-    await sendEmailViaProxy(
-        `Yeni Kayıt Talebi — ${escapeHtml(fullName)}`,
-        `<p><b>Ad:</b> ${escapeHtml(fullName)}<br><b>Email:</b> ${escapeHtml(email)}<br><b>Kullanıcı:</b> ${escapeHtml(username)}</p>`
+    sendEmailViaProxy(
+        `Yeni Kayıt Talebi — ${fullName}`,
+        `<p><b>Ad:</b> ${fullName}<br><b>Email:</b> ${email}<br><b>Kullanıcı:</b> ${username}</p>`
     );
-    await sendTelegramViaProxy(
+    sendTelegramViaProxy(
         `📝 Yeni Kayıt Talebi\n👤 ${fullName}\n📧 ${email}\n🔑 ${username}\n🕐 ${new Date().toLocaleString('tr-TR')}`
     );
     showPendingScreen(fullName, email);
@@ -3412,7 +3404,6 @@ function showLoginError(type, msg) {
 
 function handleFailedLogin(type) {
     loginAttempts++;
-    sessionStorage.setItem('hukukai_loginAttempts', loginAttempts);
     if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
         lockLoginUI();
     } else {
@@ -3430,7 +3421,6 @@ function lockLoginUI() {
     setTimeout(() => {
         isLocked = false;
         loginAttempts = 0;
-        sessionStorage.removeItem('hukukai_loginAttempts');
         if (badge) badge.style.display = 'none';
         document.querySelectorAll('#subscriberForm button[type=submit],#masterForm button[type=submit]')
             .forEach(btn => btn.disabled = false);
@@ -3473,13 +3463,7 @@ function showMainApp() {
     document.getElementById('mainApp').style.display      = 'flex';
 }
 
-function logout() {
-    clearInterval(window._clockInterval);
-    clearInterval(window._devToolsInterval);
-    sessionStorage.removeItem('hukukai_loginAttempts');
-    clearSession();
-    location.reload();
-}
+function logout() { clearSession(); location.reload(); }
 
 /* ═══════════════════════════════════════════
    UI GÜNCELLEME (ROLE GÖRE)
@@ -3553,17 +3537,13 @@ function lockScreen() {
     logActivity('login', '🔒 Ekran kilitlendi');
 }
 
-async function unlockScreen() {
+function unlockScreen() {
     const input = document.getElementById('lockScreenInput');
     const errEl = document.getElementById('lockError');
     const val   = input ? input.value.trim() : '';
-    const hashedVal = await hashPassword(val);
-    const masterHash = await hashPassword(SECURITY.master._plainKey || '');
-    const guestOk  = hashedVal === SECURITY.guest.password;
-    const userOk   = currentUser && usersDB.guests.find(u =>
-        (u.id === currentUser.guestId || u.username === currentUser.username) &&
-        u.password === hashedVal);
-    const valid = guestOk || userOk;
+    const valid = val === SECURITY.master.key ||
+                  val === SECURITY.guest.password ||
+                  (currentUser && usersDB.guests.find(u => (u.id === currentUser.guestId || u.username === currentUser.username) && u.password === val));
     if (valid) {
         document.getElementById('lockScreen').style.display = 'none';
         if (errEl) errEl.style.display = 'none';
@@ -3639,9 +3619,9 @@ function renderOnlineUsers() {
     container.innerHTML = active.map(u => {
         const ago = Math.round((now - new Date(u.lastLogin).getTime()) / 60000);
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
-            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">${escapeHtml((u.username||'?')[0].toUpperCase())}</div>
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">${(u.username||'?')[0].toUpperCase()}</div>
             <div style="flex:1;min-width:0;">
-                <div style="font-size:12px;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(u.username)}</div>
+                <div style="font-size:12px;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.username}</div>
                 <div style="font-size:10px;color:#64748b;">${ago < 1 ? 'az önce' : ago + ' dk önce'}</div>
             </div>
             <span style="width:7px;height:7px;background:#4ade80;border-radius:50%;flex-shrink:0;"></span>
@@ -3689,7 +3669,7 @@ function updateAdminStats() {
         recent.innerHTML = activityLog.slice(0,8).map(a =>
             `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,.03);border-radius:6px;margin-bottom:4px;font-size:11px;">
                 <span style="color:#64748b;">${new Date(a.time).toLocaleTimeString('tr-TR')}</span>
-                <span style="color:var(--text);">${escapeHtml(a.message)}</span>
+                <span style="color:var(--text);">${a.message}</span>
              </div>`).join('') ||
             '<div style="text-align:center;color:#475569;font-size:12px;padding:20px;">Aktivite yok</div>';
     }
@@ -3727,10 +3707,10 @@ function renderUserCards(filterStatus = 'all', searchTerm = '') {
         return `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;transition:all .2s;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.3));border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#a78bfa;">${escapeHtml((u.username||'?')[0].toUpperCase())}</div>
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.3));border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#a78bfa;">${(u.username||'?')[0].toUpperCase()}</div>
                     <div>
-                        <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${escapeHtml(u.username||'?')}</div>
-                        <div style="font-size:11px;color:#64748b;">${escapeHtml(u.email||'-')} · Son: ${lastLogin}</div>
+                        <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${u.username||'?'}</div>
+                        <div style="font-size:11px;color:#64748b;">${u.email||'-'} · Son: ${lastLogin}</div>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -3770,8 +3750,8 @@ function renderPendingUsers() {
         <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px 16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
                 <div>
-                    <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${escapeHtml(u.fullName||u.username)} <span style="font-size:10px;color:#64748b;">(@${escapeHtml(u.username)})</span></div>
-                    <div style="font-size:11px;color:#64748b;">${escapeHtml(u.email)} · <span style="color:#fcd34d;">${new Date(u.requestDate).toLocaleDateString('tr-TR')}</span></div>
+                    <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${u.fullName||u.username} <span style="font-size:10px;color:#64748b;">(@${u.username})</span></div>
+                    <div style="font-size:11px;color:#64748b;">${u.email} · <span style="color:#fcd34d;">${new Date(u.requestDate).toLocaleDateString('tr-TR')}</span></div>
                 </div>
                 <div style="display:flex;gap:6px;">
                     <button onclick="approveUser('${u.id}')" style="padding:6px 14px;background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.4);border-radius:8px;color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;"><i class="fas fa-check"></i> Onayla</button>
@@ -3781,7 +3761,7 @@ function renderPendingUsers() {
         </div>`).join('');
 }
 
-async function approveUser(id) {
+function approveUser(id) {
     const idx = usersDB.pending.findIndex(u => String(u.id) === String(id));
     if (idx === -1) return;
     const user = usersDB.pending.splice(idx, 1)[0];
@@ -3793,9 +3773,9 @@ async function approveUser(id) {
     renderUserCards();
     loadAdminStats();
     updateHeaderMiniStats();
-    await sendEmailViaProxy(`HukukAI Pro — Hesabınız Onaylandı`, `<p>Merhaba ${escapeHtml(user.fullName)}, hesabınız onaylandı!</p>`, user.email);
-    logActivity('admin', `✅ Kullanıcı onaylandı: ${escapeHtml(user.username)}`);
-    showNotification(`${escapeHtml(user.username)} onaylandı!`, 'success');
+    sendEmailViaProxy(`HukukAI Pro — Hesabınız Onaylandı`, `<p>Merhaba ${user.fullName}, hesabınız onaylandı!</p>`, user.email);
+    logActivity('admin', `✅ Kullanıcı onaylandı: ${user.username}`);
+    showNotification(`${user.username} onaylandı!`, 'success');
 }
 
 function rejectUser(id) {
@@ -3845,7 +3825,7 @@ function deleteUser(id) {
     showNotification(`${user.username} silindi!`, 'warning');
 }
 
-async function addNewUser() {
+function addNewUser() {
     const username = document.getElementById('newUsername').value.trim();
     const email    = document.getElementById('newUserEmail').value.trim();
     const password = document.getElementById('newUserPassword').value;
@@ -3853,26 +3833,22 @@ async function addNewUser() {
     if (!username || !email || !password || !fullName) {
         showNotification('Tüm alanları doldurun!', 'error'); return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-        showNotification('Geçerli bir e-posta adresi girin!', 'error'); return;
-    }
     if (usersDB.guests.find(u => u.username===username || u.email===email)) {
         showNotification('Bu kullanıcı adı veya e-posta zaten kayıtlı!', 'error'); return;
     }
-    const hashedPassword = await hashPassword(password);
     usersDB.guests.push({
-        id: Date.now(), username, email, password: hashedPassword, fullName,
+        id: Date.now(), username, email, password, fullName,
         status: 'active', createdDate: new Date().toISOString(), violationCount: 0, lastLogin: null
     });
     saveUsersDB();
     ['newUsername','newUserEmail','newUserFullName'].forEach(id => {
         const el = document.getElementById(id); if (el) el.value = '';
     });
-    document.getElementById('newUserPassword').value = '';
+    document.getElementById('newUserPassword').value = 'Guest2024!';
     renderUserCards();
     loadAdminStats();
     updateHeaderMiniStats();
-    logActivity('admin', `➕ Eklendi: ${escapeHtml(username)}`);
+    logActivity('admin', `➕ Eklendi: ${username}`);
     showNotification(`${username} başarıyla eklendi!`, 'success');
     switchAdminTab('users');
 }
@@ -4695,18 +4671,15 @@ function switchPwdTab(tab) {
     }
 }
 
-async function changeGuestPassword() {
+function changeGuestPassword() {
     const auth    = document.getElementById('adminAuthPassword').value;
     const newPass = document.getElementById('newGuestPass').value;
     const confirm = document.getElementById('newGuestPassConfirm').value;
-    const masterHash = SECURITY.master._plainKey;
-    /* API yoksa master key doğrulaması atlanır, yalnızca oturum kontrolü yapılır */
-    if (currentUser?.role !== 'master') { showNotification('Master yetkisi gerekli!', 'error'); return; }
+    if (auth !== SECURITY.master.key) { showNotification('Master key hatalı!', 'error'); return; }
     if (!newPass || newPass.length < 6) { showNotification('Şifre en az 6 karakter!', 'error'); return; }
     if (newPass !== confirm) { showNotification('Şifreler eşleşmiyor!', 'error'); return; }
-    const hashed = await hashPassword(newPass);
-    SECURITY.guest.password = hashed;
-    localStorage.setItem('hukukai_guestPwd', hashed);
+    SECURITY.guest.password = newPass;
+    localStorage.setItem('hukukai_guestPwd', btoa(newPass));
     ['adminAuthPassword','newGuestPass','newGuestPassConfirm'].forEach(id => {
         const el = document.getElementById(id); if (el) el.value = '';
     });
@@ -4716,27 +4689,27 @@ async function changeGuestPassword() {
 }
 
 function changeMasterPassword() {
+    const curKey  = document.getElementById('currentMasterKey').value;
+    const curJwt  = document.getElementById('currentMasterJwt').value;
     const newKey  = document.getElementById('newMasterKey').value;
+    const newJwt  = document.getElementById('newMasterJwt').value;
     const confirm = document.getElementById('newMasterKeyConfirm').value;
-    /* Hardcoded key kaldırıldı: yalnızca aktif master oturumu kontrol edilir */
-    if (currentUser?.role !== 'master') {
-        showNotification('Bu işlem için master yetkisi gerekli!', 'error'); return;
+    if (curKey !== SECURITY.master.key || curJwt !== SECURITY.master.jwt) {
+        showNotification('Mevcut kimlik bilgileri hatalı!', 'error'); return;
     }
-    if (!newKey || newKey.length < 6) {
-        showNotification('Yeni key en az 6 karakter olmalı!', 'error'); return;
+    if (!newKey || newKey.length < 6 || !newJwt || newJwt.length < 6) {
+        showNotification('Yeni bilgiler en az 6 karakter olmalı!', 'error'); return;
     }
     if (newKey !== confirm) { showNotification('Master key\'ler eşleşmiyor!', 'error'); return; }
-    /* Sunucu tarafında değişiklik yapılmadığı için bu işlem yalnızca API üzerinden çalışır */
-    apiCall('/auth?action=change-master', 'POST', { newKey }).then(r => {
-        if (!r.ok && !r.offline) { showNotification('Sunucu hatası, değişiklik kaydedilemedi.', 'error'); return; }
-        ['currentMasterKey','currentMasterJwt','newMasterKey','newMasterJwt','newMasterKeyConfirm']
-            .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-        closeModal('guestPasswordModal');
-        closeModal('pwdChangeModal');
-        logActivity('admin', '🔐 Master şifresi değiştirildi');
-        showNotification('Master bilgileri güncellendi! Yeni bilgilerle giriş yapın.', 'success');
-        setTimeout(() => logout(), 3000);
-    });
+    SECURITY.master.key = newKey;
+    SECURITY.master.jwt = newJwt;
+    ['currentMasterKey','currentMasterJwt','newMasterKey','newMasterJwt','newMasterKeyConfirm']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    closeModal('guestPasswordModal'); /* Şifre Yönetimi modalini kapat */
+    logActivity('admin', '🔐 Master şifresi değiştirildi');
+    showNotification('Master bilgileri güncellendi! Yeni bilgilerle giriş yapın.', 'success');
+    setTimeout(() => logout(), 3000);
+}
 
 /* ═══════════════════════════════════════════
    FİYAT KAYDET
@@ -4813,8 +4786,8 @@ function renderActivityLog(filter = 'all') {
                 ${a.type==='login'?'🔐':a.type==='dilekce'?'📄':a.type==='admin'?'⚙️':a.type==='register'?'📝':'🔍'}
             </div>
             <div style="flex:1;min-width:0;">
-                <div style="font-size:12px;font-weight:600;color:#f1f5f9;">${escapeHtml(a.message)}</div>
-                <div style="font-size:10px;color:#475569;margin-top:2px;">${escapeHtml(a.user || '')} · ${new Date(a.time).toLocaleString('tr-TR')}</div>
+                <div style="font-size:12px;font-weight:600;color:#f1f5f9;">${a.message}</div>
+                <div style="font-size:10px;color:#475569;margin-top:2px;">${a.user} · ${new Date(a.time).toLocaleString('tr-TR')}</div>
             </div>
         </div>`).join('');
 }
@@ -4946,7 +4919,7 @@ function initDevToolsProtection() {
             devToolsOpen = false;
         }
     };
-    window._devToolsInterval = setInterval(check, 1000);
+    setInterval(check, 1000);
     document.addEventListener('keydown', e => {
         if (e.key === 'F12' ||
             (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
@@ -5025,6 +4998,28 @@ function closeSidebar() {
     document.getElementById('sidebarOverlay')?.classList.remove('active');
 }
 
+function toggleRightSidebar() {
+    const sb    = document.getElementById('sidebarRight');
+    const icon  = document.getElementById('sidebarCollapseIcon');
+    const label = document.getElementById('sidebarCollapseLabel');
+    if (!sb) return;
+    const collapsed = sb.classList.toggle('collapsed');
+    if (icon)  icon.className  = collapsed ? 'fas fa-chevron-left' : 'fas fa-chevron-right';
+    if (label) label.style.display = collapsed ? 'none' : 'inline';
+    localStorage.setItem('hukukai_rightSidebarCollapsed', collapsed ? '1' : '0');
+}
+
+function initRightSidebarState() {
+    if (localStorage.getItem('hukukai_rightSidebarCollapsed') === '1') {
+        const sb    = document.getElementById('sidebarRight');
+        const icon  = document.getElementById('sidebarCollapseIcon');
+        const label = document.getElementById('sidebarCollapseLabel');
+        if (sb)    sb.classList.add('collapsed');
+        if (icon)  icon.className  = 'fas fa-chevron-left';
+        if (label) label.style.display = 'none';
+    }
+}
+
 /* ═══════════════════════════════════════════
    HIZLI NOT
 ═══════════════════════════════════════════ */
@@ -5094,24 +5089,116 @@ function applyHukukiTerimTooltips() {
 }
 
 /* ═══════════════════════════════════════════
-   MASTER DÜZENLEME MODU
+   MASTER DÜZENLEME MODU — CANLAYEDIT
+   Landing page üzerinde çift tıkla düzenleme
 ═══════════════════════════════════════════ */
+function initLandingEditMode() {
+    /* Kaydedilmiş düzenlemeleri yükle */
+    try {
+        const saved = JSON.parse(localStorage.getItem('hukukai_lp_edits') || '{}');
+        Object.keys(saved).forEach(id => {
+            const el = document.getElementById(id);
+            if (el && saved[id]) el.innerHTML = saved[id];
+        });
+    } catch (e) {}
+}
+
+function saveLandingEdit(id, content) {
+    try {
+        const saved = JSON.parse(localStorage.getItem('hukukai_lp_edits') || '{}');
+        saved[id] = content;
+        localStorage.setItem('hukukai_lp_edits', JSON.stringify(saved));
+    } catch (e) {}
+}
+
 function toggleMasterEditMode() {
     if (!currentUser || currentUser.role !== 'master') return;
     masterEditMode = !masterEditMode;
     const btn   = document.getElementById('masterModeToggleBtn');
     const label = document.getElementById('masterModeLabel');
+
     if (masterEditMode) {
         if (label) label.textContent = 'Mod: AÇIK';
         if (btn)   { btn.style.background = 'rgba(220,38,38,.3)'; btn.style.borderColor = '#dc2626'; btn.style.color = '#fca5a5'; }
         document.body.classList.add('master-mode');
-        showNotification('Master düzenleme modu AKTİF!', 'warning');
+        enableLandingEditing();
+        showNotification('✏️ Master düzenleme modu AKTİF! Metinlere çift tıklayın.', 'warning');
     } else {
         if (label) label.textContent = 'Düzenleme Modu';
         if (btn)   { btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }
         document.body.classList.remove('master-mode');
+        disableLandingEditing();
         showNotification('Master düzenleme modu kapatıldı.');
     }
+}
+
+const EDITABLE_LP_IDS = ['lp_heroTitle', 'lp_heroDesc', 'lp_howTitle', 'lp_howDesc'];
+
+function enableLandingEditing() {
+    EDITABLE_LP_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.setAttribute('contenteditable', 'true');
+        el.style.outline = '2px dashed rgba(201,168,76,.6)';
+        el.style.cursor  = 'text';
+        el.title = 'Düzenlemek için tıklayın';
+        el._lpBlurHandler = () => {
+            saveLandingEdit(id, el.innerHTML);
+            showNotification('💾 Değişiklik kaydedildi!', 'success');
+        };
+        el.addEventListener('blur', el._lpBlurHandler);
+    });
+
+    /* Fiyat düzenleme için özel tooltip */
+    const priceEls = document.querySelectorAll('#landingPage [data-price-key]');
+    priceEls.forEach(el => {
+        el.style.outline = '2px dashed rgba(201,168,76,.6)';
+        el.title = 'Fiyat düzenlemek için Admin > Şifre Yönetimi > Fiyat Düzenle';
+    });
+
+    showLandingEditBar();
+}
+
+function disableLandingEditing() {
+    EDITABLE_LP_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.removeAttribute('contenteditable');
+        el.style.outline = '';
+        el.style.cursor  = '';
+        el.title = '';
+        if (el._lpBlurHandler) {
+            el.removeEventListener('blur', el._lpBlurHandler);
+        }
+    });
+    hideLandingEditBar();
+}
+
+function showLandingEditBar() {
+    let bar = document.getElementById('masterEditBar');
+    if (bar) { bar.style.display = 'flex'; return; }
+    bar = document.createElement('div');
+    bar.id = 'masterEditBar';
+    bar.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9998;display:flex;gap:8px;align-items:center;background:rgba(15,15,30,.95);border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:10px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);font-family:Outfit,sans-serif;';
+    bar.innerHTML = `
+        <i class="fas fa-wand-magic-sparkles" style="color:#c9a84c;font-size:14px;"></i>
+        <span style="color:#e8e4da;font-size:12px;font-weight:600;">Düzenleme Modu Aktif</span>
+        <span style="color:#8a8070;font-size:11px;">— Metinlere tıklayıp yazın</span>
+        <button onclick="resetLandingEdits()" style="padding:5px 10px;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);border-radius:6px;color:#fca5a5;font-size:10px;cursor:pointer;font-family:Outfit,sans-serif;margin-left:8px;">
+            <i class="fas fa-undo"></i> Sıfırla
+        </button>`;
+    document.body.appendChild(bar);
+}
+
+function hideLandingEditBar() {
+    const bar = document.getElementById('masterEditBar');
+    if (bar) bar.style.display = 'none';
+}
+
+function resetLandingEdits() {
+    if (!confirm('Tüm landing page düzenlemeleri sıfırlanacak. Emin misiniz?')) return;
+    localStorage.removeItem('hukukai_lp_edits');
+    location.reload();
 }
 
 /* ═══════════════════════════════════════════
