@@ -32,6 +32,7 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -272,7 +273,7 @@
         .lf-back { width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.06); background:transparent; color:#475569; font-family:'Outfit',sans-serif; font-size:12px; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; }
         .lf-back:hover { border-color:rgba(255,255,255,.15); color:#94a3b8; }
         .lf-version { text-align:center; font-size:10px; color:#1e293b; margin-top:16px; }
-        .login-attempts-badge { position:fixed; top:20px; right:20px; background:rgba(220,38,38,.15); border:1px solid rgba(220,38,38,.4); color:#fca5a5; padding:10px 16px; border-radius:10px; font-size:12px; z-index:10000; display:none; align-items:center; gap:8px; backdrop-filter:blur(10px); animation:slideInRight .3s ease; }
+        .login-attempts-badge { background:rgba(220,38,38,.15); border:1px solid rgba(220,38,38,.4); color:#fca5a5; padding:10px 16px; border-radius:10px; font-size:12px; z-index:10000; display:none; align-items:center; gap:8px; backdrop-filter:blur(10px); animation:slideInRight .3s ease; }
         .login-attempts-badge.show { display:flex; }
         @keyframes slideInRight { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
 
@@ -339,7 +340,7 @@
         .quick-sources { padding:12px; flex:1; overflow-y:auto; }
         .source-category { margin-bottom:12px; }
         .source-category-title { font-size:10px; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:6px; letter-spacing:.5px; }
-        .source-link { display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:4px; background:rgba(30,27,75,.5); border:1px solid var(--border-light); border-radius:6px; cursor:pointer; transition:all .2s; font-size:11px; color:var(--text); text-decoration:none; }
+        .source-link { display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:4px; background:rgba(30,27,75,.5); border:1px solid var(--border-light); border-radius:6px; cursor:pointer !important; pointer-events:auto !important; transition:all .2s; font-size:11px; color:var(--text); text-decoration:none; }
         .source-link:hover { background:rgba(220,38,38,.2); border-color:var(--primary); color:#fff; transform:translateX(3px); }
         .source-link i { color:var(--primary); width:16px; font-size:13px; }
         .whatsapp-simple { padding:8px; text-align:center; border-top:1px solid var(--border); font-size:11px; color:#25d366; }
@@ -607,8 +608,7 @@
 @keyframes lpShimmer { 0%{left:-100%} 100%{left:100%} }
 @keyframes lpRotate { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 @keyframes lpSlideUp { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
-/* LP Font imports */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+/* LP Font imports — moved to <head> */
 /* LP Responsive */
 @media (max-width:1024px) {
     #landingPage section[style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; padding:60px 40px !important; }
@@ -1222,7 +1222,7 @@
 </div>
 
 <!-- GİRİŞ/KAYIT MODALİ (landing içi) -->
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeLpModal()">
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeLpModal()">
     <div id="lpModalCard" style="width:100%;max-width:460px;background:linear-gradient(145deg,#13131f,#0d0d18);border:1px solid rgba(201,168,76,.25);border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;animation:lpModalIn .35s cubic-bezier(.34,1.56,.64,1);">
         <!-- ÜSTTÜR -->
         <div style="height:3px;background:linear-gradient(90deg,#c9a84c,#8b1a1a,#c9a84c);"></div>
@@ -1247,9 +1247,15 @@
             </button>
         </div>
         <!-- LOCKOUT BADGE -->
-        <div class="login-attempts-badge" id="loginAttemptsBadge" style="display:none;margin:12px 28px 0;padding:10px 14px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:10px;color:#fca5a5;font-size:12px;gap:8px;align-items:center;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span id="loginAttemptsText">Çok fazla deneme! 30 saniye bekleyin.</span>
+        <div id="loginAttemptsBadge" style="display:none;margin:12px 28px 0;padding:12px 16px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:10px;color:#fca5a5;font-size:12px;gap:8px;align-items:center;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-lock"></i>
+                <span id="loginAttemptsText">Çok fazla deneme! 30 saniye bekleyin.</span>
+            </div>
+            <div style="width:100%;background:rgba(220,38,38,.15);border-radius:4px;height:4px;overflow:hidden;">
+                <div id="lockoutProgressBar" style="height:100%;background:#ef4444;border-radius:4px;width:100%;transition:width 1s linear;"></div>
+            </div>
+            <div style="font-size:11px;color:#f87171;font-weight:700;"><span id="lockoutCountdown">30</span> saniye kaldı</div>
         </div>
         <!-- FORM ALANI -->
         <div style="padding:20px 28px 28px;">
@@ -1621,6 +1627,9 @@
                     <button class="header-btn" id="masterModeToggleBtn" onclick="toggleMasterEditMode()" style="background:rgba(124,58,237,.2);border-color:var(--accent);color:var(--accent-light);">
                         <i class="fas fa-wand-magic-sparkles"></i> <span id="masterModeLabel">Düzenleme Modu</span>
                     </button>
+                    <button class="header-btn" id="livePreviewBtn" onclick="openLivePreview()" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:#34d399;display:none;">
+                        <i class="fas fa-eye"></i> Canlı Önizle
+                    </button>
                 </div>
                 <button class="header-btn" onclick="openProfileModal()" style="background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.4);color:#a78bfa;" title="Profil Fotoğrafı"><i class="fas fa-user-circle"></i></button>
             </div>
@@ -1743,6 +1752,9 @@
             <div class="source-category" data-category="yargi">
                 <div class="source-category-title"><i class="fas fa-gavel"></i> <span class="cat-title">Yargı Kararları</span></div>
                 <a href="https://karararama.yargitay.gov.tr" target="_blank" class="source-link"><i class="fas fa-balance-scale"></i><span>Yargıtay Karar Arama</span></a>
+                <a href="https://yargitayictihatmerkezi.gov.tr" target="_blank" class="source-link"><i class="fas fa-star"></i><span>Yargıtay İçtihat Merkezi (YİM)</span></a>
+                <a href="https://karararama.bam.adalet.gov.tr" target="_blank" class="source-link"><i class="fas fa-university"></i><span>BAM Kararları</span></a>
+                <a href="https://www.danistay.gov.tr" target="_blank" class="source-link"><i class="fas fa-building"></i><span>Danıştay</span></a>
                 <a href="https://www.anayasa.gov.tr" target="_blank" class="source-link"><i class="fas fa-landmark"></i><span>Anayasa Mahkemesi</span></a>
                 <a href="https://hudoc.echr.coe.int" target="_blank" class="source-link"><i class="fas fa-globe"></i><span>AİHM (HUDOC)</span></a>
             </div>
@@ -1815,7 +1827,6 @@
                 <option value="taksirle-yaralama">🚗 Taksirle Yaralama Şikayeti</option>
                 <option value="ticari-uyusmazlik">💼 Ticari Uyuşmazlık / TTK</option>
                 <option value="miras-red">📜 Mirasın Reddi</option>
-                <option value="icra-itiraz">📋 İcra Takibine İtiraz</option>
                 </optgroup>
                 </select></div>
                 <div class="form-grid">
@@ -2459,6 +2470,18 @@ function openLpModal(tab) {
     const overlay = document.getElementById('loginOverlay');
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    // Önceki değerleri temizle
+    ['subUsername','subPassword','masterKeyInput','jwtInput',
+     'regFullName','regEmail','regUsername','regPassword'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const kvkk = document.getElementById('regKvkkCheck');
+    const cookie = document.getElementById('regCookieCheck');
+    if (kvkk) kvkk.checked = false;
+    if (cookie) cookie.checked = false;
+    const badge = document.getElementById('loginAttemptsBadge');
+    if (badge && !isLocked) badge.style.display = 'none';
     setLpTab(tab || 'login');
 }
 function closeLpModal() {
@@ -2474,6 +2497,15 @@ function setLpTab(tab) {
     const masterForm = document.getElementById('masterForm');
     const subtitle = document.getElementById('lpModalSubtitle');
     [subForm, regForm, masterForm].forEach(f => { if(f) f.style.display = 'none'; });
+
+    // Hataları ve banner'ı temizle
+    ['masterError','subError','regError'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.style.display = 'none'; if(el._hideTimer) clearTimeout(el._hideTimer); }
+    });
+    const pb = document.getElementById('pendingBanner');
+    if (pb) pb.style.display = 'none';
+
     if (tab === 'login') {
         if (subForm) subForm.style.display = 'block';
         if (loginTab) { loginTab.style.background='linear-gradient(135deg,#c9a84c,#a8833a)'; loginTab.style.color='#0a0a0f'; }
@@ -2525,9 +2557,11 @@ function lpCookieReddet() {
 // RESEND E-POSTA BİLDİRİM SİSTEMİ
 // ============================================================
 async function sendResendEmail(subject, htmlBody, toOverride) {
+    // Not: Bu fonksiyon sadece sunucu taraflı API anahtarı ile çalışır.
+    // Tarayıcıdan çağrıldığında CORS engeli nedeniyle sessizce başarısız olur.
     try {
         const toArr = toOverride ? [toOverride] : ['info@hukukai.pro'];
-        await fetch('https://api.resend.com/emails', {
+        const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2540,7 +2574,11 @@ async function sendResendEmail(subject, htmlBody, toOverride) {
                 html: htmlBody
             })
         });
-    } catch(e) { console.warn('Resend gönderilemedi:', e); }
+        return res.ok;
+    } catch(e) {
+        // CORS veya ağ hatası — beklenen davranış, konsol kirliliği önlemek için sessiz
+        return false;
+    }
 }
 
 // ── Onay/Red Token Sistemi ──
@@ -3014,17 +3052,35 @@ function setLoginTab(tab) {
 // ============================================================
 async function handleMasterLogin() {
     if (isLocked) return;
-    const key = document.getElementById('masterKeyInput').value;
-    const jwt = document.getElementById('jwtInput').value;
+    const key = (document.getElementById('masterKeyInput')?.value || '').trim();
+    const jwt = (document.getElementById('jwtInput')?.value || '').trim();
+
+    // Boş alan kontrolü
+    if (!key || !jwt) {
+        showLoginError('master', 'Master key ve JWT token boş bırakılamaz!');
+        return;
+    }
+
+    // Önceki hatayı gizle
+    const errEl = document.getElementById('masterError');
+    if (errEl) errEl.style.display = 'none';
+
+    // Yükleniyor durumu
+    const btn = document.getElementById('masterSubmitBtn');
+    const origHTML = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Doğrulanıyor...'; }
+
     let apiOk = false;
     try {
         const r = await apiMasterLogin(key, jwt);
         if (r.ok) apiOk = true;
     } catch(e) {}
+
+    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+
     if (apiOk || (key === SECURITY.master.key && jwt === SECURITY.master.jwt)) {
         loginAttempts = 0;
         isDemoMode = false;
-        // Demo key'i temizle — master girişi demo modunu geçersiz kılar
         localStorage.removeItem('dSt4r7_' + btoa('demoStart'));
         currentUser = { role:'master', username:'Master Admin', loginTime:Date.now(), isDemo:false };
         createSession();
@@ -3045,8 +3101,24 @@ async function handleMasterLogin() {
 // ============================================================
 async function handleSubscriberLogin() {
     if (isLocked) return;
-    const username = document.getElementById('subUsername').value.trim();
-    const password = document.getElementById('subPassword').value;
+    const username = (document.getElementById('subUsername')?.value || '').trim();
+    const password = (document.getElementById('subPassword')?.value || '');
+
+    // Boş alan kontrolü
+    if (!username) { showLoginError('sub','Kullanıcı adı veya e-posta boş bırakılamaz!'); return; }
+    if (!password) { showLoginError('sub','Şifre boş bırakılamaz!'); return; }
+
+    // Önceki hatayı gizle
+    const errEl = document.getElementById('subError');
+    if (errEl) errEl.style.display = 'none';
+    const pb = document.getElementById('pendingBanner');
+    if (pb) pb.style.display = 'none';
+
+    // Yükleniyor durumu
+    const btn = document.getElementById('subSubmitBtn');
+    const origHTML = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...'; }
+
     try {
         const apiResult = await apiUserLogin(username, password);
         if (apiResult.ok) {
@@ -3061,12 +3133,13 @@ async function handleSubscriberLogin() {
             updateHeroSavedCount();
             logActivity('login', u.username + ' giriş yaptı (API)');
             showNotification(`Hoş geldiniz, ${u.username}!`);
+            if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
             return;
         }
         if (!apiResult.offline) {
-            const errMsg = apiResult.data ? apiResult.data.error : 'Hata';
+            const errMsg = (apiResult.data && apiResult.data.error) ? apiResult.data.error : 'Hatalı bilgiler!';
+            if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
             if (errMsg && errMsg.includes('onay bekliyor')) {
-                const pb = document.getElementById('pendingBanner');
                 if (pb) pb.style.display = 'block';
                 return;
             }
@@ -3076,11 +3149,12 @@ async function handleSubscriberLogin() {
         }
     } catch(e) {}
 
-    const pending = usersDB.pending.find(u => (u.username === username || u.email === username));
+    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+
+    // API çevrimdışı → localStorage'a bak
+    const pending = usersDB.pending.find(u => u.username === username || u.email === username);
     if (pending) {
-        const pb = document.getElementById('pendingBanner');
-        if (pb) pb.style.display = 'block';
-        return;
+        if (pending.status === 'pending') { if (pb) pb.style.display = 'block'; return; }
     }
 
     const user = usersDB.guests.find(u =>
@@ -3088,8 +3162,8 @@ async function handleSubscriberLogin() {
     );
 
     if (user) {
-        if (user.status === 'blocked') { showLoginError('sub','Hesabınız engellenmiştir!'); return; }
-        if (user.status === 'passive') { showLoginError('sub','Hesabınız pasif durumdadır!'); return; }
+        if (user.status === 'blocked') { showLoginError('sub','Hesabınız engellenmiştir. Yönetici ile iletişime geçin.'); return; }
+        if (user.status === 'passive') { showLoginError('sub','Hesabınız pasif durumdadır. Yönetici ile iletişime geçin.'); return; }
         loginAttempts = 0;
         user.lastLogin = new Date().toISOString();
         saveUsersDB();
@@ -3129,16 +3203,27 @@ async function handleRegister() {
     const existsPending = usersDB.pending.find(u => u.username === username || u.email === email);
     if (existsGuest || existsPending) { showLoginError('reg','Bu kullanıcı adı veya e-posta zaten kayıtlı!'); return; }
 
+    // Önceki hatayı gizle & yükleniyor durumu
+    const errEl = document.getElementById('regError');
+    if (errEl) errEl.style.display = 'none';
+    const regBtn = document.querySelector('#registerForm .lf-submit');
+    const origHTML = regBtn ? regBtn.innerHTML : '';
+    if (regBtn) { regBtn.disabled = true; regBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...'; }
+
     try {
         const r = await apiCall('/auth?action=register', 'POST', { fullName, email, username, password });
         if (r.ok) {
+            if (regBtn) { regBtn.disabled = false; regBtn.innerHTML = origHTML; }
             showPendingApprovalScreen(fullName, email);
             return;
         } else if (!r.offline) {
+            if (regBtn) { regBtn.disabled = false; regBtn.innerHTML = origHTML; }
             showLoginError('reg', r.data?.error || 'Kayıt hatası');
             return;
         }
     } catch(e) {}
+
+    if (regBtn) { regBtn.disabled = false; regBtn.innerHTML = origHTML; }
 
     const newPending = {
         id: Date.now(), username, email, password, fullName,
@@ -3170,47 +3255,37 @@ async function handleRegister() {
                     <a href="${reddetUrl}" style="display:block;text-align:center;background:linear-gradient(90deg,#dc2626,#b91c1c);color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">❌ Reddet</a>
                 </div>
             </div>
-            <div style="background:rgba(124,58,237,.15);padding:14px 28px;font-size:12px;color:#a78bfa;text-align:center;">
-                hukukai.pro — Kayıt Talep Bildirimi
-            </div>
         </div>`;
     sendResendEmail('📝 Yeni Kayıt Talebi — ' + fullName, regHtml);
-
     showPendingApprovalScreen(fullName, email);
 }
 
 function showPendingApprovalScreen(fullName, email) {
-    // Login kartının içini "onay bekleniyor" ekranıyla değiştir
-    const loginOverlay = document.getElementById('loginOverlay');
-    if (!loginOverlay) return;
-
-    // Kart içeriğini değiştir
-    const card = loginOverlay.querySelector('.login-card');
+    const card = document.getElementById('lpModalCard');
     if (!card) return;
-
     card.innerHTML = `
-        <div class="login-card-top-bar"></div>
-        <div style="padding:40px 32px;text-align:center;">
-            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:ringPulse 2s infinite;">
+        <div style="height:3px;background:linear-gradient(90deg,#f59e0b,#c9a84c);"></div>
+        <div style="padding:36px 28px;text-align:center;">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:ringPulse 2s infinite;">
                 <i class="fas fa-clock" style="font-size:32px;color:#f59e0b;"></i>
             </div>
-            <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;">Talebiniz Alındı!</div>
-            <div style="font-size:14px;color:#f59e0b;font-weight:600;margin-bottom:16px;">Hesabınız İnceleniyor</div>
-            <div style="font-size:13px;color:var(--text-muted);line-height:1.8;margin-bottom:24px;">
-                Merhaba <strong style="color:var(--text);">${fullName}</strong>,<br>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#e8e4da;margin-bottom:6px;">Talebiniz Alındı!</div>
+            <div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:16px;">Hesabınız İnceleniyor</div>
+            <div style="font-size:13px;color:#8a8070;line-height:1.8;margin-bottom:20px;">
+                Merhaba <strong style="color:#e8e4da;">${fullName}</strong>,<br>
                 Kaydınız başarıyla alındı. Yönetici en kısa sürede hesabınızı onaylayacak.<br><br>
-                Onay bildirimi <strong style="color:var(--accent-light);">${email}</strong> adresine gönderilecektir.
+                Onay bildirimi <strong style="color:#c9a84c;">${email}</strong> adresine gönderilecektir.
             </div>
-            <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:16px;margin-bottom:24px;">
-                <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Ortalama onay süresi</div>
-                <div style="font-size:20px;font-weight:800;color:#f59e0b;">24 Saat</div>
+            <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;margin-bottom:20px;">
+                <div style="font-size:11px;color:#8a8070;margin-bottom:4px;">Ortalama onay süresi</div>
+                <div style="font-size:22px;font-weight:800;color:#f59e0b;">24 Saat</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-                <button onclick="location.reload()" style="padding:12px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;">
+                <button onclick="setLpTab('login')" style="padding:12px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
                     <i class="fas fa-sign-in-alt"></i> Onaylandım, Giriş Yap
                 </button>
-                <button onclick="location.reload()" style="padding:10px;background:transparent;border:1px solid var(--border-light);border-radius:10px;color:var(--text-muted);font-size:12px;cursor:pointer;font-family:Outfit,sans-serif;">
-                    <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
+                <button onclick="closeLpModal()" style="padding:10px;background:transparent;border:1px solid rgba(201,168,76,.2);border-radius:10px;color:#8a8070;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                    <i class="fas fa-arrow-left"></i> Kapat
                 </button>
             </div>
         </div>`;
@@ -3219,11 +3294,15 @@ function showPendingApprovalScreen(fullName, email) {
 function showLoginError(type, msg) {
     const err = document.getElementById(type + 'Error');
     const errText = document.getElementById(type + 'ErrorText');
-    if (err && errText) {
-        errText.textContent = msg;
-        err.style.display = 'flex';
-        setTimeout(() => { err.style.display = 'none'; }, 5000);
-    }
+    if (!err || !errText) return;
+    errText.textContent = msg;
+    err.style.display = 'flex';
+    err.style.animation = 'none';
+    // restart shake animation
+    void err.offsetWidth;
+    err.style.animation = '';
+    if (err._hideTimer) clearTimeout(err._hideTimer);
+    err._hideTimer = setTimeout(() => { err.style.display = 'none'; }, 6000);
 }
 
 function handleFailedLogin(type) {
@@ -3240,11 +3319,24 @@ function handleFailedLogin(type) {
 function lockLoginUI() {
     isLocked = true;
     const badge = document.getElementById('loginAttemptsBadge');
+    const bar   = document.getElementById('lockoutProgressBar');
+    const countdown = document.getElementById('lockoutCountdown');
     if (badge) badge.style.display = 'flex';
     document.querySelectorAll('.lf-submit').forEach(btn => btn.disabled = true);
+    const totalSec = LOCKOUT_DURATION / 1000;
+    let remaining = totalSec;
+    if (countdown) countdown.textContent = remaining;
+    if (bar) bar.style.width = '100%';
+    const tick = setInterval(() => {
+        remaining--;
+        if (countdown) countdown.textContent = remaining;
+        if (bar) bar.style.width = ((remaining / totalSec) * 100) + '%';
+        if (remaining <= 0) clearInterval(tick);
+    }, 1000);
     setTimeout(() => {
         isLocked = false;
         loginAttempts = 0;
+        clearInterval(tick);
         if (badge) badge.style.display = 'none';
         document.querySelectorAll('.lf-submit').forEach(btn => btn.disabled = false);
     }, LOCKOUT_DURATION);
@@ -3291,9 +3383,16 @@ function clearSession() {
 }
 
 function showMainApp() {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('landingPage').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'flex';
+    const lo = document.getElementById('loginOverlay');
+    const lp = document.getElementById('landingPage');
+    const ma = document.getElementById('mainApp');
+    if (lo) lo.style.display = 'none';
+    if (lp) lp.style.display = 'none';
+    if (ma) ma.style.display = 'flex';
+    document.body.style.overflow = '';
+    // Cookie banner'ı kapat
+    const cb = document.getElementById('lpCookieBanner');
+    if (cb) cb.style.display = 'none';
 }
 
 function logout() {
@@ -3382,6 +3481,7 @@ function toggleMasterEditMode() {
     masterEditMode = !masterEditMode;
     const btn = document.getElementById('masterModeToggleBtn');
     const label = document.getElementById('masterModeLabel');
+    const previewBtn = document.getElementById('livePreviewBtn');
     const body = document.body;
     if (masterEditMode) {
         label.textContent = 'Mod: AÇIK';
@@ -3390,6 +3490,8 @@ function toggleMasterEditMode() {
         btn.style.color = '#fca5a5';
         body.classList.add('master-mode');
         enableMasterEditing();
+        if (previewBtn) previewBtn.style.display = '';
+        startPreviewObserver();
         showNotification('Master düzenleme modu AKTİF!', 'warning');
     } else {
         label.textContent = 'Düzenleme Modu';
@@ -3398,6 +3500,8 @@ function toggleMasterEditMode() {
         btn.style.color = '';
         body.classList.remove('master-mode');
         disableMasterEditing();
+        if (previewBtn) previewBtn.style.display = 'none';
+        stopPreviewObserver();
         showNotification('Master düzenleme modu kapatıldı.');
     }
 }
@@ -3411,7 +3515,15 @@ function enableMasterEditing() {
         if (!el.querySelector('.master-edit-dot')) {
             const dot = document.createElement('span');
             dot.className = 'master-edit-dot';
-            dot.style.cssText = 'display:inline-block;width:6px;height:6px;border-radius:50%;background:#f59e0b;margin-left:6px;';
+            dot.style.cssText = 'display:inline-block;width:6px;height:6px;border-radius:50%;background:#f59e0b;margin-left:6px;flex-shrink:0;';
+            el.appendChild(dot);
+        }
+    });
+    document.querySelectorAll('.source-link').forEach(el => {
+        if (!el.querySelector('.master-edit-dot')) {
+            const dot = document.createElement('span');
+            dot.className = 'master-edit-dot';
+            dot.style.cssText = 'display:inline-block;width:6px;height:6px;border-radius:50%;background:#f59e0b;margin-left:auto;flex-shrink:0;';
             el.appendChild(dot);
         }
     });
@@ -3424,6 +3536,84 @@ function disableMasterEditing() {
     });
     document.querySelectorAll('.master-edit-dot').forEach(d => d.remove());
 }
+
+// ============================================================
+// CANLI ÖNİZLEME
+// ============================================================
+let _previewObserver = null;
+let _previewDebounceTimer = null;
+
+function startPreviewObserver() {
+    if (_previewObserver) return;
+    _previewObserver = new MutationObserver(() => {
+        clearTimeout(_previewDebounceTimer);
+        _previewDebounceTimer = setTimeout(() => {
+            const modal = document.getElementById('livePreviewModal');
+            if (modal && modal.classList.contains('active')) {
+                _injectPreviewContent();
+                const st = document.getElementById('livePreviewStatus');
+                if (st) { st.textContent = 'GÜNCELLENDİ'; setTimeout(() => { if(st) st.textContent = 'CANLI'; }, 1200); }
+            }
+        }, 600);
+    });
+    _previewObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
+}
+
+function stopPreviewObserver() {
+    if (_previewObserver) { _previewObserver.disconnect(); _previewObserver = null; }
+    clearTimeout(_previewDebounceTimer);
+}
+
+function _injectPreviewContent() {
+    const frame = document.getElementById('livePreviewFrame');
+    if (!frame) return;
+    // Sayfanın mevcut tam HTML'ini iframe'e yaz (live state)
+    const html = '<!DOCTYPE html>' + document.documentElement.outerHTML;
+    try {
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const old = frame.getAttribute('data-bloburl');
+        frame.src = url;
+        frame.setAttribute('data-bloburl', url);
+        if (old) setTimeout(() => URL.revokeObjectURL(old), 3000);
+    } catch(e) {
+        frame.srcdoc = html;
+    }
+}
+
+function openLivePreview() {
+    const modal = document.getElementById('livePreviewModal');
+    if (!modal) return;
+    modal.classList.add('active');
+    document.getElementById('livePreviewLoading').style.display = 'flex';
+    _attachFrameLoad();
+    _injectPreviewContent();
+}
+
+function onPreviewFrameLoad() {
+    const loading = document.getElementById('livePreviewLoading');
+    if (loading) loading.style.display = 'none';
+}
+
+function _attachFrameLoad() {
+    const frame = document.getElementById('livePreviewFrame');
+    if (!frame) return;
+    frame.onload = onPreviewFrameLoad;
+}
+
+function closeLivePreview() {
+    const modal = document.getElementById('livePreviewModal');
+    if (modal) modal.classList.remove('active');
+}
+
+function refreshLivePreview() {
+    const icon = document.getElementById('refreshIcon');
+    if (icon) { icon.classList.add('fa-spin'); setTimeout(() => icon.classList.remove('fa-spin'), 800); }
+    document.getElementById('livePreviewLoading').style.display = 'flex';
+    _attachFrameLoad();
+    _injectPreviewContent();
+}
+
 
 function masterContextMenu(e) {
     e.preventDefault();
@@ -3454,6 +3644,11 @@ function applyInlineEdit() {
     closeModal('inlineEditModal');
     inlineEditTarget = null;
     showNotification('Eleman güncellendi!');
+    // Canlı önizleme açıksa otomatik güncelle
+    const previewModal = document.getElementById('livePreviewModal');
+    if (previewModal && previewModal.classList.contains('active')) {
+        setTimeout(_injectPreviewContent, 200);
+    }
 }
 
 function removeEditTarget() {
@@ -3463,6 +3658,10 @@ function removeEditTarget() {
     closeModal('inlineEditModal');
     inlineEditTarget = null;
     showNotification('Eleman kaldırıldı!');
+    const previewModal = document.getElementById('livePreviewModal');
+    if (previewModal && previewModal.classList.contains('active')) {
+        setTimeout(_injectPreviewContent, 200);
+    }
 }
 // ============================================================
 // KULLANICI VERİTABANI (localStorage)
@@ -3498,11 +3697,13 @@ function openAdminPanel() {
 }
 
 function openFullAdminPanel() {
-    // Create full panel on demand if needed
     loadAdminStats();
     renderUserCards();
     renderPendingUsers();
     updateHeaderMiniStats();
+    const modal = document.getElementById('fullAdminPanelModal');
+    if (modal) modal.classList.add('active');
+    switchAdminTab('users');
 }
 
 function renderOnlineUsers() {
@@ -4731,7 +4932,13 @@ function openModal(id) {
 }
 function closeModal(id) {
     const el = document.getElementById(id);
-    if (el) { el.classList.remove('active'); el.style.display=''; }
+    if (!el) return;
+    el.classList.remove('active');
+    if (id === 'aiAnalysisModal') {
+        el.style.cssText = 'display:none!important;';
+    } else {
+        el.style.display = '';
+    }
 }
 
 function openAkilliDilekceModal() { document.getElementById('akilliDilekceModal').classList.add('active'); }
@@ -4955,6 +5162,12 @@ function addViolation() {
     updateViolationBadge();
     logActivity('admin', `⚠️ İhlal eklendi: ${user.username} - ${reason}`);
     showNotification('İhlal kaydedildi!', 'warning');
+}
+
+function loadViolationList() {
+    violationList = JSON.parse(localStorage.getItem('violationList') || '[]');
+    renderViolationList();
+    updateViolationBadge();
 }
 
 function renderViolationList() {
@@ -5310,11 +5523,17 @@ function closeIntro() {
 // ============================================================
 function openAIAnalysisModal() {
     let modal = document.getElementById('aiAnalysisModal');
+    // Gizli wrapper içindeyse çıkar, body'e taşı
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'aiAnalysisModal';
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `<div class="modal" style="max-width:680px;">
+    } else if (modal.parentNode && modal.parentNode !== document.body) {
+        modal.parentNode.removeChild(modal);
+    }
+    document.body.appendChild(modal);
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position:fixed!important;inset:0!important;background:rgba(0,0,0,.85)!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:99998!important;padding:20px!important;backdrop-filter:blur(10px)!important;';
+    modal.innerHTML = `<div class="modal" style="max-width:680px;">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.2));">
                 <div class="modal-title"><i class="fas fa-brain" style="color:#a78bfa;"></i> Olayımı Anlat — AI Hukuki Analiz <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div>
                 <button class="modal-close" onclick="closeModal('aiAnalysisModal')"><i class="fas fa-times"></i></button>
@@ -5327,26 +5546,22 @@ function openAIAnalysisModal() {
                     <label class="form-label">Olayınızı Anlatın</label>
                     <div style="position:relative;">
                         <textarea id="aiAnalysisText" class="form-textarea" rows="7" placeholder="Örnek: 2018 yılında evlendim, 2 çocuğumuz var. Eşim 6 aydır beni terk etti. Çocuklar benimle. Boşanmak ve nafaka almak istiyorum..." style="min-height:160px;font-size:13px;line-height:1.7;padding-right:48px;"></textarea>
-                        <button id="micBtn" onclick="toggleMic()" title="Sesli anlatım" style="position:absolute;bottom:10px;right:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(124,58,237,.3);color:#a78bfa;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;">
+                        <button type="button" id="micBtn" onclick="toggleMic()" title="Sesli anlatım" style="position:absolute;bottom:10px;right:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(124,58,237,.3);color:#a78bfa;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-microphone"></i>
                         </button>
                     </div>
-                    <div id="micStatus" style="display:none;font-size:11px;color:#a78bfa;text-align:center;padding:4px;animation:pulse 1s infinite;">
+                    <div id="micStatus" style="display:none;font-size:11px;color:#a78bfa;text-align:center;padding:4px;">
                         🎙️ Dinleniyor... Konuşmayı bitirmek için tekrar tıklayın
                     </div>
                 </div>
                 <div id="aiAnalysisResult" style="display:none;"></div>
-                <div style="display:flex;gap:10px;">
-                    <button onclick="runAIAnalysis()" id="aiAnalysisBtn" style="flex:1;padding:13px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="fas fa-brain"></i> AI ile Analiz Et</button>
-                    <button onclick="document.getElementById('aiAnalysisText').value='';document.getElementById('aiAnalysisResult').style.display='none';" style="padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#64748b;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-trash-alt"></i></button>
+                <div style="display:flex;gap:10px;margin-top:12px;">
+                    <button type="button" onclick="runAIAnalysis()" id="aiAnalysisBtn" style="flex:1;padding:13px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="fas fa-brain"></i> AI ile Analiz Et</button>
+                    <button type="button" onclick="document.getElementById('aiAnalysisText').value='';document.getElementById('aiAnalysisResult').style.display='none';" style="padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#64748b;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
         </div>`;
-        document.body.appendChild(modal);
-    }
     modal.classList.add('active');
-    const r = document.getElementById('aiAnalysisResult');
-    if (r) r.style.display = 'none';
 }
 
 function runAIAnalysis() {
@@ -5357,24 +5572,38 @@ function runAIAnalysis() {
     if (btn) { btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> AI Analiz Yapıyor...'; }
     setTimeout(() => {
         const analysis = localAIAnalysis(text);
+        // Sonucu global'e kaydet — onclick içinde newline problemi olmadan çağırılacak
+        window._lastAIAnalysis = { davaTuru: analysis.davaTuru, olay: text, talepler: analysis.talepler };
         if (btn) { btn.disabled=false; btn.innerHTML='<i class="fas fa-brain"></i> AI ile Analiz Et'; }
         if (result) {
             result.style.display = 'block';
             result.innerHTML = `<div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.3);border-radius:12px;padding:16px;margin-bottom:12px;">
                 <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:10px;"><i class="fas fa-check-circle"></i> AI Analiz Tamamlandı</div>
-                <div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Tespit Edilen Dava</div>
-                <div style="background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;font-size:13px;color:#a78bfa;font-weight:700;">${analysis.davaLabel}</div></div>
-                <div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Yasal Dayanaklar</div>
-                <div style="font-size:12px;color:#94a3b8;line-height:2;">${analysis.maddeList}</div></div>
-                <div><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Önerilen Talepler</div>
-                <div style="font-size:12px;color:#94a3b8;line-height:2;">${analysis.talepler.replace(/\n/g,'<br>')}</div></div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Tespit Edilen Dava</div>
+                    <div style="background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;font-size:13px;color:#a78bfa;font-weight:700;">${analysis.davaLabel}</div>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Yasal Dayanaklar</div>
+                    <div style="font-size:12px;color:#94a3b8;line-height:2;">${analysis.maddeList}</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Önerilen Talepler</div>
+                    <div style="font-size:12px;color:#94a3b8;line-height:1.8;">${analysis.talepler.replace(/\n/g,'<br>')}</div>
+                </div>
             </div>
-            <button onclick="applyAIAnalysis('${analysis.davaTuru}',\`${text.replace(/`/g,"'")}\`,\`${analysis.talepler.replace(/`/g,"'")}\`)"
-                style="width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;">
+            <button onclick="applyLastAIAnalysis()"
+                style="width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
                 <i class="fas fa-magic"></i> Bu Bilgilerle Dilekçe Oluştur
             </button>`;
         }
-    }, 1200); // Küçük bekleme - AI etkisi için
+    }, 1200);
+}
+
+function applyLastAIAnalysis() {
+    const a = window._lastAIAnalysis;
+    if (!a) return;
+    applyAIAnalysis(a.davaTuru, a.olay, a.talepler);
 }
 
 function localAIAnalysis(text) {
@@ -6096,12 +6325,11 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
 </div>
 
 
-<div class="modal-overlay" id="fullAdminOverlay">
-    id="fullAdminPanelModal">
+<div class="modal-overlay" id="fullAdminPanelModal">
     <div class="modal large" style="max-width:900px;max-height:90vh;">
         <div class="modal-header" style="background:linear-gradient(135deg,#0b0e1c,#0f0c24);border-bottom:1px solid rgba(220,38,38,.2);">
             <div class="modal-title"><i class="fas fa-shield-halved" style="color:#dc2626;"></i> Master Kontrol Paneli</div>
-            <button class="modal-close" onclick="closeModal('adminPanelModal')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="closeModal('fullAdminPanelModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body" style="padding:0;">
             <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3);">
@@ -6234,25 +6462,18 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
     </div>
 </div>
 
-<!-- Hidden stubs for JS compatibility -->
+<!-- Hidden stubs for JS compatibility — inputs required for .value.trim() calls -->
 <div style="display:none;">
-  <div id="aiAnalysisModal"></div>
   <div id="contactPhone"></div>
   <div id="cookieBanner"></div>
-  <div id="demoReqEmail"></div>
-  <div id="demoReqModal"></div>
-  <div id="demoReqName"></div>
-  <div id="demoReqNote"></div>
-  <div id="demoReqOrg"></div>
-  <div id="demoReqPhone"></div>
+  <input id="lpMDemoAd"    type="text"  value="">
+  <input id="lpMDemoEmail" type="email" value="">
+  <input id="lpMDemoTel"   type="tel"   value="">
+  <input id="lpMDemoNot"   type="text"  value="">
   <div id="loginParticles"></div>
   <div id="lpDemoModal"></div>
-  <div id="lpMDemoAd"></div>
-  <div id="lpMDemoEmail"></div>
-  <div id="lpMDemoNot"></div>
-  <div id="lpMDemoTel"></div>
   <div id="monthlyCard"></div>
-  <div id="monthlyPrice"></div>
+  <input id="monthlyPrice" type="text" value="">
   <div id="savedDilekcelerModal"></div>
   <div id="tabMaster"></div>
   <div id="tabRegister"></div>
@@ -6260,7 +6481,62 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
   <div id="telegramBotModal"></div>
   <div id="versionHistoryModal"></div>
   <div id="yearlyCard"></div>
-  <div id="yearlyPrice"></div>
+  <input id="yearlyPrice" type="text" value="">
 </div>
+
+<!-- DEMO TALEP MODALI -->
+<div class="modal-overlay" id="demoReqModal" onclick="if(event.target===this)closeModal('demoReqModal')">
+    <div class="modal" style="max-width:480px;">
+        <div class="modal-header" style="background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(91,33,182,.2));">
+            <div class="modal-title"><i class="fas fa-star" style="color:#a78bfa;"></i> Demo Talebi</div>
+            <button class="modal-close" onclick="closeModal('demoReqModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group"><label class="form-label">Ad Soyad *</label>
+                <input type="text"  class="form-input" id="demoReqName"  placeholder="Adınız soyadınız..."></div>
+            <div class="form-group"><label class="form-label">E-posta *</label>
+                <input type="email" class="form-input" id="demoReqEmail" placeholder="ornek@email.com..."></div>
+            <div class="form-group"><label class="form-label">Telefon</label>
+                <input type="tel"   class="form-input" id="demoReqPhone" placeholder="0500 000 00 00"></div>
+            <div class="form-group"><label class="form-label">Kurum / Firma</label>
+                <input type="text"  class="form-input" id="demoReqOrg"   placeholder="Kurum adı (opsiyonel)"></div>
+            <div class="form-group"><label class="form-label">Not</label>
+                <input type="text"  class="form-input" id="demoReqNote"  placeholder="Eklemek istedikleriniz..."></div>
+            <button onclick="submitDemoReq()" class="btn-primary btn-magic" style="margin-top:8px;">
+                <i class="fas fa-paper-plane"></i> Demo Talebi Gönder
+            </button>
+        </div>
+    </div>
+</div>
+<!-- CANLI ÖNİZLEME MODALI -->
+<div class="modal-overlay" id="livePreviewModal" style="z-index:10000;">
+    <div class="modal large" style="max-width:98vw;width:98vw;max-height:96vh;height:96vh;display:flex;flex-direction:column;">
+        <div class="modal-header" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.15));border-bottom:1px solid rgba(16,185,129,.25);flex-shrink:0;">
+            <div class="modal-title" style="display:flex;align-items:center;gap:12px;">
+                <i class="fas fa-eye" style="color:#34d399;"></i>
+                <span>Canlı Site Önizlemesi</span>
+                <span id="livePreviewStatus" style="font-size:10px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.3);color:#34d399;padding:2px 10px;border-radius:20px;font-weight:600;letter-spacing:.5px;">CANLI</span>
+                <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:4px;">Sayfa değişikliklerini gerçek zamanlı izleyin</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <button onclick="refreshLivePreview()" style="padding:6px 14px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.3);border-radius:8px;color:#34d399;font-family:Outfit,sans-serif;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                    <i class="fas fa-sync-alt" id="refreshIcon"></i> Yenile
+                </button>
+                <button class="modal-close" onclick="closeLivePreview()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div style="flex:1;overflow:hidden;position:relative;background:#000;border-radius:0 0 16px 16px;">
+            <div id="livePreviewLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:5;background:var(--surface);">
+                <i class="fas fa-spinner fa-spin" style="font-size:28px;color:#34d399;"></i>
+                <div style="font-size:13px;color:#64748b;">Önizleme yükleniyor...</div>
+            </div>
+            <iframe id="livePreviewFrame"
+                style="width:100%;height:100%;border:none;border-radius:0 0 16px 16px;display:block;"
+                sandbox="allow-same-origin allow-scripts allow-forms">
+            </iframe>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
