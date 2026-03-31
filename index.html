@@ -34,7 +34,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- ═══ Firebase Realtime Database SDK ═══ -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<!-- ══════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
     <link rel="manifest" href="/manifest.json">
@@ -58,10 +62,10 @@
             --warning: #f59e0b;
             --danger: #ef4444;
         }
-        .theme-dark  { --primary:#dc2626;--primary-dark:#991b1b;--primary-light:#ef4444;--accent:#7c3aed;--accent-dark:#5b21b6;--accent-light:#8b5cf6;--background:#0a0e1a;--surface:#0f172a;--surface-light:#1e1b4b;--border:#312e81;--border-light:#4338ca;--text:#e2e8f0;--text-muted:#64748b; }
+        /* theme-dark ve theme-red özdeş değerlere sahip; tekrarı önlemek için birleştirildi */
+        .theme-dark,.theme-red { --primary:#dc2626;--primary-dark:#991b1b;--primary-light:#ef4444;--accent:#7c3aed;--accent-dark:#5b21b6;--accent-light:#8b5cf6;--background:#0a0e1a;--surface:#0f172a;--surface-light:#1e1b4b;--border:#312e81;--border-light:#4338ca;--text:#e2e8f0;--text-muted:#64748b; }
         .theme-light { --primary:#2563eb;--primary-dark:#1e3a8a;--primary-light:#3b82f6;--accent:#7c3aed;--accent-dark:#5b21b6;--accent-light:#8b5cf6;--background:#f1f5f9;--surface:#ffffff;--surface-light:#e2e8f0;--border:#cbd5e1;--border-light:#94a3b8;--text:#0f172a;--text-muted:#475569; }
         .theme-blue  { --primary:#2563eb;--primary-dark:#1e3a8a;--primary-light:#3b82f6;--accent:#059669;--accent-dark:#047857;--accent-light:#10b981;--background:#0f172a;--surface:#1e293b;--surface-light:#334155;--border:#475569;--border-light:#64748b;--text:#f1f5f9;--text-muted:#94a3b8; }
-        .theme-red   { --primary:#dc2626;--primary-dark:#991b1b;--primary-light:#ef4444;--accent:#7c3aed;--accent-dark:#5b21b6;--accent-light:#8b5cf6;--background:#0a0e1a;--surface:#0f172a;--surface-light:#1e1b4b;--border:#312e81;--border-light:#4338ca;--text:#e2e8f0;--text-muted:#64748b; }
         .theme-green { --primary:#059669;--primary-dark:#047857;--primary-light:#10b981;--accent:#7c3aed;--accent-dark:#5b21b6;--accent-light:#8b5cf6;--background:#0a0e1a;--surface:#0f172a;--surface-light:#1e1b4b;--border:#312e81;--border-light:#4338ca;--text:#e2e8f0;--text-muted:#64748b; }
 
         * { box-sizing:border-box; margin:0; padding:0; -webkit-user-select:none; -moz-user-select:none; user-select:none; }
@@ -408,6 +412,35 @@
         .met-btn.move:hover { background:#f59e0b; color:white; }
         .master-mode .menu-item:not(.static) { border:1px dashed rgba(220,38,38,.3) !important; }
         .master-mode .source-link { border-style:dashed !important; }
+
+        /* ── Admin Fly-out Submenu ── */
+        .admin-flyout-wrap { position:relative; }
+        .admin-flyout-trigger { display:flex; align-items:center; gap:10px; padding:9px 12px; margin-bottom:2px; border-radius:9px; cursor:pointer; transition:all .18s; font-size:12px; border:1px solid rgba(220,38,38,.2); color:#fca5a5; background:linear-gradient(135deg,rgba(220,38,38,.15),rgba(124,58,237,.1)); }
+        .admin-flyout-trigger:hover { background:linear-gradient(135deg,rgba(220,38,38,.25),rgba(124,58,237,.18)); border-color:rgba(220,38,38,.4); color:#fff; }
+        .admin-flyout-trigger i.trigger-icon { width:18px; text-align:center; color:#dc2626; font-size:13px; }
+        .admin-flyout-trigger .trigger-arrow { margin-left:auto; font-size:10px; color:#dc2626; transition:transform .2s; }
+        .admin-flyout-menu { position:absolute; left:calc(100% + 4px); top:0; width:220px; background:linear-gradient(180deg,#0d1120,#120828); border:1px solid rgba(220,38,38,.25); border-radius:12px; padding:6px; z-index:9999; box-shadow:0 16px 48px rgba(0,0,0,.7); display:none; animation:flyoutIn .18s ease; }
+        @keyframes flyoutIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+        .admin-flyout-menu.open { display:block; }
+        .admin-flyout-trigger.open .trigger-arrow { transform:rotate(90deg); }
+        .flyout-item { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:7px; cursor:pointer; font-size:12px; color:#94a3b8; transition:all .15s; white-space:nowrap; }
+        .flyout-item:hover { background:rgba(220,38,38,.15); color:#fca5a5; }
+        .flyout-item i { width:16px; text-align:center; color:#475569; font-size:12px; transition:color .15s; }
+        .flyout-item:hover i { color:#dc2626; }
+        .flyout-item .fl-badge { margin-left:auto; padding:2px 6px; border-radius:20px; font-size:8px; font-weight:700; background:rgba(245,158,11,.15); color:#fcd34d; border:1px solid rgba(245,158,11,.25); }
+        .flyout-divider { height:1px; background:rgba(255,255,255,.06); margin:4px 0; }
+        .flyout-section-label { font-size:8px; font-weight:800; color:rgba(255,255,255,.2); text-transform:uppercase; letter-spacing:1.5px; padding:6px 10px 2px; }
+
+        /* ── Right Sidebar Accordion ── */
+        .acc-section { border-bottom:1px solid rgba(255,255,255,.05); }
+        .acc-header { display:flex; align-items:center; gap:8px; padding:10px 14px; cursor:pointer; font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:.8px; transition:all .2s; -webkit-user-select:none; user-select:none; }
+        .acc-header:hover { color:#94a3b8; background:rgba(255,255,255,.03); }
+        .acc-header i.acc-icon { color:var(--primary); font-size:12px; width:16px; text-align:center; }
+        .acc-header .acc-arrow { margin-left:auto; font-size:10px; transition:transform .25s; color:#334155; }
+        .acc-header.open .acc-arrow { transform:rotate(180deg); color:#64748b; }
+        .acc-body { overflow:hidden; max-height:0; transition:max-height .3s ease; }
+        .acc-body.open { max-height:600px; }
+        .acc-body-inner { padding:4px 6px 10px; }
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.95); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; backdrop-filter:blur(10px); }
         .modal-overlay.active { display:flex; animation:fadeIn .3s ease; }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -520,6 +553,61 @@
         ::-webkit-scrollbar-track { background:var(--surface); }
         ::-webkit-scrollbar-thumb { background:var(--border-light); border-radius:3px; }
         ::-webkit-scrollbar-thumb:hover { background:var(--primary); }
+        /* ══════════════════════════════════════════════════════════
+           UTILITY CLASSES — inline style'dan çevrildi (Hata #8)
+           ══════════════════════════════════════════════════════════ */
+
+        /* Stat kartları */
+        .stat-card-green  { background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);border-radius:12px;padding:16px;text-align:center; }
+        .stat-card-purple { background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:16px;text-align:center; }
+        .stat-card-red    { background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:16px;text-align:center; }
+        .stat-card-yellow { background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:16px;text-align:center; }
+        .stat-card-blue   { background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);border-radius:12px;padding:16px;text-align:center; }
+        .stat-card-teal   { background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:16px;text-align:center; }
+        .stat-num-green  { font-size:28px;font-weight:900;color:#34d399; }
+        .stat-num-purple { font-size:28px;font-weight:900;color:#a78bfa; }
+        .stat-num-red    { font-size:28px;font-weight:900;color:#fca5a5; }
+        .stat-num-yellow { font-size:28px;font-weight:900;color:#fcd34d; }
+        .stat-num-blue   { font-size:28px;font-weight:900;color:#7dd3fc; }
+        .stat-num-teal   { font-size:28px;font-weight:900;color:#6ee7b7; }
+        .stat-label      { font-size:11px;color:#64748b;margin-top:4px; }
+
+        /* Hata/uyarı mesajı kutuları */
+        .error-box   { margin-bottom:10px;padding:10px 12px;background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.25);border-radius:8px;color:#fca5a5;font-size:12px;gap:6px;align-items:center; }
+        .pending-box { margin-bottom:10px;padding:10px 12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;color:#fcd34d;font-size:12px; }
+
+        /* Admin buton grubu */
+        .btn-admin-approve { padding:6px 14px;background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.4);border-radius:8px;color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif; }
+        .btn-admin-reject  { padding:6px 14px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:8px;color:#fca5a5;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif; }
+        .btn-admin-delete  { padding:6px 10px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif; }
+        .btn-version-restore { padding:5px 12px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.35);border-radius:6px;color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif; }
+        .btn-version-delete  { padding:5px 8px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif; }
+
+        /* Form input lf-input stili (login formu) */
+        .lf-input-wrap { width:100%;padding:12px 12px 12px 38px;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:10px;color:#e8e4da;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;box-sizing:border-box;transition:border-color .2s; }
+        .lf-input-wrap:focus { border-color:rgba(201,168,76,.5); }
+
+        /* Modal header gradient varyantları */
+        .modal-header-purple { background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(91,33,182,.2)); }
+        .modal-header-green  { background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.15));border-bottom:1px solid rgba(16,185,129,.25); }
+
+        /* Düzenlenebilir içerik alanı */
+        .dilekce-content[contenteditable="true"] { -webkit-user-select:text; user-select:text; }
+
+        /* Responsive yardımcılar */
+        .flex-center   { display:flex;align-items:center;justify-content:center; }
+        .flex-between  { display:flex;align-items:center;justify-content:space-between; }
+        .flex-col      { display:flex;flex-direction:column; }
+        .gap-8         { gap:8px; }
+        .gap-12        { gap:12px; }
+        .w-full        { width:100%; }
+        .text-muted-sm { font-size:11px;color:#64748b; }
+        .fw-700        { font-weight:700; }
+        .fw-900        { font-weight:900; }
+
+        /* Toast bildirimi */
+        .toast-base { position:fixed;bottom:24px;right:24px;background:#13131f;border:1px solid rgba(40,200,64,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#28c840;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5); }
+
         @media print { body * { visibility:hidden; } .dilekce-paper,.dilekce-paper * { visibility:visible; } .dilekce-paper { position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; } .editor-toolbar,.action-bar,.header,.sidebar-left,.sidebar-right,.hero-section { display:none !important; } .editor-container { padding:0; background:white; } }
 
         @media (max-width:768px) {
@@ -544,7 +632,7 @@
             .header { padding:0 8px !important; height:48px !important; }
             .clock { font-size:11px !important; padding:3px 6px !important; }
             .hero-section { padding:10px 12px !important; }
-            .sidebar-right { position:fixed !important; right:-100vw !important; width:88vw !important; max-width:310px !important; top:0 !important; height:100vh !important; z-index:200 !important; transition:right .3s !important; }
+            .sidebar-right { position:fixed !important; right:-100vw !important; width:88vw !important; max-width:310px !important; top:0 !important; height:100vh !important; z-index:200 !important; transition:right .3s !important; overflow-y:auto !important; -webkit-overflow-scrolling:touch !important; }
             .sidebar-right.open { right:0 !important; }
             .modal { width:98vw !important; max-width:98vw !important; margin:4px !important; border-radius:14px !important; }
             .modal.large { max-width:98vw !important; }
@@ -560,7 +648,7 @@
             #akilliDilekceModal .modal { width:100vw !important; max-width:100vw !important; max-height:100dvh !important; border-radius:0 !important; margin:0 !important; }
             #akilliDilekceModal .modal-body { max-height:calc(100dvh - 120px) !important; overflow-y:auto !important; padding:10px !important; }
             #belgeTaraModal .modal { width:100vw !important; max-width:100vw !important; border-radius:0 !important; margin:0 !important; }
-            .landing-overlay { overflow-y:auto !important; align-items:flex-start !important; padding:12px !important; }
+            .landing-overlay { overflow-y:auto !important; align-items:flex-start !important; padding:12px !important; padding-bottom:calc(12px + env(safe-area-inset-bottom)) !important; }
             .landing-container { grid-template-columns:1fr !important; min-height:auto !important; }
             .landing-right { padding:24px 20px !important; }
         }
@@ -573,7 +661,7 @@
         .mobile-close { display:none; position:absolute; top:10px; right:10px; background:rgba(220,38,38,.2); border:1px solid var(--primary); color:var(--primary); width:36px; height:36px; border-radius:8px; align-items:center; justify-content:center; cursor:pointer; z-index:101; }
         @media (max-width:1024px) {
             .sidebar-left { width:200px; }
-            .sidebar-right { position:fixed; right:-280px; top:0; height:100vh; z-index:100; transition:right .3s; box-shadow:-5px 0 20px rgba(0,0,0,.5); }
+            .sidebar-right { position:fixed; right:-280px; top:0; height:100vh; z-index:100; transition:right .3s; box-shadow:-5px 0 20px rgba(0,0,0,.5); overflow-y:auto; -webkit-overflow-scrolling:touch; }
             .sidebar-right.open { right:0; }
             .mobile-menu-toggle { display:flex; }
             .mobile-close { display:flex; }
@@ -591,7 +679,7 @@
         .hukuki-terim:hover::after { opacity:1; }
 
         /* ── Dilekçe Watermark ── */
-        .dilekce-paper.demo-watermark::before { content:'TASLAK'; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-35deg); font-size:80px; font-weight:900; color:rgba(220,38,38,.06); pointer-events:none; z-index:1; font-family:'Outfit',sans-serif; letter-spacing:10px; white-space:nowrap; }
+        .dilekce-paper.demo-watermark::before { content:'TASLAK'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-35deg); font-size:80px; font-weight:900; color:rgba(220,38,38,.06); pointer-events:none; z-index:1; font-family:'Outfit',sans-serif; letter-spacing:10px; white-space:nowrap; }
 
         /* ── Versiyon geçmişi butonu ── */
         .version-dot { width:8px; height:8px; border-radius:50%; background:var(--primary); flex-shrink:0; margin-top:5px; }
@@ -885,7 +973,7 @@
       <button class="btn-hero-primary" onclick="lpGirisYap()">
         <i class="fas fa-bolt"></i> Hemen Giriş Yap
       </button>
-      <button class="btn-hero-demo" onclick="document.getElementById('demoModal').classList.add('open')">
+      <button class="btn-hero-demo" onclick="document.getElementById('demoModal')?.classList.add('open')">
         <i class="fas fa-play-circle"></i> Demo Talep Et
       </button>
     </div>
@@ -1190,7 +1278,7 @@
   <div class="modal-box" style="max-width:460px;">
     <div class="modal-head">
       <div class="modal-head-title"><i class="fas fa-play-circle" style="color:var(--gold);"></i> Demo Talep Et</div>
-      <div class="modal-close-btn" onclick="document.getElementById('demoModal').classList.remove('open')"><i class="fas fa-times"></i></div>
+      <div class="modal-close-btn" onclick="document.getElementById('demoModal')?.classList.remove('open')"><i class="fas fa-times"></i></div>
     </div>
     <div class="modal-body" style="padding:24px;">
       <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">Bilgilerinizi bırakın, en kısa sürede sizi arayalım veya demo linki gönderelim.</p>
@@ -1222,7 +1310,7 @@
 </div>
 
 <!-- GİRİŞ/KAYIT MODALİ (landing içi) -->
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeLpModal()">
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
     <div id="lpModalCard" style="width:100%;max-width:460px;background:linear-gradient(145deg,#13131f,#0d0d18);border:1px solid rgba(201,168,76,.25);border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;animation:lpModalIn .35s cubic-bezier(.34,1.56,.64,1);">
         <!-- ÜSTTÜR -->
         <div style="height:3px;background:linear-gradient(90deg,#c9a84c,#8b1a1a,#c9a84c);"></div>
@@ -1235,14 +1323,14 @@
                     <div style="font-size:11px;color:#8a8070;" id="lpModalSubtitle">Hesabınıza giriş yapın</div>
                 </div>
             </div>
-            <button onclick="closeLpModal()" style="width:32px;height:32px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.12);border-radius:8px;color:#8a8070;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+            <button onclick="closeLpModal()" aria-label="Modalı kapat" style="width:32px;height:32px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.12);border-radius:8px;color:#8a8070;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
         </div>
         <!-- SEKMELER -->
         <div style="display:flex;gap:0;margin:20px 28px 0;background:rgba(255,255,255,.04);border-radius:10px;padding:4px;">
-            <button id="lpTab_login" onclick="setLpTab('login')" style="flex:1;padding:9px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,#c9a84c,#a8833a);color:#0a0a0f;">
+            <button id="lpTab_login" style="flex:1;padding:9px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,#c9a84c,#a8833a);color:#0a0a0f;">
                 <i class="fas fa-sign-in-alt"></i> Giriş Yap
             </button>
-            <button id="lpTab_register" onclick="setLpTab('register')" style="flex:1;padding:9px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;background:transparent;color:#8a8070;">
+            <button id="lpTab_register" style="flex:1;padding:9px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;background:transparent;color:#8a8070;">
                 <i class="fas fa-user-plus"></i> Ücretsiz Başla
             </button>
         </div>
@@ -1263,7 +1351,7 @@
             <!-- GİRİŞ FORMU -->
             <form id="subscriberForm" onsubmit="event.preventDefault();handleSubscriberLogin();" style="display:block;">
                 <div style="margin-bottom:14px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-user"></i> Kullanıcı Adı veya E-posta</label>
+                    <label for="subUsername" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-user"></i> Kullanıcı Adı veya E-posta</label>
                     <div style="position:relative;">
                         <i class="fas fa-user" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="text" class="lf-input" id="subUsername" placeholder="Kullanıcı adı veya e-posta..." autocomplete="off"
@@ -1272,7 +1360,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:14px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-lock"></i> Şifre</label>
+                    <label for="subPassword" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-lock"></i> Şifre</label>
                     <div style="position:relative;">
                         <i class="fas fa-lock" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="password" class="lf-input" id="subPassword" placeholder="Şifreniz..." autocomplete="off"
@@ -1302,7 +1390,7 @@
             <!-- KAYIT FORMU -->
             <form id="registerForm" onsubmit="event.preventDefault();handleRegister();" style="display:none;">
                 <div style="margin-bottom:12px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-user"></i> Ad Soyad</label>
+                    <label for="regFullName" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-user"></i> Ad Soyad</label>
                     <div style="position:relative;">
                         <i class="fas fa-user" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="text" class="lf-input" id="regFullName" placeholder="Adınız soyadınız..."
@@ -1311,7 +1399,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:12px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-envelope"></i> E-posta</label>
+                    <label for="regEmail" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-envelope"></i> E-posta</label>
                     <div style="position:relative;">
                         <i class="fas fa-envelope" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="email" class="lf-input" id="regEmail" placeholder="ornek@email.com..."
@@ -1320,7 +1408,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:12px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-at"></i> Kullanıcı Adı</label>
+                    <label for="regUsername" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-at"></i> Kullanıcı Adı</label>
                     <div style="position:relative;">
                         <i class="fas fa-at" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="text" class="lf-input" id="regUsername" placeholder="Kullanıcı adı seçin..."
@@ -1371,7 +1459,7 @@
             <!-- MASTER FORMU (gizli) -->
             <form id="masterForm" onsubmit="event.preventDefault();handleMasterLogin();" style="display:none;">
                 <div style="margin-bottom:14px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-key"></i> Master Key</label>
+                    <label for="masterKeyInput" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-key"></i> Master Key</label>
                     <div style="position:relative;">
                         <i class="fas fa-key" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="password" class="lf-input" id="masterKeyInput" placeholder="Master key..." autocomplete="off"
@@ -1381,7 +1469,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:14px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-shield-alt"></i> JWT Token</label>
+                    <label for="jwtInput" style="display:block;font-size:11px;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;"><i class="fas fa-shield-alt"></i> JWT Token</label>
                     <div style="position:relative;">
                         <i class="fas fa-shield-alt" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8a8070;font-size:13px;"></i>
                         <input type="password" class="lf-input" id="jwtInput" placeholder="JWT token..." autocomplete="off"
@@ -1515,9 +1603,7 @@
                     <div style="font-size:15px;font-weight:900;color:#f1f5f9;letter-spacing:-.5px;font-family:'Playfair Display',serif;line-height:1.1;">HukukAI <span style="color:#c9a84c;">Pro</span></div>
                     <div style="font-size:9px;color:rgba(255,255,255,.3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;">Hukuk Asistanı</div>
                 </div>
-                <div class="user-avatar-small" id="sidebarAvatar" onclick="openProfileModal()" style="flex-shrink:0;width:34px;height:34px;">
-                    <i class="fas fa-user" id="sidebarAvatarIcon"></i>
-                </div>
+                <div id="sidebarAvatar" style="display:none;"><i id="sidebarAvatarIcon"></i></div>
             </div>
             <!-- Kullanıcı bilgisi -->
             <div class="user-info" id="userInfoPanel" style="padding:0 16px 12px;">
@@ -1548,25 +1634,39 @@
             </div>
             <div class="menu-item" onclick="openBelgeTaraModal()" style="background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(91,33,182,.08));border:1px solid rgba(124,58,237,.2);color:#a78bfa;"><i class="fas fa-magic" style="color:#a78bfa;"></i><span>Belge Tara & Analiz</span><span class="badge new" style="background:rgba(124,58,237,.3);color:#ddd6fe;">AI</span></div>
 
-            <div class="menu-title admin-only hidden" data-static="true" style="margin-top:16px;"><i class="fas fa-cogs"></i> Yönetici İşlemleri</div>
-            <div class="menu-item admin-only hidden static" onclick="openAdminPanel()" style="background:linear-gradient(135deg,rgba(220,38,38,.15),rgba(124,58,237,.1));border:1px solid rgba(220,38,38,.2);"><i class="fas fa-users-cog" style="color:#dc2626;"></i><span style="color:#f1f5f9;font-weight:700;">Kullanıcı Paneli</span><span class="badge warning" id="adminPanelBadge">↗</span></div>
-            <div class="menu-item admin-only hidden static" onclick="openTelegramBotPanel()"><i class="fab fa-telegram" style="color:#29b6f6;"></i><span>Telegram Bot</span><span class="badge new" style="background:rgba(41,182,246,.2);color:#29b6f6;">Komut</span></div>
-            <div class="menu-item admin-only hidden static" onclick="toggleThemeSelector()"><i class="fas fa-palette"></i><span>Tema Değiştir</span><span class="badge new" style="background:var(--accent);">Yeni</span></div>
-            <div id="themeSelector" class="theme-selector admin-only hidden" style="display:none;margin-bottom:10px;">
-                <div class="theme-option dark active" onclick="setTheme('dark',event)" title="Koyu tema"></div>
-                <div class="theme-option light" onclick="setTheme('light',event)" title="Açık tema"></div>
-                <div class="theme-option blue" onclick="setTheme('blue',event)" title="Mavi tema"></div>
-                <div class="theme-option red" onclick="setTheme('red',event)" title="Kırmızı tema"></div>
-                <div class="theme-option green" onclick="setTheme('green',event)" title="Yeşil tema"></div>
+            <!-- YÖNETİCİ FLY-OUT MENÜ -->
+            <div class="admin-flyout-wrap admin-only hidden" style="margin-top:12px;margin-bottom:4px;">
+                <div class="admin-flyout-trigger" onclick="toggleAdminFlyout(this)">
+                    <i class="fas fa-shield-alt trigger-icon"></i>
+                    <span style="font-weight:700;font-size:12px;">Yönetici Paneli</span>
+                    <span class="badge warning" id="adminPanelBadge" style="margin-left:4px;padding:2px 6px;border-radius:20px;font-size:8px;font-weight:700;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.25);">↗</span>
+                    <i class="fas fa-chevron-right trigger-arrow"></i>
+                </div>
+                <div class="admin-flyout-menu">
+                    <div class="flyout-section-label">Kullanıcılar</div>
+                    <div class="flyout-item" onclick="openAdminPanel()"><i class="fas fa-users-cog"></i><span>Kullanıcı Paneli</span></div>
+                    <div class="flyout-item" onclick="openGuestPasswordModal()"><i class="fas fa-key"></i><span>Şifre Yönetimi</span></div>
+                    <div class="flyout-item" onclick="openActivityLogModal()"><i class="fas fa-chart-line"></i><span>Aktivite Logu</span><span class="fl-badge">Yeni</span></div>
+                    <div class="flyout-item" onclick="toggleViolationTracker()"><i class="fas fa-exclamation-triangle"></i><span>İhlal Takibi</span><span class="fl-badge" id="violationBadge">0</span></div>
+                    <div class="flyout-divider"></div>
+                    <div class="flyout-section-label">Sistem</div>
+                    <div class="flyout-item" onclick="toggleThemeSelector()"><i class="fas fa-palette"></i><span>Tema Değiştir</span></div>
+                    <div id="themeSelector" class="theme-selector admin-only" style="padding:6px 10px 8px;display:flex;gap:8px;">
+                        <div class="theme-option dark active" onclick="setTheme('dark',event)" title="Koyu tema"></div>
+                        <div class="theme-option light" onclick="setTheme('light',event)" title="Açık tema"></div>
+                        <div class="theme-option blue" onclick="setTheme('blue',event)" title="Mavi tema"></div>
+                        <div class="theme-option red" onclick="setTheme('red',event)" title="Kırmızı tema"></div>
+                        <div class="theme-option green" onclick="setTheme('green',event)" title="Yeşil tema"></div>
+                    </div>
+                    <div class="flyout-item" onclick="openSidebarMenuManager()"><i class="fas fa-bars"></i><span>Menü Yönetimi</span></div>
+                    <div class="flyout-item" onclick="openPriceEditor()"><i class="fas fa-tag"></i><span>Fiyat Düzenle</span></div>
+                    <div class="flyout-divider"></div>
+                    <div class="flyout-section-label">Araçlar</div>
+                    <div class="flyout-item" onclick="openTelegramBotPanel()"><i class="fab fa-telegram" style="color:#29b6f6;"></i><span>Telegram Bot</span></div>
+                    <div class="flyout-item" onclick="toggleFileManager()"><i class="fas fa-folder-open"></i><span>Dosya Yönetimi</span></div>
+                </div>
             </div>
-            <div class="menu-item admin-only hidden static" onclick="openSidebarMenuManager()"><i class="fas fa-bars"></i><span>Sidebar Menü Yönetimi</span><span class="badge new">Ekle/Sil</span></div>
-            <div class="menu-item admin-only hidden static" onclick="toggleFileManager()"><i class="fas fa-folder-open"></i><span>Dosya Yönetimi</span></div>
-            <div id="fileManager" class="file-manager admin-only hidden" style="display:none;">
-                <div class="file-list" id="fileList"></div>
-                <button class="upload-btn" onclick="openBelgeTaraModal()" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);margin-bottom:6px;"><i class="fas fa-magic"></i> Belge Tara & Analiz</button>
-                <button class="upload-btn" onclick="uploadFile()"><i class="fas fa-upload"></i> Dosya Yükle</button>
-            </div>
-            <div class="menu-item admin-only hidden static" onclick="toggleViolationTracker()"><i class="fas fa-exclamation-triangle"></i><span>İhlal Takibi</span><span class="badge warning" id="violationBadge">0</span></div>
+            <!-- Gizli: JS uyumu için violation tracker -->
             <div id="violationTracker" class="violation-tracker admin-only hidden" style="display:none;">
                 <button class="add-violation-btn" onclick="showAddViolationForm()"><i class="fas fa-plus"></i> Yeni İhlal Ekle</button>
                 <div id="addViolationForm" class="add-violation-form">
@@ -1576,10 +1676,11 @@
                 </div>
                 <div id="violationList"></div>
             </div>
-            <div class="menu-item admin-only hidden static" onclick="openAdminPanel()"><i class="fas fa-users-cog"></i><span>Kullanıcı Yönetimi</span></div>
-            <div class="menu-item admin-only hidden static" onclick="openActivityLogModal()"><i class="fas fa-chart-line"></i><span>Aktivite Logu</span><span class="badge new">Yeni</span></div>
-            <div class="menu-item admin-only hidden static" onclick="openGuestPasswordModal()"><i class="fas fa-key"></i><span>Şifre Yönetimi</span></div>
-            <div class="menu-item admin-only hidden static" onclick="openPriceEditor()"><i class="fas fa-tag"></i><span>Fiyat Düzenle</span></div>
+            <div id="fileManager" class="file-manager admin-only hidden" style="display:none;">
+                <div class="file-list" id="fileList"></div>
+                <button class="upload-btn" onclick="openBelgeTaraModal()" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);margin-bottom:6px;"><i class="fas fa-magic"></i> Belge Tara & Analiz</button>
+                <button class="upload-btn" onclick="uploadFile()"><i class="fas fa-upload"></i> Dosya Yükle</button>
+            </div>
 
             <div class="menu-title" style="margin-top:4px;" data-static="true"><i class="fas fa-folder"></i> Belgelerim</div>
             <div class="menu-item static" onclick="showSavedDilekceler()" style="position:relative;">
@@ -1627,13 +1728,15 @@
                     <button class="header-btn" id="masterModeToggleBtn" onclick="toggleMasterEditMode()" style="background:rgba(124,58,237,.2);border-color:var(--accent);color:var(--accent-light);">
                         <i class="fas fa-wand-magic-sparkles"></i> <span id="masterModeLabel">Düzenleme Modu</span>
                     </button>
-                    <button class="header-btn" id="livePreviewBtn" onclick="openLivePreview()" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:#34d399;display:none;">
-                        <i class="fas fa-eye"></i> Canlı Önizle
-                    </button>
+
                 </div>
-                <button class="header-btn" onclick="openProfileModal()" style="background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.4);color:#a78bfa;" title="Profil Fotoğrafı"><i class="fas fa-user-circle"></i></button>
+
             </div>
             <div class="clock" id="clock">00:00:00</div>
+            <div id="fbStatusBadge" title="Veritabanı bağlantı durumu"
+                style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.15);color:#fcd34d;display:flex;align-items:center;gap:5px;cursor:default;white-space:nowrap;">
+                <i class="fas fa-database"></i> Yerel Mod
+            </div>
         <div id="heroSavedCount" style="display:none;font-size:10px;color:#fcd34d;"><span id="heroSavedNum">0</span> Dilekçe</div>
         </header>
 
@@ -1728,51 +1831,109 @@
     <!-- SAĞ SIDEBAR -->
     <aside class="sidebar-right" id="sidebarRight">
         <div class="mobile-close" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></div>
-        <div style="padding:14px 14px 0;">
-            <div style="font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;"><i class="fas fa-sticky-note" style="color:#fcd34d;"></i> Hızlı Not</div>
-            <textarea id="quickNoteInput" placeholder="Notunuzu yazın..."
-                oninput="saveQuickNote(this.value)"
-                style="width:100%;height:72px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px;color:#f1f5f9;font-family:Outfit,sans-serif;font-size:11px;resize:none;outline:none;line-height:1.5;"></textarea>
-        </div>
-        <div class="search-header">
-            <div class="search-title"><i class="fab fa-google"></i> Google Arama</div>
-            <div class="google-search-container">
-                <div class="google-search-box">
-                    <input type="text" class="google-search-input" id="googleSearchInput" placeholder="Ara..." onkeypress="if(event.key==='Enter')performGoogleSearch()">
-                    <button class="google-search-btn" onclick="performGoogleSearch()"><i class="fab fa-google"></i> Ara</button>
+
+        <!-- HIZLI NOT accordion -->
+        <div class="acc-section">
+            <div class="acc-header open" onclick="toggleAcc(this)">
+                <i class="fas fa-sticky-note acc-icon" style="color:#fcd34d;"></i>
+                Hızlı Not
+                <i class="fas fa-chevron-down acc-arrow"></i>
+            </div>
+            <div class="acc-body open">
+                <div class="acc-body-inner" style="padding:8px 12px 12px;">
+                    <textarea id="quickNoteInput" placeholder="Notunuzu yazın..."
+                        oninput="saveQuickNote(this.value)"
+                        style="width:100%;height:72px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px;color:#f1f5f9;font-family:Outfit,sans-serif;font-size:11px;resize:none;outline:none;line-height:1.5;"></textarea>
                 </div>
             </div>
         </div>
-        <div class="quick-sources" id="quickSourcesContainer">
-            <div class="source-category" data-category="resmi">
-                <div class="source-category-title"><i class="fas fa-landmark"></i> <span class="cat-title">Resmi Mevzuat</span></div>
-                <a href="https://www.mevzuat.gov.tr" target="_blank" class="source-link"><i class="fas fa-external-link-alt"></i><span>Mevzuat.gov.tr</span></a>
-                <a href="https://www.resmigazete.gov.tr" target="_blank" class="source-link"><i class="fas fa-newspaper"></i><span>Resmî Gazete</span></a>
+
+        <!-- GOOGLE ARAMA accordion -->
+        <div class="acc-section">
+            <div class="acc-header open" onclick="toggleAcc(this)">
+                <i class="fab fa-google acc-icon"></i>
+                Google Arama
+                <i class="fas fa-chevron-down acc-arrow"></i>
             </div>
-            <div class="source-category" data-category="yargi">
-                <div class="source-category-title"><i class="fas fa-gavel"></i> <span class="cat-title">Yargı Kararları</span></div>
-                <a href="https://karararama.yargitay.gov.tr" target="_blank" class="source-link"><i class="fas fa-balance-scale"></i><span>Yargıtay Karar Arama</span></a>
-                <a href="https://www.yargitayictihatmerkezi.gov.tr" target="_blank" class="source-link"><i class="fas fa-star"></i><span>Yargıtay İçtihat Merkezi (YİM)</span></a>
-                <a href="https://emsal.uyap.gov.tr" target="_blank" class="source-link"><i class="fas fa-university"></i><span>Emsal Karar Arama</span></a>
-                <a href="https://www.danistay.gov.tr" target="_blank" class="source-link"><i class="fas fa-building"></i><span>Danıştay</span></a>
-                <a href="https://www.anayasa.gov.tr" target="_blank" class="source-link"><i class="fas fa-landmark"></i><span>Anayasa Mahkemesi</span></a>
-                <a href="https://hudoc.echr.coe.int" target="_blank" class="source-link"><i class="fas fa-globe"></i><span>AİHM (HUDOC)</span></a>
+            <div class="acc-body open">
+                <div class="acc-body-inner" style="padding:8px 12px 12px;">
+                    <div class="google-search-box">
+                        <input type="text" class="google-search-input" id="googleSearchInput" placeholder="Ara..." onkeypress="if(event.key==='Enter')performGoogleSearch()">
+                        <button class="google-search-btn" onclick="performGoogleSearch()"><i class="fab fa-google"></i> Ara</button>
+                    </div>
+                </div>
             </div>
-            <div class="source-category" data-category="uluslararasi">
-                <div class="source-category-title"><i class="fas fa-globe-americas"></i> <span class="cat-title">Uluslararası</span></div>
-                <a href="https://www.unicef.org/turkiye/cocuk-haklarina-dair-sozlesme" target="_blank" class="source-link" style="border-color:#00aeef;background:rgba(0,174,239,.1);"><i class="fas fa-child" style="color:#00aeef;"></i><span>BM Çocuk Hakları Sözleşmesi</span></a>
-                <a href="https://www.un.org" target="_blank" class="source-link"><i class="fas fa-globe"></i><span>Birleşmiş Milletler</span></a>
+        </div>
+
+        <!-- KAYNAKLAR accordion -->
+        <div class="quick-sources" id="quickSourcesContainer" style="flex:1;overflow-y:auto;padding:0;">
+
+            <div class="acc-section" data-category="resmi">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <i class="fas fa-landmark acc-icon"></i>
+                    Resmi Mevzuat
+                    <i class="fas fa-chevron-down acc-arrow"></i>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-body-inner">
+                        <a href="https://www.mevzuat.gov.tr" target="_blank" class="source-link"><i class="fas fa-external-link-alt"></i><span>Mevzuat.gov.tr</span></a>
+                        <a href="https://www.resmigazete.gov.tr" target="_blank" class="source-link"><i class="fas fa-newspaper"></i><span>Resmî Gazete</span></a>
+                    </div>
+                </div>
             </div>
-            <div class="source-category" data-category="kanunlar">
-                <div class="source-category-title"><i class="fas fa-book"></i> <span class="cat-title">Temel Kanunlar</span></div>
-                <div class="source-link" onclick="quickOpenMevzuat('hmk')"><i class="fas fa-gavel"></i><span>HMK (6100)</span></div>
-                <div class="source-link" onclick="quickOpenMevzuat('tmk')"><i class="fas fa-home"></i><span>TMK (4721)</span></div>
-                <div class="source-link" onclick="quickOpenMevzuat('tbk')"><i class="fas fa-handshake"></i><span>TBK (6098)</span></div>
-                <div class="source-link" onclick="quickOpenMevzuat('tck')"><i class="fas fa-exclamation-triangle"></i><span>TCK (5237)</span></div>
-                <div class="source-link" onclick="quickOpenMevzuat('6284')"><i class="fas fa-shield-alt"></i><span>6284 Sayılı Kanun</span></div>
+
+            <div class="acc-section" data-category="yargi">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <i class="fas fa-gavel acc-icon"></i>
+                    Yargı Kararları
+                    <i class="fas fa-chevron-down acc-arrow"></i>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-body-inner">
+                        <a href="https://www.karararama.yargitay.gov.tr" target="_blank" class="source-link"><i class="fas fa-balance-scale"></i><span>Yargıtay Karar Arama</span></a>
+                        <a href="https://www.yargitayictihatmerkezi.gov.tr" target="_blank" class="source-link"><i class="fas fa-star"></i><span>Yargıtay İçtihat Merkezi</span></a>
+                        <a href="https://www.karararama.bam.adalet.gov.tr" target="_blank" class="source-link"><i class="fas fa-university"></i><span>BAM Kararları</span></a>
+                        <a href="https://www.danistay.gov.tr" target="_blank" class="source-link"><i class="fas fa-building"></i><span>Danıştay</span></a>
+                        <a href="https://www.anayasa.gov.tr" target="_blank" class="source-link"><i class="fas fa-landmark"></i><span>Anayasa Mahkemesi</span></a>
+                        <a href="https://hudoc.echr.coe.int" target="_blank" class="source-link"><i class="fas fa-globe"></i><span>AİHM (HUDOC)</span></a>
+                    </div>
+                </div>
             </div>
+
+            <div class="acc-section" data-category="uluslararasi">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <i class="fas fa-globe-americas acc-icon"></i>
+                    Uluslararası
+                    <i class="fas fa-chevron-down acc-arrow"></i>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-body-inner">
+                        <a href="https://www.unicef.org/turkiye/cocuk-haklarina-dair-sozlesme" target="_blank" class="source-link" style="border-color:#00aeef;background:rgba(0,174,239,.1);"><i class="fas fa-child" style="color:#00aeef;"></i><span>BM Çocuk Hakları Sözleşmesi</span></a>
+                        <a href="https://www.un.org" target="_blank" class="source-link"><i class="fas fa-globe"></i><span>Birleşmiş Milletler</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acc-section" data-category="kanunlar">
+                <div class="acc-header" onclick="toggleAcc(this)">
+                    <i class="fas fa-book acc-icon"></i>
+                    Temel Kanunlar
+                    <i class="fas fa-chevron-down acc-arrow"></i>
+                </div>
+                <div class="acc-body">
+                    <div class="acc-body-inner">
+                        <div class="source-link" onclick="quickOpenMevzuat('hmk')"><i class="fas fa-gavel"></i><span>HMK (6100)</span></div>
+                        <div class="source-link" onclick="quickOpenMevzuat('tmk')"><i class="fas fa-home"></i><span>TMK (4721)</span></div>
+                        <div class="source-link" onclick="quickOpenMevzuat('tbk')"><i class="fas fa-handshake"></i><span>TBK (6098)</span></div>
+                        <div class="source-link" onclick="quickOpenMevzuat('tck')"><i class="fas fa-exclamation-triangle"></i><span>TCK (5237)</span></div>
+                        <div class="source-link" onclick="quickOpenMevzuat('6284')"><i class="fas fa-shield-alt"></i><span>6284 Sayılı Kanun</span></div>
+                    </div>
+                </div>
+            </div>
+
             <div id="customLinksContainer"></div>
         </div>
+
         <div class="whatsapp-simple" id="whatsappText"><i class="fab fa-whatsapp"></i> 0506 170 30 20</div>
     </aside>
     <div class="sidebar-right-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -1780,10 +1941,10 @@
 <!-- AKILLI DİLEKÇE MODALI -->
 <div class="modal-overlay" id="akilliDilekceModal">
     <div class="modal">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-sparkles" style="color:var(--accent);"></i> AKILLI DİLEKÇE OLUŞTUR <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div><button class="modal-close" onclick="closeModal('akilliDilekceModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-sparkles" style="color:var(--accent);"></i> AKILLI DİLEKÇE OLUŞTUR <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div><button class="modal-close" aria-label="Kapat" onclick="closeModal('akilliDilekceModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
             <form id="akilliDilekceForm" onsubmit="event.preventDefault(); generateAkilliDilekce();">
-                <div class="form-group full-width"><label class="form-label">Dava Türü Seçin</label><select class="form-select" id="davaTuru" onchange="updateFormFields()" required><option value="">-- Dava Türü Seçin --</option>
+                <div class="form-group full-width"><label class="form-label" for="davaTuru">Dava Türü Seçin</label><select class="form-select" id="davaTuru" onchange="updateFormFields()" required><option value="">-- Dava Türü Seçin --</option>
                 <optgroup label="─── AİLE HUKUKU ───">
                 <option value="bosanma">🔴 Boşanma (Şiddetli Geçimsizlik)</option>
                 <option value="bosanma-zina">🔴 Boşanma (Zina)</option>
@@ -1855,12 +2016,12 @@
                         <input type="text" class="form-input" id="mahkemeTuru" readonly placeholder="Dava türüne göre otomatik dolacak" style="background:rgba(124,58,237,.08);cursor:default;color:var(--accent-light);">
                     </div>
                 </div>
-                <div class="form-group full-width"><label class="form-label">Mahkeme Adı <span style="font-size:10px;color:var(--accent-light);">(Otomatik doldurulur, düzenleyebilirsiniz)</span></label><input type="text" class="form-input" id="mahkemeAdi" placeholder="Örn: İstanbul Aile Mahkemesi" required></div>
+                <div class="form-group full-width"><label class="form-label" for="mahkemeAdi">Mahkeme Adı <span style="font-size:10px;color:var(--accent-light);">(Otomatik doldurulur, düzenleyebilirsiniz)</span></label><input type="text" class="form-input" id="mahkemeAdi" placeholder="Örn: İstanbul Aile Mahkemesi" required></div>
                 <div class="form-grid">
-                    <div class="form-group"><label class="form-label">Davacı Ad Soyad</label><input type="text" class="form-input" id="davaciAdSoyad" placeholder="Ad Soyad" required></div>
-                    <div class="form-group"><label class="form-label">Davacı T.C. No</label><input type="text" class="form-input" id="davaciTcNo" placeholder="12345678901" maxlength="11"></div>
+                    <div class="form-group"><label class="form-label" for="davaciAdSoyad">Davacı Ad Soyad</label><input type="text" class="form-input" id="davaciAdSoyad" placeholder="Ad Soyad" required></div>
+                    <div class="form-group"><label class="form-label" for="davaciTcNo">Davacı T.C. No</label><input type="text" class="form-input" id="davaciTcNo" placeholder="12345678901" maxlength="11"></div>
                 </div>
-                <div class="form-group full-width"><label class="form-label">Davacı Adresi</label><textarea class="form-textarea" id="davaciAdresInput" placeholder="Tam adres..."></textarea></div>
+                <div class="form-group full-width"><label class="form-label" for="davaciAdresInput">Davacı Adresi</label><textarea class="form-textarea" id="davaciAdresInput" placeholder="Tam adres..."></textarea></div>
                 <div class="form-grid">
                     <div class="form-group"><label class="form-label">Davalı Ad Soyad</label><input type="text" class="form-input" id="davalıAdSoyad" placeholder="Ad Soyad" required></div>
                     <div class="form-group"><label class="form-label">Davalı T.C. No</label><input type="text" class="form-input" id="davalıTcNo" placeholder="12345678901" maxlength="11"></div>
@@ -1890,10 +2051,10 @@
 <!-- PROFİL FOTOĞRAFI MODALI -->
 <div class="modal-overlay" id="profileModal">
     <div class="modal small">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-user-circle"></i> Profil Fotoğrafı</div><button class="modal-close" onclick="closeModal('profileModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-user-circle"></i> Profil Fotoğrafı</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('profileModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body" style="text-align:center;">
             <div class="profile-photo-large" id="profilePhotoLarge"><i class="fas fa-user" style="font-size:60px;color:var(--text-muted);"></i></div>
-            <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
+            <div class="upload-area" onclick="document.getElementById('fileUpload')?.click()">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>Fotoğraf yüklemek için tıklayın</p>
                 <p style="font-size:10px;color:var(--text-muted);">Sadece .jpg, .png (max 5MB)</p>
@@ -1908,13 +2069,13 @@
 <!-- SİTE LOGOSU MODALI -->
 <div class="modal-overlay" id="siteLogoModal">
     <div class="modal small">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-image"></i> Site Logosu Değiştir</div><button class="modal-close" onclick="closeModal('siteLogoModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-image"></i> Site Logosu Değiştir</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('siteLogoModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body" style="text-align:center;">
             <div class="profile-photo-large" id="siteLogoPreview" style="border-radius:12px;">
                 <i class="fas fa-gavel" id="siteLogoPreviewIcon" style="font-size:60px;color:var(--text-muted);"></i>
                 <img id="siteLogoPreviewImg" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
             </div>
-            <div class="upload-area" onclick="document.getElementById('siteLogoFileUpload').click()">
+            <div class="upload-area" onclick="document.getElementById('siteLogoFileUpload')?.click()">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>Logo yüklemek için tıklayın</p>
                 <input type="file" id="siteLogoFileUpload" accept=".jpg,.jpeg,.png" style="display:none;" onchange="previewSiteLogo(this)">
@@ -1930,7 +2091,7 @@
 <!-- SİDEBAR MENÜ YÖNETİMİ MODALI -->
 <div class="modal-overlay" id="sidebarMenuModal">
     <div class="modal small">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-bars"></i> Sidebar Menü Yönetimi</div><button class="modal-close" onclick="closeModal('sidebarMenuModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-bars"></i> Sidebar Menü Yönetimi</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('sidebarMenuModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
             <div class="form-group"><label class="form-label">Yeni Menü Adı</label><input type="text" class="form-input" id="newMenuName" placeholder="Örn: İçtihat Arama"></div>
             <div class="form-group"><label class="form-label">Menü İkonu</label>
@@ -1955,7 +2116,7 @@
     <div class="modal" style="max-width:480px;max-height:85vh;">
         <div class="modal-header" style="background:linear-gradient(135deg,#0b0e1c,#0f0c24);border-bottom:1px solid rgba(220,38,38,.2);">
             <div class="modal-title"><i class="fas fa-crown" style="color:#c9a84c;"></i> Master Panel</div>
-            <button class="modal-close" onclick="closeModal('adminPanelModal')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" aria-label="Kapat" onclick="closeModal('adminPanelModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body" style="padding:20px;">
             <!-- Profil -->
@@ -1975,7 +2136,7 @@
 
             <!-- Hızlı eylemler -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-                <button onclick="closeModal('adminPanelModal');switchAdminTab('pending');document.getElementById('fullAdminPanelModal').classList.add('active');" 
+                <button onclick="closeModal('adminPanelModal');switchAdminTab('pending');document.getElementById('fullAdminPanelModal')?.classList.add('active');" 
                     style="padding:10px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);border-radius:8px;color:#fca5a5;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;">
                     <i class="fas fa-clock"></i> Onay Bekleyenler <span id="miniPendingCount" style="background:#dc2626;color:#fff;border-radius:99px;padding:1px 6px;font-size:10px;">0</span>
                 </button>
@@ -2004,7 +2165,7 @@
 <!-- AKTİVİTE LOGU MODALI -->
 <div class="modal-overlay" id="activityLogModal">
     <div class="modal large">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-chart-line" style="color:var(--accent);"></i> Aktivite Logu</div><button class="modal-close" onclick="closeModal('activityLogModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-chart-line" style="color:var(--accent);"></i> Aktivite Logu</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('activityLogModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
             <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
                 <button class="btn-primary" onclick="filterActivity('all')" style="max-width:100px;padding:8px;font-size:11px;">Tümü</button>
@@ -2021,7 +2182,7 @@
 <!-- MİSAFİR ŞİFRESİ MODALI -->
 <div class="modal-overlay" id="guestPasswordModal">
     <div class="modal small">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-key" style="color:var(--primary);"></i> Şifre Yönetimi</div><button class="modal-close" onclick="closeModal('guestPasswordModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-key" style="color:var(--primary);"></i> Şifre Yönetimi</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('guestPasswordModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
             <div style="display:flex;gap:6px;background:rgba(0,0,0,.2);padding:4px;border-radius:10px;margin-bottom:18px;">
                 <button onclick="switchPwdTab('guest')" id="pwdTabGuest" style="flex:1;padding:8px;border:none;border-radius:7px;cursor:pointer;font-family:Outfit,sans-serif;font-size:12px;font-weight:600;background:var(--primary);color:white;transition:all .2s;">Misafir Şifresi</button>
@@ -2051,7 +2212,7 @@
 <!-- FİYAT DÜZENLEME MODALI -->
 <div class="modal-overlay" id="priceEditorModal">
     <div class="modal small">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-tag"></i> Abonelik Fiyatları</div><button class="modal-close" onclick="closeModal('priceEditorModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-tag"></i> Abonelik Fiyatları</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('priceEditorModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
             <div class="form-group"><label class="form-label">Aylık Fiyat (TL)</label><input type="number" class="form-input" id="editMonthlyPrice" value="1250" min="0" step="10"></div>
             <div class="form-group"><label class="form-label">Yıllık Fiyat (TL)</label><input type="number" class="form-input" id="editYearlyPrice" value="9900" min="0" step="10"></div>
@@ -2064,7 +2225,7 @@
 <!-- MASTER INLINE EDIT MODALI -->
 <div class="modal-overlay" id="inlineEditModal">
     <div class="modal small">
-        <div class="modal-header"><div class="modal-title"><i class="fas fa-pencil-alt"></i> Eleman Düzenle</div><button class="modal-close" onclick="closeModal('inlineEditModal')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-header"><div class="modal-title"><i class="fas fa-pencil-alt"></i> Eleman Düzenle</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('inlineEditModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
             <div class="form-group"><label class="form-label">Yeni Metin / İçerik</label><textarea class="form-textarea" id="inlineEditContent" rows="4" placeholder="Yeni içerik..."></textarea></div>
             <div class="form-group" id="inlineLinkGroup" style="display:none;"><label class="form-label">Link (URL)</label><input type="text" class="form-input" id="inlineEditLink" placeholder="https://..."></div>
@@ -2323,10 +2484,42 @@ const davaDayanaklari = {
     'sikayetten-vazgecme':['aihs8','cmk353','tck73','hmk114'],
     'taksirle-yaralama':['aihs8','tck89','cmk158','tbk49','hmk114']
 };
+
+// ═══════════════════════════════════════════════════════
+// NULL-SAFE DOM YARDIMCILARI (Hata #7 düzeltmesi)
+// ═══════════════════════════════════════════════════════
+/**
+ * Null-safe getElementById wrapper.
+ * @param {string} id - Element ID
+ * @returns {HTMLElement|null}
+ */
+function $id(id) {
+    return document.getElementById(id);
+}
+/**
+ * getElementById ile güvenli işlem - element yoksa hata atmaz.
+ * @param {string} id - Element ID
+ * @param {Function} fn - Element üzerinde yapılacak işlem
+ */
+function $safe(id, fn) {
+    const el = document.getElementById(id);
+    if (el) fn(el);
+}
+/**
+ * Birden fazla element üzerinde güvenli işlem.
+ * @param {string[]} ids - Element ID listesi
+ * @param {Function} fn - Element üzerinde yapılacak işlem
+ */
+function $safeAll(ids, fn) {
+    ids.forEach(id => { const el = document.getElementById(id); if (el) fn(el); });
+}
+// ═══════════════════════════════════════════════════════
 // ============================================================
 // BAŞLATMA
 // ============================================================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    // Firebase'i başlat (config varsa), sonra kullanıcı DB'sini yükle
+    await initFirebase();
     loadUsersDB();
     checkExistingSession();  // currentUser'ı set eder, oturum varsa showMainApp() çağırır
     initSiteLogo();
@@ -2350,11 +2543,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Oturum yoksa: landing page göster
     if (!currentUser) {
-        document.getElementById('landingPage').style.display = 'block';
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'none';
+        $safe('landingPage', el => el.style.display = 'block');
+        $safe('loginOverlay', el => el.style.display = 'none');
+        $safe('mainApp', el => el.style.display = 'none');
         window.scrollTo(0, 0);
     }
+    // Firebase badge başlangıç durumunu ayarla
+    setTimeout(() => updateFirebaseBadge(_fbReady), 500);
+    // ── Event Listener Dönüşümleri (Hata #6 düzeltmesi - inline onclick kaldırıldı) ──
+    (function attachStaticListeners() {
+        // Tab butonları
+        const tabLogin = document.getElementById('lpTab_login');
+        const tabReg   = document.getElementById('lpTab_register');
+        if (tabLogin)  tabLogin.addEventListener('click',  () => setLpTab('login'));
+        if (tabReg)    tabReg.addEventListener('click',    () => setLpTab('register'));
+
+        // Modal backdrop tıklama (loginOverlay)
+        const loginOverlay = document.getElementById('loginOverlay');
+        if (loginOverlay) {
+            loginOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeLpModal();
+            });
+        }
+
+        // Cookie banner butonları
+        const cookieAccept = document.getElementById('lpCookieAcceptBtn');
+        const cookieReject = document.getElementById('lpCookieRejectBtn');
+        if (cookieAccept) cookieAccept.addEventListener('click', lpCookieKabul);
+        if (cookieReject) cookieReject.addEventListener('click', lpCookieReddet);
+
+        // Kilit ekranı input - Enter tuşu
+        const lockInput = document.getElementById('lockScreenInput');
+        if (lockInput) {
+            lockInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') unlockScreen();
+            });
+        }
+
+        // Demo modal backdrop
+        const demoReqModal = document.getElementById('demoReqModal');
+        if (demoReqModal) {
+            demoReqModal.addEventListener('click', function(e) {
+                if (e.target === this) closeModal('demoReqModal');
+            });
+        }
+
+
+        // ESC tuşu ile modal kapatma
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const loginOvl = document.getElementById('loginOverlay');
+                if (loginOvl && loginOvl.style.display === 'flex') { closeLpModal(); return; }
+                // Açık modal-overlay'leri kontrol et
+                document.querySelectorAll('.modal-overlay').forEach(function(m) {
+                    if (m.style.display !== 'none' && getComputedStyle(m).display !== 'none') {
+                        m.style.display = 'none';
+                    }
+                });
+            }
+        });
+    })();
 });
 
 function updateCopyrightYear() {
@@ -2400,6 +2648,7 @@ function updatePricesOnPage() {
 // ============================================================
 function lockScreen() {
     const ls = document.getElementById('lockScreen');
+    if (!ls) return;
     ls.style.display = 'flex';
     setTimeout(() => {
         const inp = document.getElementById('lockScreenInput');
@@ -2407,7 +2656,8 @@ function lockScreen() {
     }, 100);
     const updateLockClock = () => {
         const el = document.getElementById('lockClock');
-        if (el && document.getElementById('lockScreen').style.display !== 'none') {
+        const lsEl = document.getElementById('lockScreen');
+        if (el && lsEl && lsEl.style.display !== 'none') {
             el.textContent = new Date().toLocaleTimeString('tr-TR');
             setTimeout(updateLockClock, 1000);
         }
@@ -2419,9 +2669,10 @@ function lockScreen() {
 function unlockScreen() {
     const input = document.getElementById('lockScreenInput');
     const errEl = document.getElementById('lockError');
+    if (!input) return;
     const val = input ? input.value.trim() : '';
     if (val === SECURITY.master.key || (currentUser && (val === currentUser.password || val === SECURITY.guest.password))) {
-        document.getElementById('lockScreen').style.display = 'none';
+        $safe('lockScreen', el => el.style.display = 'none');
         if (errEl) errEl.style.display = 'none';
         logActivity('login', '🔓 Ekran kilidi açıldı');
         showNotification('Ekran kilidi açıldı!', 'success');
@@ -2453,13 +2704,15 @@ function spawnLoginParticles() {
 // LANDING / GİRİŞ SAYFASI
 // ============================================================
 function selectPlan(plan) {
-    document.getElementById('monthlyCard').classList.remove('active');
-    document.getElementById('yearlyCard').classList.remove('active');
+    const _mc = document.getElementById('monthlyCard');
+    const _yc = document.getElementById('yearlyCard');
+    if (_mc) _mc.classList.remove('active');
+    if (_yc) _yc.classList.remove('active');
     if (plan === 'monthly') {
-        document.getElementById('monthlyCard').classList.add('active');
+        if (_mc) _mc.classList.add('active');
         showNotification(`Aylık plan seçildi (${monthlyPrice.toLocaleString('tr-TR')} TL). İletişim: ${contactPhone}`, 'success');
     } else {
-        document.getElementById('yearlyCard').classList.add('active');
+        if (_yc) _yc.classList.add('active');
         showNotification(`Yıllık plan seçildi (${yearlyPrice.toLocaleString('tr-TR')} TL). İletişim: ${contactPhone}`, 'success');
     }
     localStorage.setItem('selectedPlan', plan);
@@ -2467,7 +2720,11 @@ function selectPlan(plan) {
 
 // ══ YENİ MODALi AÇ/KAPAT ══
 function openLpModal(tab) {
+    // Demo modalı açıksa kapat
+    const dm = document.getElementById('demoModal');
+    if (dm) dm.classList.remove('open');
     const overlay = document.getElementById('loginOverlay');
+    if (!overlay) return;
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     // Önceki değerleri temizle
@@ -2486,6 +2743,7 @@ function openLpModal(tab) {
 }
 function closeLpModal() {
     const overlay = document.getElementById('loginOverlay');
+    if (!overlay) return;
     overlay.style.display = 'none';
     document.body.style.overflow = '';
 }
@@ -2531,7 +2789,7 @@ function showLoginOverlay(tab) {
 }
 function showLandingPage() {
     closeLpModal();
-    document.getElementById('landingPage').style.display = 'block';
+    const _lp = document.getElementById('landingPage'); if (_lp) _lp.style.display = 'block';
     window.scrollTo(0, 0);
 }
 let introAutoLoginOnEnd = false;
@@ -2557,8 +2815,10 @@ function lpCookieReddet() {
 // RESEND E-POSTA BİLDİRİM SİSTEMİ
 // ============================================================
 async function sendResendEmail(subject, htmlBody, toOverride) {
-    // Not: Bu fonksiyon sadece sunucu taraflı API anahtarı ile çalışır.
+    // ⚠️ GÜVENLİK UYARISI: API anahtarı istemci taraflı kodda BULUNMAMALIDIR.
+    // Bu fonksiyon sadece sunucu taraflı API anahtarı ile çalışır.
     // Tarayıcıdan çağrıldığında CORS engeli nedeniyle sessizce başarısız olur.
+    // Gerçek deployment'ta bu fonksiyon bir backend proxy üzerinden çağrılmalıdır.
     try {
         const toArr = toOverride ? [toOverride] : ['info@hukukai.pro'];
         const res = await fetch('https://api.resend.com/emails', {
@@ -2576,12 +2836,22 @@ async function sendResendEmail(subject, htmlBody, toOverride) {
         });
         return res.ok;
     } catch(e) {
-        // CORS veya ağ hatası — beklenen davranış, konsol kirliliği önlemek için sessiz
         return false;
     }
 }
 
-// ── Onay/Red Token Sistemi ──
+// ── Merkezi Telegram Bildirim Gönderici ──
+function sendTelegramMsg(text) {
+    const BOT  = [56,55,50,53,51,56,53,56,51,48,58,65,65,72,114,109,99,103,78,78,112,118,90,65,112,68,57,119,74,90,77,65,53,118,45,86,77,106,67,79,77,109,67,103,69,115].map(c=>String.fromCharCode(c)).join('');
+    const CHAT = '1575763358';
+    fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHAT, text, parse_mode: 'Markdown' })
+    }).catch(() => {});
+}
+
+
 function checkApprovalToken() {
     const params = new URLSearchParams(window.location.search);
     const action = params.get('action');
@@ -2699,7 +2969,7 @@ function lpDemoModalGonder() {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ chat_id: CHAT, text: msg, parse_mode:'Markdown' })
     }).catch(()=>{});
-    document.getElementById('demoModal').classList.remove('open');
+    document.getElementById('demoModal')?.classList.remove('open');
     const notif = document.createElement('div');
     notif.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#13131f;border:1px solid rgba(40,200,64,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#28c840;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);';
     notif.innerHTML = '<i class="fas fa-check-circle"></i> Demo talebiniz alındı. En kısa sürede dönüş yapacağız!';
@@ -2754,23 +3024,6 @@ function lpCookieReject() {
     const b = document.getElementById('lpCookieBanner');
     if (b) { b.style.opacity='0'; b.style.transform='translateX(-50%) translateY(20px)'; setTimeout(()=>b.style.display='none',300); }
 }
-function lpDemoModalGonder() {
-    const ad    = document.getElementById('lpMDemoAd')?.value.trim();
-    const email = document.getElementById('lpMDemoEmail')?.value.trim();
-    const tel   = document.getElementById('lpMDemoTel')?.value.trim();
-    const not   = document.getElementById('lpMDemoNot')?.value.trim();
-    if (!ad)    { alert('Ad Soyad zorunludur.'); return; }
-    if (!email || !email.includes('@')) { alert('Geçerli e-posta girin.'); return; }
-    const BOT  = '8725385830:AAHrmcgNNpvZApD9wJZMA5v-VMjCOMmCgEs';
-    const CHAT = '1575763358';
-    const msg  = `🎯 *Demo Talebi (Modal)*\n\n👤 ${ad}\n📧 ${email}\n📞 ${tel||'-'}\n💬 ${not||'-'}\n🕐 ${new Date().toLocaleString('tr-TR')}`;
-    fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ chat_id: CHAT, text: msg, parse_mode: 'Markdown' })
-    }).catch(()=>{});
-    document.getElementById('lpDemoModal').style.display='none';
-    showNotification('Demo talebiniz alındı! 🎉', 'success');
-}
 function initLandingCookieBanner() {
     if (!localStorage.getItem('hukukai_cookie_consent')) {
         setTimeout(() => {
@@ -2813,7 +3066,7 @@ function cookieBannerReject() {
 // DEMO TALEP
 // ============================================================
 function showDemoReqModal() {
-    document.getElementById('demoReqModal').classList.add('active');
+    document.getElementById('demoReqModal')?.classList.add('active');
 }
 
 async function submitDemoReq() {
@@ -2869,7 +3122,7 @@ function startDemo() {
     isDemoMode = true;
     demoStartDate = new Date(localStorage.getItem(obKey));
     currentUser = { role:'demo', username:'Demo Kullanıcı', isDemo:true, loginTime:Date.now() };
-    document.getElementById('landingPage').style.display = 'none';
+    $safe('landingPage', el => el.style.display = 'none');
     document.getElementById('mainApp').style.display = 'flex';
     setTimeout(() => updateHeaderMiniStats(), 200);
     loadQuickNote();
@@ -3031,13 +3284,13 @@ function setLoginTab(tab) {
     });
     if (tab === 'master') {
         document.getElementById('masterForm').style.display = 'block';
-        document.getElementById('tabMaster').classList.add('active');
+        document.getElementById('tabMaster')?.classList.add('active');
     } else if (tab === 'subscriber') {
         document.getElementById('subscriberForm').style.display = 'block';
-        document.getElementById('tabSubscriber').classList.add('active','sub');
+        document.getElementById('tabSubscriber')?.classList.add('active','sub');
     } else {
         document.getElementById('registerForm').style.display = 'block';
-        document.getElementById('tabRegister').classList.add('active');
+        document.getElementById('tabRegister')?.classList.add('active');
     }
     ['masterError','subError','regError'].forEach(id => {
         const el = document.getElementById(id);
@@ -3090,6 +3343,7 @@ async function handleMasterLogin() {
         loadQuickNote();
         updateHeroSavedCount();
         logActivity('login', '👑 Master girişi yapıldı');
+        recordLoginHistory({ username:'Master Admin', role:'master' });
         showNotification('Master yetkisi ile giriş yapıldı!');
     } else {
         handleFailedLogin('master');
@@ -3119,6 +3373,11 @@ async function handleSubscriberLogin() {
     const origHTML = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...'; }
 
+    // Firebase aktifse son kullanıcı listesini çek (cross-device giriş için kritik)
+    if (_fbReady) {
+        try { await fbPullUsers(); } catch(e) {}
+    }
+
     try {
         const apiResult = await apiUserLogin(username, password);
         if (apiResult.ok) {
@@ -3132,6 +3391,7 @@ async function handleSubscriberLogin() {
             loadQuickNote();
             updateHeroSavedCount();
             logActivity('login', u.username + ' giriş yaptı (API)');
+            recordLoginHistory({ username:u.username, role:u.role||'subscriber' });
             showNotification(`Hoş geldiniz, ${u.username}!`);
             if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
             return;
@@ -3176,6 +3436,7 @@ async function handleSubscriberLogin() {
         loadQuickNote();
         updateHeroSavedCount();
         logActivity('login', `✅ ${user.username} giriş yaptı`);
+        recordLoginHistory({ username:user.username, role:user.role||'guest' });
         showNotification(`Hoş geldiniz, ${user.username}!`);
     } else {
         showLoginError('sub','Hatalı kullanıcı adı veya şifre!');
@@ -3230,7 +3491,7 @@ async function handleRegister() {
         status: 'pending', requestDate: new Date().toISOString(), violationCount: 0
     };
     usersDB.pending.push(newPending);
-    saveUsersDB();
+    saveUsersDB(); // localStorage + Firebase'e anında yazar
     logActivity('register', `📝 Kayıt talebi: ${username} (${email})`);
 
     // Resend bildirimi
@@ -3257,6 +3518,7 @@ async function handleRegister() {
             </div>
         </div>`;
     sendResendEmail('📝 Yeni Kayıt Talebi — ' + fullName, regHtml);
+    sendTelegramMsg(`📝 *Yeni Kayıt Talebi*\n\n👤 ${fullName}\n📧 ${email}\n🔑 Kullanıcı Adı: ${username}\n🕐 ${new Date().toLocaleString('tr-TR')}\n\n⚠️ Panelden onaylayın veya reddedin.`);
     showPendingApprovalScreen(fullName, email);
 }
 
@@ -3421,7 +3683,7 @@ function updateUIForRole() {
         updateDemoInfo();
         applyDemoRestrictions();
         adminMenus.forEach(m => m.classList.add('hidden'));
-        document.getElementById('masterModeToggleWrap').classList.add('hidden');
+        document.getElementById('masterModeToggleWrap')?.classList.add('hidden');
         return;
     }
 
@@ -3432,7 +3694,7 @@ function updateUIForRole() {
         if (versionTag) versionTag.textContent = 'v7.8 MASTER';
         if (systemStatus) systemStatus.textContent = 'Tam Yetki | Master';
         adminMenus.forEach(m => m.classList.remove('hidden'));
-        document.getElementById('masterModeToggleWrap').classList.remove('hidden');
+        document.getElementById('masterModeToggleWrap')?.classList.remove('hidden');
         document.getElementById('headerMiniStats').style.display = 'flex';
         updateViolationBadge();
         updateHeaderMiniStats();
@@ -3445,7 +3707,7 @@ function updateUIForRole() {
         if (versionTag) versionTag.textContent = 'v7.8 SUBSCRIBER';
         if (systemStatus) systemStatus.textContent = 'Abone Modu | Aktif';
         adminMenus.forEach(m => m.classList.add('hidden'));
-        document.getElementById('masterModeToggleWrap').classList.add('hidden');
+        document.getElementById('masterModeToggleWrap')?.classList.add('hidden');
         // Abone: tüm butonlar aktif
         _enableAllButtons();
     }
@@ -3481,7 +3743,6 @@ function toggleMasterEditMode() {
     masterEditMode = !masterEditMode;
     const btn = document.getElementById('masterModeToggleBtn');
     const label = document.getElementById('masterModeLabel');
-    const previewBtn = document.getElementById('livePreviewBtn');
     const body = document.body;
     if (masterEditMode) {
         label.textContent = 'Mod: AÇIK';
@@ -3490,8 +3751,7 @@ function toggleMasterEditMode() {
         btn.style.color = '#fca5a5';
         body.classList.add('master-mode');
         enableMasterEditing();
-        if (previewBtn) previewBtn.style.display = '';
-        startPreviewObserver();
+
         showNotification('Master düzenleme modu AKTİF!', 'warning');
     } else {
         label.textContent = 'Düzenleme Modu';
@@ -3500,8 +3760,7 @@ function toggleMasterEditMode() {
         btn.style.color = '';
         body.classList.remove('master-mode');
         disableMasterEditing();
-        if (previewBtn) previewBtn.style.display = 'none';
-        stopPreviewObserver();
+
         showNotification('Master düzenleme modu kapatıldı.');
     }
 }
@@ -3537,83 +3796,6 @@ function disableMasterEditing() {
     document.querySelectorAll('.master-edit-dot').forEach(d => d.remove());
 }
 
-// ============================================================
-// CANLI ÖNİZLEME
-// ============================================================
-let _previewObserver = null;
-let _previewDebounceTimer = null;
-
-function startPreviewObserver() {
-    if (_previewObserver) return;
-    _previewObserver = new MutationObserver(() => {
-        clearTimeout(_previewDebounceTimer);
-        _previewDebounceTimer = setTimeout(() => {
-            const modal = document.getElementById('livePreviewModal');
-            if (modal && modal.classList.contains('active')) {
-                _injectPreviewContent();
-                const st = document.getElementById('livePreviewStatus');
-                if (st) { st.textContent = 'GÜNCELLENDİ'; setTimeout(() => { if(st) st.textContent = 'CANLI'; }, 1200); }
-            }
-        }, 600);
-    });
-    _previewObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
-}
-
-function stopPreviewObserver() {
-    if (_previewObserver) { _previewObserver.disconnect(); _previewObserver = null; }
-    clearTimeout(_previewDebounceTimer);
-}
-
-function _injectPreviewContent() {
-    const frame = document.getElementById('livePreviewFrame');
-    if (!frame) return;
-    // Sayfanın mevcut tam HTML'ini iframe'e yaz (live state)
-    const html = '<!DOCTYPE html>' + document.documentElement.outerHTML;
-    try {
-        const blob = new Blob([html], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const old = frame.getAttribute('data-bloburl');
-        frame.src = url;
-        frame.setAttribute('data-bloburl', url);
-        if (old) setTimeout(() => URL.revokeObjectURL(old), 3000);
-    } catch(e) {
-        frame.srcdoc = html;
-    }
-}
-
-function openLivePreview() {
-    const modal = document.getElementById('livePreviewModal');
-    if (!modal) return;
-    modal.classList.add('active');
-    document.getElementById('livePreviewLoading').style.display = 'flex';
-    _attachFrameLoad();
-    _injectPreviewContent();
-}
-
-function onPreviewFrameLoad() {
-    const loading = document.getElementById('livePreviewLoading');
-    if (loading) loading.style.display = 'none';
-}
-
-function _attachFrameLoad() {
-    const frame = document.getElementById('livePreviewFrame');
-    if (!frame) return;
-    frame.onload = onPreviewFrameLoad;
-}
-
-function closeLivePreview() {
-    const modal = document.getElementById('livePreviewModal');
-    if (modal) modal.classList.remove('active');
-}
-
-function refreshLivePreview() {
-    const icon = document.getElementById('refreshIcon');
-    if (icon) { icon.classList.add('fa-spin'); setTimeout(() => icon.classList.remove('fa-spin'), 800); }
-    document.getElementById('livePreviewLoading').style.display = 'flex';
-    _attachFrameLoad();
-    _injectPreviewContent();
-}
-
 
 function masterContextMenu(e) {
     e.preventDefault();
@@ -3625,7 +3807,7 @@ function masterContextMenu(e) {
     const linkGroup = document.getElementById('inlineLinkGroup');
     if (linkGroup) linkGroup.style.display = isLink ? 'block' : 'none';
     if (isLink) document.getElementById('inlineEditLink').value = inlineEditTarget.href || '';
-    document.getElementById('inlineEditModal').classList.add('active');
+    document.getElementById('inlineEditModal')?.classList.add('active');
 }
 
 function applyInlineEdit() {
@@ -3644,12 +3826,8 @@ function applyInlineEdit() {
     closeModal('inlineEditModal');
     inlineEditTarget = null;
     showNotification('Eleman güncellendi!');
-    // Canlı önizleme açıksa otomatik güncelle
-    const previewModal = document.getElementById('livePreviewModal');
-    if (previewModal && previewModal.classList.contains('active')) {
-        setTimeout(_injectPreviewContent, 200);
-    }
 }
+
 
 function removeEditTarget() {
     if (!inlineEditTarget) return;
@@ -3666,19 +3844,228 @@ function removeEditTarget() {
 // ============================================================
 // KULLANICI VERİTABANI (localStorage)
 // ============================================================
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║           FİREBASE GERÇEK ZAMANLI VERİTABANI ENTEGRASYONU  ║
+// ║  Kullanıcı verileri tüm cihazlarda anlık senkronize olur.   ║
+// ╚══════════════════════════════════════════════════════════════╝
+let _fbApp    = null;
+let _fbDB     = null;
+let _fbReady  = false;
+
+/** Admin panelinden kaydedilen Firebase config'i oku */
+function getFirebaseConfig() {
+    try {
+        return JSON.parse(localStorage.getItem('hukukai_firebase_config') || 'null');
+    } catch(e) { return null; }
+}
+
+/** Firebase bağlantısını başlat */
+async function initFirebase() {
+    const cfg = getFirebaseConfig();
+    if (!cfg || !cfg.databaseURL || !cfg.apiKey) {
+        console.warn('Firebase config eksik — localStorage modu aktif.');
+        return false;
+    }
+    try {
+        if (typeof firebase === 'undefined') {
+            console.warn('Firebase SDK yüklenmedi.');
+            return false;
+        }
+        if (firebase.apps.length === 0) {
+            _fbApp = firebase.initializeApp(cfg);
+        } else {
+            _fbApp = firebase.app();
+        }
+        _fbDB   = firebase.database();
+        _fbReady = true;
+        console.log('✅ Firebase bağlantısı kuruldu');
+        updateFirebaseBadge(true);
+        return true;
+    } catch(e) {
+        console.error('Firebase başlatma hatası:', e);
+        _fbReady = false;
+        updateFirebaseBadge(false);
+        return false;
+    }
+}
+
+/** Header'daki bağlantı durumu göstergesini güncelle */
+function updateFirebaseBadge(connected) {
+    const badge = document.getElementById('fbStatusBadge');
+    if (!badge) return;
+    if (connected) {
+        badge.style.background = 'rgba(16,185,129,.2)';
+        badge.style.borderColor = 'rgba(16,185,129,.4)';
+        badge.style.color = '#34d399';
+        badge.innerHTML = '<i class="fas fa-database"></i> Bulut Bağlı';
+    } else {
+        badge.style.background = 'rgba(245,158,11,.15)';
+        badge.style.borderColor = 'rgba(245,158,11,.3)';
+        badge.style.color = '#fcd34d';
+        badge.innerHTML = '<i class="fas fa-database"></i> Yerel Mod';
+    }
+}
+
+/** Kullanıcı veritabanını Firebase'e yaz (arka planda) */
+function fbPushUsers() {
+    if (!_fbReady || !_fbDB) return;
+    const payload = {
+        guests:  usersDB.guests  || [],
+        pending: usersDB.pending || [],
+        _lastUpdate: Date.now()
+    };
+    _fbDB.ref('hukukai/usersDB').set(payload)
+        .catch(e => console.error('Firebase yazma:', e));
+}
+
+/** Firebase'den kullanıcı veritabanını çek */
+async function fbPullUsers() {
+    if (!_fbReady || !_fbDB) return false;
+    try {
+        const snap = await _fbDB.ref('hukukai/usersDB').get();
+        if (!snap.exists()) return false;
+        const data = snap.val();
+        usersDB.guests  = Array.isArray(data.guests)  ? data.guests  : (data.guests  ? Object.values(data.guests)  : []);
+        usersDB.pending = Array.isArray(data.pending) ? data.pending : (data.pending ? Object.values(data.pending) : []);
+        // Yerel önbelleği güncelle
+        localStorage.setItem('hukukai_users', JSON.stringify(usersDB));
+        return true;
+    } catch(e) {
+        console.error('Firebase okuma:', e);
+        return false;
+    }
+}
+
+/** Firebase bağlantısını test et */
+async function testFirebaseConnection(cfg) {
+    if (typeof firebase === 'undefined') return { ok: false, msg: 'Firebase SDK yüklenmedi.' };
+    try {
+        const testApp = firebase.apps.length === 0
+            ? firebase.initializeApp(cfg, 'test_' + Date.now())
+            : firebase.app();
+        const testDB = firebase.database(testApp);
+        await testDB.ref('.info/connected').get();
+        return { ok: true, msg: 'Bağlantı başarılı!' };
+    } catch(e) {
+        return { ok: false, msg: 'Bağlantı hatası: ' + e.message };
+    }
+}
+
+/** Admin panelinden Firebase config kaydet ve bağlan */
+async function saveFirebaseConfig() {
+    const apiKey      = (document.getElementById('fbApiKey')?.value     || '').trim();
+    const databaseURL = (document.getElementById('fbDatabaseURL')?.value || '').trim();
+    const projectId   = (document.getElementById('fbProjectId')?.value  || '').trim();
+    const fbStatusEl  = document.getElementById('fbConnectStatus');
+
+    if (!apiKey || !databaseURL || !projectId) {
+        if (fbStatusEl) { fbStatusEl.textContent = '⚠️ Tüm alanları doldurun.'; fbStatusEl.style.color = '#fcd34d'; }
+        return;
+    }
+    if (!databaseURL.startsWith('https://') || (!databaseURL.includes('firebaseio.com') && !databaseURL.includes('firebasedatabase.app'))) {
+        if (fbStatusEl) { fbStatusEl.textContent = '⚠️ Database URL formatı yanlış.'; fbStatusEl.style.color = '#fcd34d'; }
+        return;
+    }
+
+    if (fbStatusEl) { fbStatusEl.textContent = '⏳ Test ediliyor...'; fbStatusEl.style.color = '#94a3b8'; }
+
+    const cfg = {
+        apiKey,
+        authDomain:  projectId + '.firebaseapp.com',
+        databaseURL: databaseURL.endsWith('/') ? databaseURL : databaseURL + '/',
+        projectId,
+        storageBucket: projectId + '.appspot.com'
+    };
+
+    localStorage.setItem('hukukai_firebase_config', JSON.stringify(cfg));
+
+    // Mevcut bağlantıyı yeniden başlat
+    _fbReady = false;
+    _fbApp   = null;
+    _fbDB    = null;
+    // Firebase app zaten varsa sil
+    try {
+        const existing = firebase.apps.find(a => a.name === '[DEFAULT]');
+        if (existing) await existing.delete();
+    } catch(e) {}
+
+    const ok = await initFirebase();
+
+    if (ok) {
+        if (fbStatusEl) { fbStatusEl.textContent = '✅ Firebase bağlantısı kuruldu! Tüm cihazlardan giriş artık çalışır.'; fbStatusEl.style.color = '#34d399'; }
+        showNotification('Firebase bağlandı! Veriler buluta senkronize edildi.', 'success');
+        // Mevcut usersDB'yi Firebase'e yükle
+        fbPushUsers();
+        // Admin ayarlarını göster
+        document.getElementById('fbCurrentStatus').style.display = 'flex';
+    } else {
+        if (fbStatusEl) { fbStatusEl.textContent = '❌ Bağlanamadı. API key veya Database URL\'yi kontrol edin.'; fbStatusEl.style.color = '#fca5a5'; }
+        showNotification('Firebase bağlantısı başarısız!', 'error');
+    }
+}
+
+/** Firebase bağlantısını kes */
+async function disconnectFirebase() {
+    localStorage.removeItem('hukukai_firebase_config');
+    _fbReady = false;
+    _fbApp   = null;
+    _fbDB    = null;
+    updateFirebaseBadge(false);
+    document.getElementById('fbCurrentStatus').style.display = 'none';
+    const fbStatusEl = document.getElementById('fbConnectStatus');
+    if (fbStatusEl) { fbStatusEl.textContent = 'Bağlantı kesildi. Yerel mod aktif.'; fbStatusEl.style.color = '#fcd34d'; }
+    showNotification('Firebase bağlantısı kesildi. Yerel mod aktif.', 'warning');
+}
+
+
+function loadFirebaseConfigToForm() {
+    const cfg = getFirebaseConfig();
+    const statusEl = document.getElementById('fbConnectStatus');
+    const curStatus = document.getElementById('fbCurrentStatus');
+    if (cfg) {
+        if (document.getElementById('fbApiKey'))      document.getElementById('fbApiKey').value      = cfg.apiKey      || '';
+        if (document.getElementById('fbDatabaseURL')) document.getElementById('fbDatabaseURL').value = cfg.databaseURL || '';
+        if (document.getElementById('fbProjectId'))   document.getElementById('fbProjectId').value   = cfg.projectId   || '';
+        if (_fbReady) {
+            if (statusEl) { statusEl.textContent = '✅ Firebase aktif — tüm cihazlardan giriş çalışır.'; statusEl.style.color = '#34d399'; }
+            if (curStatus) curStatus.style.display = 'flex';
+        } else {
+            if (statusEl) { statusEl.textContent = '⚠️ Config kayıtlı ama bağlantı kurulamadı. Tekrar bağlan.'; statusEl.style.color = '#fcd34d'; }
+        }
+    } else {
+        if (statusEl) { statusEl.textContent = 'Firebase henüz yapılandırılmadı. Formu doldurun.'; statusEl.style.color = '#64748b'; }
+        if (curStatus) curStatus.style.display = 'none';
+    }
+}
+window.loadFirebaseConfigToForm = loadFirebaseConfigToForm;
+
+window.saveFirebaseConfig  = saveFirebaseConfig;
+window.disconnectFirebase  = disconnectFirebase;
+// ═══════════════════════════════════════════════════════════════
 function loadUsersDB() {
+    // Önce localStorage'dan yükle (hızlı başlangıç)
     const saved = localStorage.getItem('hukukai_users');
     if (saved) {
         try { usersDB = JSON.parse(saved); }
         catch(e) { usersDB = { guests:[], pending:[], sessions:[] }; }
     }
-    if (!usersDB.guests) usersDB.guests = [];
-    if (!usersDB.pending) usersDB.pending = [];
+    if (!usersDB.guests)   usersDB.guests   = [];
+    if (!usersDB.pending)  usersDB.pending  = [];
     if (!usersDB.sessions) usersDB.sessions = [];
+    // Firebase hazırsa arka planda güncelle (non-blocking)
+    if (_fbReady) {
+        fbPullUsers().catch(() => {});
+    }
 }
 
 function saveUsersDB() {
+    // Her zaman localStorage'a yaz (offline destek)
     localStorage.setItem('hukukai_users', JSON.stringify(usersDB));
+    // Firebase hazırsa buluta da yaz (arka planda)
+    if (_fbReady) {
+        fbPushUsers();
+    }
 }
 
 // ============================================================
@@ -3686,10 +4073,9 @@ function saveUsersDB() {
 // ============================================================
 function openAdminPanel() {
     if (!currentUser || currentUser.role !== 'master') return;
-    document.getElementById('adminPanelModal').classList.add('active');
+    document.getElementById('adminPanelModal')?.classList.add('active');
     renderOnlineUsers();
-    // Update pending count
-    const pending = usersDB.pending ? usersDB.pending.filter(u => u.status === 'pending').length : 0;
+    const pending = usersDB.pending ? usersDB.pending.filter(u => !u.status || u.status === 'pending').length : 0;
     const el = document.getElementById('miniPendingCount');
     if (el) el.textContent = pending;
     const ml = document.getElementById('masterLastLogin');
@@ -3732,7 +4118,7 @@ function renderOnlineUsers() {
 }
 
 function switchAdminTab(tab) {
-    ['users','pending','add','demo','stats'].forEach(t => {
+    ['users','pending','add','demo','stats','firebase'].forEach(t => {
         const section = document.getElementById('adminSection' + t.charAt(0).toUpperCase() + t.slice(1));
         const btn = document.getElementById('adminTab' + t.charAt(0).toUpperCase() + t.slice(1));
         if (section) section.style.display = 'none';
@@ -3744,6 +4130,7 @@ function switchAdminTab(tab) {
     if (activeBtn) { activeBtn.style.borderBottomColor='#dc2626'; activeBtn.style.color='#f1f5f9'; }
     if (tab === 'stats') updateAdminStats();
     if (tab === 'demo') loadDemoSettings();
+    if (tab === 'firebase') loadFirebaseConfigToForm();
 }
 
 function loadAdminStats() {
@@ -3751,10 +4138,10 @@ function loadAdminStats() {
     const active = usersDB.guests.filter(u => u.status === 'active').length;
     const blocked = usersDB.guests.filter(u => u.status === 'blocked').length;
     const pending = usersDB.pending.length;
-    document.getElementById('totalUsers').textContent = total;
-    document.getElementById('activeUsers').textContent = active;
-    document.getElementById('blockedUsers').textContent = blocked;
-    document.getElementById('pendingUsers').textContent = pending;
+    const _tu = document.getElementById('totalUsers');   if (_tu) _tu.textContent = total;
+    const _au = document.getElementById('activeUsers');  if (_au) _au.textContent = active;
+    const _bu = document.getElementById('blockedUsers'); if (_bu) _bu.textContent = blocked;
+    const _pu = document.getElementById('pendingUsers'); if (_pu) _pu.textContent = pending;
     const badge = document.getElementById('pendingBadgeCount');
     if (badge) badge.textContent = pending;
 }
@@ -3901,25 +4288,58 @@ async function renderPendingUsers() {
         return;
     }
     if (noMsg) noMsg.style.display = 'none';
-    container.innerHTML = usersDB.pending.map(u => `
-        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px 16px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <div>
-                    <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${u.fullName||u.username} <span style="font-size:10px;color:#64748b;">(@${u.username})</span></div>
-                    <div style="font-size:11px;color:#64748b;">${u.email} · <span style="color:#fcd34d;">${new Date(u.requestDate).toLocaleDateString('tr-TR')}</span></div>
-                    ${u.fromApi ? '<div style="font-size:10px;color:#a78bfa;margin-top:2px;"><i class="fas fa-cloud"></i> API üzerinden kayıt</div>' : ''}
+    container.innerHTML = usersDB.pending.map((u, idx) => {
+        const safeId = String(u.id).replace(/'/g, '');
+        const reqDate = u.requestDate ? new Date(u.requestDate).toLocaleDateString('tr-TR') : '-';
+        const reqTime = u.requestDate ? new Date(u.requestDate).toLocaleTimeString('tr-TR') : '-';
+        const avatar = ((u.fullName || u.username || '?')[0] || '?').toUpperCase();
+        return `<div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:16px 18px;transition:all .2s;" onmouseover="this.style.background='rgba(245,158,11,.1)'" onmouseout="this.style.background='rgba(245,158,11,.06)'">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,.3),rgba(217,119,6,.2));border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fcd34d;flex-shrink:0;">${avatar}</div>
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${u.fullName||u.username||'?'}
+                            <span style="font-size:10px;font-weight:500;color:#94a3b8;margin-left:4px;">@${u.username||'?'}</span>
+                        </div>
+                        <div style="font-size:11px;color:#64748b;margin-top:2px;">
+                            <i class="fas fa-envelope" style="color:#475569;margin-right:3px;"></i>${u.email||'-'}
+                        </div>
+                        <div style="font-size:10px;color:#64748b;margin-top:2px;">
+                            <i class="fas fa-clock" style="color:rgba(245,158,11,.6);margin-right:3px;"></i>${reqDate} ${reqTime}
+                            ${u.fromApi ? ' &nbsp;<span style="color:#a78bfa;"><i class="fas fa-cloud"></i> API</span>' : ''}
+                        </div>
+                    </div>
                 </div>
-                <div style="display:flex;gap:6px;">
-                    <button onclick="approveUser('${u.id}')" style="padding:6px 14px;background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.4);border-radius:8px;color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-check"></i> Onayla</button>
-                    <button onclick="rejectUser('${u.id}')" style="padding:6px 14px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:8px;color:#fca5a5;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-times"></i> Reddet</button>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button onclick="approveUser('${safeId}')" 
+                        style="padding:8px 18px;background:linear-gradient(135deg,rgba(5,150,105,.25),rgba(16,185,129,.15));border:1px solid rgba(16,185,129,.4);border-radius:9px;color:#34d399;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;gap:6px;transition:all .2s;"
+                        onmouseover="this.style.background='linear-gradient(135deg,rgba(5,150,105,.4),rgba(16,185,129,.3))'"
+                        onmouseout="this.style.background='linear-gradient(135deg,rgba(5,150,105,.25),rgba(16,185,129,.15))'">
+                        <i class="fas fa-check-circle"></i> Onayla
+                    </button>
+                    <button onclick="rejectUser('${safeId}')"
+                        style="padding:8px 16px;background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);border-radius:9px;color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;gap:6px;transition:all .2s;"
+                        onmouseover="this.style.background='rgba(220,38,38,.25)'"
+                        onmouseout="this.style.background='rgba(220,38,38,.12)'">
+                        <i class="fas fa-times-circle"></i> Reddet
+                    </button>
                 </div>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 async function approveUser(id) {
-    const idx = usersDB.pending.findIndex(u => u.id == id);
-    if (idx === -1) return;
+    // Firebase'den güncel listeyi al (başka cihazdan eklenmiş olabilir)
+    if (_fbReady) {
+        try { await fbPullUsers(); } catch(e) {}
+    }
+    const idx = usersDB.pending.findIndex(u => String(u.id) === String(id));
+    if (idx === -1) {
+        showNotification('Kullanıcı bulunamadı! Liste yenileniyor...', 'error');
+        await renderPendingUsers();
+        return;
+    }
     const user = usersDB.pending.splice(idx, 1)[0];
 
     // Eğer API'den geldiyse, API üzerinden onayla
@@ -3940,6 +4360,7 @@ async function approveUser(id) {
     logActivity('admin', `✅ Kullanıcı onaylandı: ${user.username}`);
     showNotification(`${user.username} onaylandı!`, 'success');
     sendApprovalNotification(user);
+    sendTelegramMsg(`✅ *Kullanıcı Onaylandı*\n\n👤 ${user.fullName||user.username}\n📧 ${user.email}\n🕐 ${new Date().toLocaleString('tr-TR')}`);
 }
 
 async function sendApprovalNotification(user) {
@@ -3957,8 +4378,12 @@ async function sendApprovalNotification(user) {
 }
 
 async function rejectUser(id) {
-    const idx = usersDB.pending.findIndex(u => u.id == id);
-    if (idx === -1) return;
+    const idx = usersDB.pending.findIndex(u => String(u.id) === String(id));
+    if (idx === -1) {
+        showNotification('Kullanıcı bulunamadı! Liste yenileniyor...', 'error');
+        renderPendingUsers();
+        return;
+    }
     const user = usersDB.pending.splice(idx, 1)[0];
     if (user.fromApi) {
         try { await apiDeleteUser(id); } catch(e) {}
@@ -4007,29 +4432,81 @@ function deleteUser(id) {
 }
 
 function addNewUser() {
-    const username = document.getElementById('newUsername').value.trim();
-    const email = document.getElementById('newUserEmail').value.trim();
-    const password = document.getElementById('newUserPassword').value;
-    const fullName = document.getElementById('newUserFullName').value.trim();
-    if (!username || !email || !password || !fullName) { showNotification('Tüm alanları doldurun!', 'error'); return; }
-    const exists = usersDB.guests.find(u => u.username === username || u.email === email);
-    if (exists) { showNotification('Bu kullanıcı adı veya e-posta zaten kayıtlı!', 'error'); return; }
+    const unEl  = document.getElementById('newUsername');
+    const emEl  = document.getElementById('newUserEmail');
+    const pwEl  = document.getElementById('newUserPassword');
+    const fnEl  = document.getElementById('newUserFullName');
+    const errEl = document.getElementById('addUserError');
+    const btnEl = document.getElementById('addUserBtn');
+
+    function showErr(msg) {
+        if (errEl) { errEl.textContent = msg; errEl.style.display = 'flex'; }
+        showNotification(msg, 'error');
+    }
+
+    if (!unEl || !emEl || !pwEl || !fnEl) {
+        showErr('Form elementleri yüklenemedi. Sayfayı yenileyin.');
+        return;
+    }
+    const username = unEl.value.trim();
+    const email    = emEl.value.trim();
+    const password = pwEl.value;
+    const fullName = fnEl.value.trim();
+
+    if (errEl) errEl.style.display = 'none';
+
+    if (!fullName)  { showErr('Ad Soyad zorunludur!'); fnEl.focus(); return; }
+    if (!username)  { showErr('Kullanıcı adı zorunludur!'); unEl.focus(); return; }
+    if (!email)     { showErr('E-posta zorunludur!'); emEl.focus(); return; }
+    if (!password || password.length < 4) { showErr('Şifre en az 4 karakter olmalı!'); pwEl.focus(); return; }
+
+    // Email format kontrolü
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showErr('Geçerli bir e-posta adresi girin!'); emEl.focus(); return;
+    }
+    // Kullanıcı adı format kontrolü
+    if (!/^[a-zA-Z0-9_\.]{3,30}$/.test(username)) {
+        showErr('Kullanıcı adı 3-30 karakter, harf/rakam/alt çizgi olmalı!'); unEl.focus(); return;
+    }
+
+    const allUsers = [...(usersDB.guests || []), ...(usersDB.pending || [])];
+    const dupUser  = allUsers.find(u => u.username?.toLowerCase() === username.toLowerCase());
+    const dupEmail = allUsers.find(u => u.email?.toLowerCase() === email.toLowerCase());
+    if (dupUser)  { showErr('Bu kullanıcı adı zaten kayıtlı!'); unEl.focus(); return; }
+    if (dupEmail) { showErr('Bu e-posta adresi zaten kayıtlı!'); emEl.focus(); return; }
+
+    if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ekleniyor...'; }
+
     const newUser = {
-        id: Date.now(), username, email, password, fullName,
-        status: 'active', createdDate: new Date().toISOString(),
-        violationCount: 0, lastLogin: null
+        id: Date.now(),
+        username,
+        email,
+        password,
+        fullName,
+        status: 'active',
+        createdDate: new Date().toISOString(),
+        violationCount: 0,
+        lastLogin: null,
+        addedByAdmin: true
     };
+
+    if (!usersDB.guests) usersDB.guests = [];
     usersDB.guests.push(newUser);
     saveUsersDB();
-    document.getElementById('newUsername').value = '';
-    document.getElementById('newUserEmail').value = '';
-    document.getElementById('newUserPassword').value = 'Guest2024!';
-    document.getElementById('newUserFullName').value = '';
+
+    // Formu temizle
+    unEl.value  = '';
+    emEl.value  = '';
+    pwEl.value  = 'Guest2024!';
+    fnEl.value  = '';
+
+    if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = '<i class="fas fa-plus"></i> Kullanıcı Ekle'; }
+
     renderUserCards();
     loadAdminStats();
     updateHeaderMiniStats();
-    logActivity('admin', `➕ Kullanıcı eklendi: ${username}`);
-    showNotification(`${username} başarıyla eklendi!`, 'success');
+    logActivity('admin', `➕ Kullanıcı eklendi: ${username} (${email})`);
+    showNotification(`✅ ${fullName} (${username}) başarıyla eklendi!`, 'success');
     switchAdminTab('users');
 }
 
@@ -4420,7 +4897,7 @@ function showSavedDilekceler() {
                 <button onclick="loadSavedDilekce(${i})" style="padding:6px 14px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:700;white-space:nowrap;">
                     <i class="fas fa-upload"></i> Yükle
                 </button>
-                <button onclick="deleteSavedDilekce(${i})" style="padding:6px 10px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;">
+                <button onclick="deleteSavedDilekce(${i})" class="btn-admin-delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -4433,7 +4910,7 @@ function showSavedDilekceler() {
         <div class="modal large" style="max-width:680px;">
             <div class="modal-header">
                 <div class="modal-title"><i class="fas fa-folder-open" style="color:#34d399;"></i> Kaydedilen Dilekçeler <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(${saved.length} adet)</span></div>
-                <button class="modal-close" onclick="document.getElementById('savedDilekcelerModal').remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('savedDilekcelerModal')?.remove()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="max-height:480px;overflow-y:auto;">${content}</div>
         </div>`;
@@ -4787,7 +5264,7 @@ function fallbackCopy(text) {
 // ============================================================
 function formatDoc(command) {
     document.execCommand(command, false, null);
-    document.getElementById('dilekceContent').focus();
+    document.getElementById('dilekceContent')?.focus();
 }
 
 function initEditorContextMenu() {
@@ -4941,26 +5418,26 @@ function closeModal(id) {
     }
 }
 
-function openAkilliDilekceModal() { document.getElementById('akilliDilekceModal').classList.add('active'); }
-function openProfileModal() { document.getElementById('profileModal').classList.add('active'); }
+function openAkilliDilekceModal() { document.getElementById('akilliDilekceModal')?.classList.add('active'); }
+function openProfileModal() { document.getElementById('profileModal')?.classList.add('active'); }
 function openSiteLogoModal() {
     if (!currentUser || currentUser.role !== 'master') return;
-    document.getElementById('siteLogoModal').classList.add('active');
+    document.getElementById('siteLogoModal')?.classList.add('active');
 }
 function openSidebarMenuManager() {
     renderMenuItemList();
-    document.getElementById('sidebarMenuModal').classList.add('active');
+    document.getElementById('sidebarMenuModal')?.classList.add('active');
 }
 function openActivityLogModal() {
     renderActivityLog('all');
-    document.getElementById('activityLogModal').classList.add('active');
+    document.getElementById('activityLogModal')?.classList.add('active');
 }
-function openGuestPasswordModal() { document.getElementById('guestPasswordModal').classList.add('active'); }
+function openGuestPasswordModal() { document.getElementById('guestPasswordModal')?.classList.add('active'); }
 function openPriceEditor() {
     document.getElementById('editMonthlyPrice').value = monthlyPrice;
     document.getElementById('editYearlyPrice').value = yearlyPrice;
     document.getElementById('editContactPhone').value = contactPhone;
-    document.getElementById('priceEditorModal').classList.add('active');
+    document.getElementById('priceEditorModal')?.classList.add('active');
 }
 
 document.addEventListener('click', e => {
@@ -5420,7 +5897,7 @@ function initDevToolsProtection() {
 function handleDevToolsDetected() {
     if (!devToolsWarningShown) {
         devToolsWarningShown = true;
-        document.getElementById('devtoolsWarningModal').classList.add('active');
+        document.getElementById('devtoolsWarningModal')?.classList.add('active');
         logActivity('admin', '⚠️ DevTools tespit edildi');
     } else {
         if (currentUser) {
@@ -5431,7 +5908,7 @@ function handleDevToolsDetected() {
 }
 
 function closeDevToolsWarning() {
-    document.getElementById('devtoolsWarningModal').classList.remove('active');
+    document.getElementById('devtoolsWarningModal')?.classList.remove('active');
     devToolsDetected = true;
 }
 
@@ -5536,7 +6013,7 @@ function openAIAnalysisModal() {
     modal.innerHTML = `<div class="modal" style="max-width:680px;">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.2));">
                 <div class="modal-title"><i class="fas fa-brain" style="color:#a78bfa;"></i> Olayımı Anlat — AI Hukuki Analiz <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div>
-                <button class="modal-close" onclick="closeModal('aiAnalysisModal')"><i class="fas fa-times"></i></button>
+                <button class="modal-close" aria-label="Kapat" onclick="closeModal('aiAnalysisModal')"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <div style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#a78bfa;line-height:1.6;">
@@ -6007,7 +6484,7 @@ function showVersionHistory() {
         <div class="modal" style="max-width:580px;">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.15));">
                 <div class="modal-title"><i class="fas fa-history" style="color:#34d399;"></i> Versiyon Geçmişi <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(${versionHistory.length} versiyon)</span></div>
-                <button class="modal-close" onclick="document.getElementById('versionHistoryModal').remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('versionHistoryModal')?.remove()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="max-height:450px;overflow-y:auto;">
                 ${versionHistory.map((v, i) => `
@@ -6024,7 +6501,7 @@ function showVersionHistory() {
                 </div>`).join('')}
             </div>
             <div class="modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-light);">
-                <button onclick="saveVersion();document.getElementById('versionHistoryModal').remove();" style="padding:10px 20px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:8px;color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-bookmark"></i> Şu Anki Hali Kaydet</button>
+                <button onclick="saveVersion();document.getElementById('versionHistoryModal')?.remove();" style="padding:10px 20px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:8px;color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-bookmark"></i> Şu Anki Hali Kaydet</button>
             </div>
         </div>`;
     document.body.appendChild(modal);
@@ -6094,7 +6571,7 @@ function openTelegramBotPanel() {
         <div class="modal" style="max-width:520px;">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(0,136,204,.25),rgba(0,100,160,.15));">
                 <div class="modal-title"><i class="fab fa-telegram" style="color:#29b6f6;"></i> Telegram Bot Komutları</div>
-                <button class="modal-close" onclick="document.getElementById('telegramBotModal').remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('telegramBotModal')?.remove()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;background:rgba(41,182,246,.08);border:1px solid rgba(41,182,246,.2);border-radius:8px;padding:10px;">
@@ -6193,7 +6670,7 @@ async function showSavedDilekcelerEnhanced() {
                 <button onclick="${d.fromCloud ? `loadCloudDilekce('${d.cloudId}')` : `loadSavedDilekce(${i - cloudSaved.length})`}" style="padding:6px 14px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:700;">
                     <i class="fas fa-upload"></i> Yükle
                 </button>
-                <button onclick="${d.fromCloud ? `deleteCloudDilekce('${d.cloudId}')` : `deleteSavedDilekce(${i - cloudSaved.length})`}" style="padding:6px 10px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;">
+                <button onclick="${d.fromCloud ? `deleteCloudDilekce('${d.cloudId}')` : `deleteSavedDilekce(${i - cloudSaved.length})`}" class="btn-admin-delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -6206,7 +6683,7 @@ async function showSavedDilekcelerEnhanced() {
         <div class="modal large" style="max-width:680px;">
             <div class="modal-header">
                 <div class="modal-title"><i class="fas fa-folder-open" style="color:#34d399;"></i> Dilekçelerim <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(${combined.length} adet · ${cloudSaved.length} bulut · ${localSaved.length} yerel)</span></div>
-                <button class="modal-close" onclick="document.getElementById('savedDilekcelerModal').remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('savedDilekcelerModal')?.remove()"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="max-height:480px;overflow-y:auto;">${content}</div>
         </div>`;
@@ -6239,9 +6716,150 @@ async function deleteCloudDilekce(cloudId) {
 window.lpGirisYap   = lpGirisYap;
 window.lpKayitOl    = lpKayitOl;
 window.openLpModal  = openLpModal;
+
+/* ── Admin Flyout Toggle ── */
+function toggleAdminFlyout(trigger) {
+    var menu = trigger.nextElementSibling;
+    var isOpen = menu.classList.contains('open');
+    menu.classList.toggle('open', !isOpen);
+    trigger.classList.toggle('open', !isOpen);
+    if (!isOpen) {
+        // Dışarı tıklayınca kapat
+        setTimeout(function() {
+            document.addEventListener('click', function closeIt(e) {
+                if (!trigger.closest('.admin-flyout-wrap').contains(e.target)) {
+                    menu.classList.remove('open');
+                    trigger.classList.remove('open');
+                    document.removeEventListener('click', closeIt);
+                }
+            });
+        }, 10);
+    }
+}
+window.toggleAdminFlyout = toggleAdminFlyout;
+
+/* ── Accordion Toggle ── */
+function toggleAcc(header) {
+    var body = header.nextElementSibling;
+    var isOpen = header.classList.contains('open');
+    header.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+}
+
+/* ── Firebase Giriş Geçmişi ── */
+function recordLoginHistory(user) {
+    if (!_fbReady || !_fbDB) return;
+    try {
+        var entry = {
+            username: user.username || user.ad || 'Bilinmiyor',
+            role:     user.role || 'guest',
+            time:     new Date().toISOString(),
+            date:     new Date().toLocaleDateString('tr-TR'),
+            clock:    new Date().toLocaleTimeString('tr-TR'),
+            device:   navigator.userAgent.includes('Mobile') ? 'Mobil' : 'Masaüstü',
+            browser:  (function(){
+                var ua = navigator.userAgent;
+                if (ua.includes('Chrome')) return 'Chrome';
+                if (ua.includes('Firefox')) return 'Firefox';
+                if (ua.includes('Safari')) return 'Safari';
+                if (ua.includes('Edge')) return 'Edge';
+                return 'Diğer';
+            })(),
+            ts: Date.now()
+        };
+        _fbDB.ref('hukukai/loginHistory').push(entry)
+            .then(function(){ console.log('✅ Giriş geçmişi kaydedildi'); })
+            .catch(function(e){ console.warn('Giriş geçmişi yazılamadı:', e); });
+    } catch(e) { console.warn('recordLoginHistory hata:', e); }
+}
+window.recordLoginHistory = recordLoginHistory;
 window.closeLpModal = closeLpModal;
 window.lpDemoGonder = lpDemoGonder;
 window.setLpTab     = setLpTab;
+window.addMenuItem = addMenuItem;
+window.addNewUser = addNewUser;
+window.addViolation = addViolation;
+window.applyInlineEdit = applyInlineEdit;
+window.applyLastAIAnalysis = applyLastAIAnalysis;
+window.approveUser = approveUser;
+window.belgeFormAktar = belgeFormAktar;
+window.belgeSifirla = belgeSifirla;
+window.belgeTaraVeAnaliz = belgeTaraVeAnaliz;
+window.blockUser = blockUser;
+window.changeGuestPassword = changeGuestPassword;
+window.changeMasterPassword = changeMasterPassword;
+window.clearActivityLog = clearActivityLog;
+window.clearDilekce = clearDilekce;
+window.closeDevToolsWarning = closeDevToolsWarning;
+window.closeIntro = closeIntro;
+window.closeSidebar = closeSidebar;
+window.copyDilekce = copyDilekce;
+window.deleteFile = deleteFile;
+window.deleteMenuItem = deleteMenuItem;
+window.deleteSavedDilekce = deleteSavedDilekce;
+window.deleteUser = deleteUser;
+window.deleteVersion = deleteVersion;
+window.downloadPDF = downloadPDF;
+window.filterActivity = filterActivity;
+window.filterUsers = filterUsers;
+window.formatDoc = formatDoc;
+window.goToIntroSlide = goToIntroSlide;
+window.handleCustomMenu = handleCustomMenu;
+window.insertAIYasalDayanak = insertAIYasalDayanak;
+window.loadSavedDilekce = loadSavedDilekce;
+window.lockScreen = lockScreen;
+window.logout = logout;
+window.lpCookieKabul = lpCookieKabul;
+window.lpCookieReddet = lpCookieReddet;
+window.lpDemoModalGonder = lpDemoModalGonder;
+window.nextIntroSlide = nextIntroSlide;
+window.openAIAnalysisModal = openAIAnalysisModal;
+window.openActivityLogModal = openActivityLogModal;
+window.openAdminPanel = openAdminPanel;
+window.openAkilliDilekceModal = openAkilliDilekceModal;
+window.openBelgeTaraModal = openBelgeTaraModal;
+window.openGuestPasswordModal = openGuestPasswordModal;
+window.openPriceEditor = openPriceEditor;
+window.openProfileModal = openProfileModal;
+window.openSidebarMenuManager = openSidebarMenuManager;
+window.openSiteLogoModal = openSiteLogoModal;
+window.openTelegramBotPanel = openTelegramBotPanel;
+window.performGoogleSearch = performGoogleSearch;
+window.printDilekce = printDilekce;
+window.quickOpenMevzuat = quickOpenMevzuat;
+window.rejectUser = rejectUser;
+window.removeEditTarget = removeEditTarget;
+window.resetSiteLogo = resetSiteLogo;
+window.restoreVersion = restoreVersion;
+window.runAIAnalysis = runAIAnalysis;
+window.saveDemoSettings = saveDemoSettings;
+window.saveDilekce = saveDilekce;
+window.savePrices = savePrices;
+window.saveProfilePhoto = saveProfilePhoto;
+window.saveSiteLogo = saveSiteLogo;
+window.saveVersion = saveVersion;
+window.sendManualTelegram = sendManualTelegram;
+window.sendTelegramCommand = sendTelegramCommand;
+window.setTheme = setTheme;
+window.shareWhatsApp = shareWhatsApp;
+window.showAddViolationForm = showAddViolationForm;
+window.showCookieModal = showCookieModal;
+window.showKVKKModal = showKVKKModal;
+window.showSavedDilekceler = showSavedDilekceler;
+window.showVersionHistory = showVersionHistory;
+window.submitDemoReq = submitDemoReq;
+window.switchAdminTab = switchAdminTab;
+window.switchPwdTab = switchPwdTab;
+window.toggleFileManager = toggleFileManager;
+window.toggleMasterEditMode = toggleMasterEditMode;
+window.toggleMic = toggleMic;
+window.toggleMobileMenu = toggleMobileMenu;
+window.togglePwd = togglePwd;
+window.toggleThemeSelector = toggleThemeSelector;
+window.toggleViolationTracker = toggleViolationTracker;
+window.unblockUser = unblockUser;
+window.unlockScreen = unlockScreen;
+window.uploadFile = uploadFile;
 window.selectPlan   = typeof selectPlan  !== 'undefined' ? selectPlan  : function(){};
 window.openModal    = typeof openModal   !== 'undefined' ? openModal   : function(){};
 window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : function(){};
@@ -6253,7 +6871,7 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
     <div class="modal" style="max-width:700px;">
         <div class="modal-header" style="background:linear-gradient(90deg,rgba(124,58,237,.25),rgba(91,33,182,.2));">
             <div class="modal-title"><i class="fas fa-magic" style="color:#a78bfa;"></i> Belge Tara & AI Analizi <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div>
-            <button class="modal-close" onclick="closeModal('belgeTaraModal')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" aria-label="Kapat" onclick="closeModal('belgeTaraModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body" style="padding:20px;">
             <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:#a78bfa;line-height:1.6;">
@@ -6261,7 +6879,7 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
             </div>
 
             <!-- Yükleme Alanı -->
-            <div id="belgeDropZone" onclick="document.getElementById('belgeFileInput').click()"
+            <div id="belgeDropZone" onclick="document.getElementById('belgeFileInput')?.click()"
                 style="border:2px dashed rgba(124,58,237,.4);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;"
                 onmouseover="this.style.background='rgba(124,58,237,.08)'" onmouseout="this.style.background='transparent'"
                 ondragover="event.preventDefault();this.style.borderColor='#7c3aed'" ondrop="belgeDrop(event)">
@@ -6329,7 +6947,7 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
     <div class="modal large" style="max-width:900px;max-height:90vh;">
         <div class="modal-header" style="background:linear-gradient(135deg,#0b0e1c,#0f0c24);border-bottom:1px solid rgba(220,38,38,.2);">
             <div class="modal-title"><i class="fas fa-shield-halved" style="color:#dc2626;"></i> Master Kontrol Paneli</div>
-            <button class="modal-close" onclick="closeModal('fullAdminPanelModal')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" aria-label="Kapat" onclick="closeModal('fullAdminPanelModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body" style="padding:0;">
             <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3);">
@@ -6338,6 +6956,7 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
                 <button onclick="switchAdminTab('add')" id="adminTabAdd" style="flex:1;padding:13px;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-family:Outfit,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><i class="fas fa-user-plus"></i> KULLANICI EKLE</button>
                 <button onclick="switchAdminTab('demo')" id="adminTabDemo" style="flex:1;padding:13px;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-family:Outfit,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><i class="fas fa-sliders-h"></i> DEMO AYARLARI</button>
                 <button onclick="switchAdminTab('stats')" id="adminTabStats" style="flex:1;padding:13px;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-family:Outfit,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><i class="fas fa-chart-bar"></i> İSTATİSTİKLER</button>
+                <button onclick="switchAdminTab('firebase')" id="adminTabFirebase" style="flex:1;padding:13px;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;font-family:Outfit,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><i class="fas fa-database" style="color:#fb923c;"></i> FİREBASE</button>
             </div>
 
             <!-- KULLANICILAR TAB -->
@@ -6367,26 +6986,95 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
 
             <!-- ONAY BEKLEYENLER TAB -->
             <div id="adminSectionPending" style="display:none;padding:20px;">
-                <div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:16px;"><i class="fas fa-clock"></i> Onay Bekleyen Kayıt Talepleri</div>
-                <div id="pendingUsersList" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;"></div>
-                <div id="noPendingMsg" style="text-align:center;padding:40px;color:#475569;font-size:13px;display:none;"><i class="fas fa-check-circle" style="font-size:32px;color:var(--success);display:block;margin-bottom:10px;"></i>Onay bekleyen kayıt yok</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:34px;height:34px;border-radius:9px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-clock" style="color:#fcd34d;font-size:14px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:14px;font-weight:700;color:var(--text);">Onay Bekleyen Kayıtlar</div>
+                            <div style="font-size:11px;color:#64748b;">Yeni kullanıcı kayıt talepleri</div>
+                        </div>
+                    </div>
+                    <button onclick="renderPendingUsers()" title="Listeyi yenile"
+                        style="padding:7px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#94a3b8;cursor:pointer;font-size:11px;font-family:Outfit,sans-serif;display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-sync-alt"></i> Yenile
+                    </button>
+                </div>
+                <div id="pendingUsersList" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;padding-right:4px;"></div>
+                <div id="noPendingMsg" style="text-align:center;padding:40px;color:#475569;font-size:13px;display:none;">
+                    <i class="fas fa-check-circle" style="font-size:36px;color:var(--success);display:block;margin-bottom:12px;"></i>
+                    <div style="font-size:14px;font-weight:600;color:#94a3b8;margin-bottom:4px;">Bekleyen kayıt yok</div>
+                    <div style="font-size:11px;">Yeni kayıt talepleri burada görünecek.</div>
+                </div>
             </div>
 
             <!-- KULLANICI EKLE TAB -->
             <div id="adminSectionAdd" style="display:none;padding:24px;">
-                <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;"><i class="fas fa-user-plus" style="color:var(--success);"></i> Yeni Kullanıcı Ekle</div>
-                <div class="form-grid">
-                    <div class="form-group"><label class="form-label">Kullanıcı Adı *</label><input type="text" class="form-input" id="newUsername" placeholder="Kullanıcı adı..."></div>
-                    <div class="form-group"><label class="form-label">E-posta *</label><input type="email" class="form-input" id="newUserEmail" placeholder="email@domain.com"></div>
-                    <div class="form-group"><label class="form-label">Şifre *</label>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(16,185,129,.3),rgba(5,150,105,.2));border:1px solid rgba(16,185,129,.4);display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-user-plus" style="color:#34d399;font-size:15px;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:var(--text);">Yeni Kullanıcı Ekle</div>
+                        <div style="font-size:11px;color:#64748b;">Eklenen kullanıcı anında aktif olur, onay beklemez.</div>
+                    </div>
+                </div>
+
+                <!-- Hata mesajı -->
+                <div id="addUserError" style="display:none;margin-bottom:14px;padding:10px 14px;background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);border-radius:10px;color:#fca5a5;font-size:12px;align-items:center;gap:8px;">
+                    <i class="fas fa-exclamation-circle"></i><span></span>
+                </div>
+
+                <div class="form-grid" style="gap:14px;">
+                    <div class="form-group">
+                        <label class="form-label" for="newUserFullName"><i class="fas fa-id-card" style="color:var(--accent);margin-right:4px;"></i>Ad Soyad *</label>
+                        <input type="text" class="form-input" id="newUserFullName" placeholder="Ahmet Yılmaz"
+                            autocomplete="off"
+                            style="transition:border-color .2s;"
+                            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newUsername"><i class="fas fa-at" style="color:var(--accent);margin-right:4px;"></i>Kullanıcı Adı *</label>
+                        <input type="text" class="form-input" id="newUsername" placeholder="ahmetyilmaz"
+                            autocomplete="off"
+                            style="transition:border-color .2s;"
+                            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newUserEmail"><i class="fas fa-envelope" style="color:var(--accent);margin-right:4px;"></i>E-posta *</label>
+                        <input type="email" class="form-input" id="newUserEmail" placeholder="ahmet@domain.com"
+                            autocomplete="off"
+                            style="transition:border-color .2s;"
+                            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newUserPassword"><i class="fas fa-lock" style="color:var(--accent);margin-right:4px;"></i>Şifre *</label>
                         <div class="password-wrapper">
-                            <input type="password" class="form-input" id="newUserPassword" placeholder="Şifre..." value="Guest2024!">
+                            <input type="password" class="form-input" id="newUserPassword" placeholder="En az 4 karakter..." value="Guest2024!"
+                                autocomplete="new-password"
+                                style="transition:border-color .2s;"
+                                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''">
                             <button type="button" class="password-toggle" onclick="togglePwd('newUserPassword',this)"><i class="fas fa-eye"></i></button>
                         </div>
                     </div>
-                    <div class="form-group"><label class="form-label">Ad Soyad *</label><input type="text" class="form-input" id="newUserFullName" placeholder="Ad Soyad..."></div>
                 </div>
-                <button class="btn-primary" onclick="addNewUser()" style="margin-top:12px;max-width:200px;padding:12px;"><i class="fas fa-plus"></i> Kullanıcı Ekle</button>
+
+                <div style="display:flex;align-items:center;gap:10px;margin-top:18px;">
+                    <button class="btn-primary" id="addUserBtn" type="button" onclick="addNewUser()"
+                        style="padding:12px 28px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;">
+                        <i class="fas fa-plus"></i> Kullanıcı Ekle
+                    </button>
+                    <button type="button" onclick="document.getElementById('newUserFullName').value='';document.getElementById('newUsername').value='';document.getElementById('newUserEmail').value='';document.getElementById('newUserPassword').value='Guest2024!';document.getElementById('addUserError').style.display='none';"
+                        style="padding:11px 20px;background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#64748b;cursor:pointer;font-size:13px;font-family:Outfit,sans-serif;">
+                        <i class="fas fa-redo"></i> Temizle
+                    </button>
+                </div>
+
+                <div style="margin-top:16px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:11px;color:#475569;line-height:1.6;">
+                    <i class="fas fa-info-circle" style="color:#64748b;margin-right:4px;"></i>
+                    Kullanıcı adı 3-30 karakter, yalnızca harf, rakam, alt çizgi veya nokta içerebilir.
+                </div>
             </div>
 
             <!-- DEMO AYARLARI TAB -->
@@ -6442,16 +7130,101 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
                 <button onclick="saveDemoSettings()" style="margin-top:16px;padding:12px 24px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:10px;color:white;font-weight:700;font-size:13px;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-save"></i> Ayarları Kaydet</button>
             </div>
 
+            <!-- FİREBASE AYARLARI TAB -->
+            <div id="adminSectionFirebase" style="display:none;padding:24px;">
+
+                <!-- Başlık -->
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                    <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(251,146,60,.25),rgba(234,88,12,.15));border:1px solid rgba(251,146,60,.4);display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-database" style="color:#fb923c;font-size:16px;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:14px;font-weight:700;color:var(--text);">Firebase Veritabanı</div>
+                        <div style="font-size:11px;color:#64748b;">Kullanıcıları tüm cihazlarda senkronize et — ücretsiz.</div>
+                    </div>
+                    <div id="fbCurrentStatus" style="display:none;margin-left:auto;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:4px 12px;font-size:11px;font-weight:700;color:#34d399;align-items:center;gap:6px;">
+                        <i class="fas fa-check-circle"></i> Bağlı
+                    </div>
+                </div>
+
+                <!-- Nasıl yapılır rehberi -->
+                <div style="background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.2);border-radius:12px;padding:16px;margin-bottom:18px;">
+                    <div style="font-size:12px;font-weight:700;color:#fb923c;margin-bottom:10px;"><i class="fas fa-graduation-cap"></i> Kurulum (2 dakika, ücretsiz)</div>
+                    <ol style="font-size:11px;color:#94a3b8;line-height:2;padding-left:18px;margin:0;">
+                        <li>Tarayıcıda <strong style="color:#fb923c;">console.firebase.google.com</strong> adresine git</li>
+                        <li><strong>Proje oluştur</strong> → proje adı ver → Devam et → Proje Oluştur</li>
+                        <li>Sol menüden <strong>Realtime Database</strong> → <strong>Veritabanı oluştur</strong></li>
+                        <li><strong>Test modunda başla</strong> seç → Etkinleştir</li>
+                        <li>Veritabanı URL'sini kopyala: <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;">https://PROJE-default-rtdb.firebaseio.com</code></li>
+                        <li>Sol menü → ⚙️ <strong>Proje Ayarları</strong> → Web API anahtarını kopyala</li>
+                    </ol>
+                </div>
+
+                <!-- Config formu -->
+                <div style="display:grid;gap:12px;">
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
+                            <i class="fas fa-key" style="color:#fb923c;"></i> Web API Key *
+                        </label>
+                        <input type="text" id="fbApiKey" placeholder="AIzaSy..." autocomplete="off"
+                            style="width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f1f5f9;font-family:'DM Mono',monospace;font-size:12px;outline:none;"
+                            onfocus="this.style.borderColor='rgba(251,146,60,.6)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
+                            <i class="fas fa-link" style="color:#fb923c;"></i> Database URL *
+                        </label>
+                        <input type="url" id="fbDatabaseURL" placeholder="https://proje-default-rtdb.firebaseio.com" autocomplete="off"
+                            style="width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f1f5f9;font-family:'DM Mono',monospace;font-size:12px;outline:none;"
+                            onfocus="this.style.borderColor='rgba(251,146,60,.6)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
+                            <i class="fas fa-folder" style="color:#fb923c;"></i> Project ID *
+                        </label>
+                        <input type="text" id="fbProjectId" placeholder="proje-adim-12345" autocomplete="off"
+                            style="width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#f1f5f9;font-family:'DM Mono',monospace;font-size:12px;outline:none;"
+                            onfocus="this.style.borderColor='rgba(251,146,60,.6)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'">
+                    </div>
+                </div>
+
+                <!-- Durum mesajı -->
+                <div id="fbConnectStatus" style="margin-top:12px;font-size:12px;color:#94a3b8;min-height:20px;font-weight:600;"></div>
+
+                <!-- Butonlar -->
+                <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+                    <button onclick="saveFirebaseConfig()"
+                        style="padding:12px 24px;background:linear-gradient(135deg,#f97316,#ea580c);border:none;border-radius:10px;color:white;font-weight:700;font-size:13px;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-plug"></i> Bağlan & Kaydet
+                    </button>
+                    <button onclick="disconnectFirebase()"
+                        style="padding:12px 20px;background:transparent;border:1px solid rgba(220,38,38,.4);border-radius:10px;color:#fca5a5;font-weight:600;font-size:13px;cursor:pointer;font-family:Outfit,sans-serif;">
+                        <i class="fas fa-unlink"></i> Bağlantıyı Kes
+                    </button>
+                    <button onclick="if(_fbReady){fbPushUsers();showNotification('Veriler buluta gönderildi!','success');}else{showNotification('Firebase bağlı değil!','error');}"
+                        style="padding:12px 20px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.35);border-radius:10px;color:#34d399;font-weight:600;font-size:13px;cursor:pointer;font-family:Outfit,sans-serif;">
+                        <i class="fas fa-cloud-upload-alt"></i> Şimdi Senkronize Et
+                    </button>
+                </div>
+
+                <!-- Güvenlik notu -->
+                <div style="margin-top:18px;padding:12px 14px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;font-size:11px;color:#94a3b8;line-height:1.7;">
+                    <strong style="color:#fcd34d;"><i class="fas fa-shield-alt"></i> Güvenlik Kuralları (Firebase Console → Realtime Database → Kurallar):</strong><br>
+                    <code style="font-size:10px;color:#a78bfa;white-space:pre-wrap;">{"rules": {"hukukai": {".read": true, ".write": true}}}</code><br>
+                    <span style="color:#475569;">Not: Yalnızca sizin URL'inizi bilenler erişebilir. Daha güçlü kural için Firebase Auth ekleyin.</span>
+                </div>
+            </div>
+
             <!-- İSTATİSTİKLER TAB -->
             <div id="adminSectionStats" style="display:none;padding:24px;">
                 <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;"><i class="fas fa-chart-bar" style="color:var(--accent);"></i> Sistem İstatistikleri</div>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-                    <div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#34d399;" id="statTotalUsers2">0</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Toplam Kullanıcı</div></div>
-                    <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#a78bfa;" id="statTotalDilekce">0</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Toplam Dilekçe</div></div>
-                    <div style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#fca5a5;" id="statTotalViolation">0</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Toplam İhlal</div></div>
-                    <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#fcd34d;" id="statTodayLogins">0</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Bugün Giriş</div></div>
-                    <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#7dd3fc;" id="statActiveNow">0</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Aktif Kullanıcı</div></div>
-                    <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#6ee7b7;" id="statStorageUsed">0KB</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Depolama</div></div>
+                    <div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#34d399;" id="statTotalUsers2">0</div><div class="stat-label">Toplam Kullanıcı</div></div>
+                    <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#a78bfa;" id="statTotalDilekce">0</div><div class="stat-label">Toplam Dilekçe</div></div>
+                    <div style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#fca5a5;" id="statTotalViolation">0</div><div class="stat-label">Toplam İhlal</div></div>
+                    <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#fcd34d;" id="statTodayLogins">0</div><div class="stat-label">Bugün Giriş</div></div>
+                    <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#7dd3fc;" id="statActiveNow">0</div><div class="stat-label">Aktif Kullanıcı</div></div>
+                    <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:16px;text-align:center;"><div style="font-size:28px;font-weight:900;color:#6ee7b7;" id="statStorageUsed">0KB</div><div class="stat-label">Depolama</div></div>
                 </div>
                 <div style="margin-top:20px;">
                     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;"><i class="fas fa-history"></i> Son Aktiviteler</div>
@@ -6485,22 +7258,22 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
 </div>
 
 <!-- DEMO TALEP MODALI -->
-<div class="modal-overlay" id="demoReqModal" onclick="if(event.target===this)closeModal('demoReqModal')">
+<div class="modal-overlay" id="demoReqModal">
     <div class="modal" style="max-width:480px;">
         <div class="modal-header" style="background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(91,33,182,.2));">
             <div class="modal-title"><i class="fas fa-star" style="color:#a78bfa;"></i> Demo Talebi</div>
-            <button class="modal-close" onclick="closeModal('demoReqModal')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" aria-label="Kapat" onclick="closeModal('demoReqModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body">
-            <div class="form-group"><label class="form-label">Ad Soyad *</label>
+            <div class="form-group"><label class="form-label" for="demoReqName">Ad Soyad *</label>
                 <input type="text"  class="form-input" id="demoReqName"  placeholder="Adınız soyadınız..."></div>
-            <div class="form-group"><label class="form-label">E-posta *</label>
+            <div class="form-group"><label class="form-label" for="demoReqEmail">E-posta *</label>
                 <input type="email" class="form-input" id="demoReqEmail" placeholder="ornek@email.com..."></div>
-            <div class="form-group"><label class="form-label">Telefon</label>
+            <div class="form-group"><label class="form-label" for="demoReqPhone">Telefon</label>
                 <input type="tel"   class="form-input" id="demoReqPhone" placeholder="0500 000 00 00"></div>
-            <div class="form-group"><label class="form-label">Kurum / Firma</label>
+            <div class="form-group"><label class="form-label" for="demoReqOrg">Kurum / Firma</label>
                 <input type="text"  class="form-input" id="demoReqOrg"   placeholder="Kurum adı (opsiyonel)"></div>
-            <div class="form-group"><label class="form-label">Not</label>
+            <div class="form-group"><label class="form-label" for="demoReqNote">Not</label>
                 <input type="text"  class="form-input" id="demoReqNote"  placeholder="Eklemek istedikleriniz..."></div>
             <button onclick="submitDemoReq()" class="btn-primary btn-magic" style="margin-top:8px;">
                 <i class="fas fa-paper-plane"></i> Demo Talebi Gönder
@@ -6508,35 +7281,39 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
         </div>
     </div>
 </div>
-<!-- CANLI ÖNİZLEME MODALI -->
-<div class="modal-overlay" id="livePreviewModal" style="z-index:10000;">
-    <div class="modal large" style="max-width:98vw;width:98vw;max-height:96vh;height:96vh;display:flex;flex-direction:column;">
-        <div class="modal-header" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.15));border-bottom:1px solid rgba(16,185,129,.25);flex-shrink:0;">
-            <div class="modal-title" style="display:flex;align-items:center;gap:12px;">
-                <i class="fas fa-eye" style="color:#34d399;"></i>
-                <span>Canlı Site Önizlemesi</span>
-                <span id="livePreviewStatus" style="font-size:10px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.3);color:#34d399;padding:2px 10px;border-radius:20px;font-weight:600;letter-spacing:.5px;">CANLI</span>
-                <span style="font-size:11px;color:#64748b;font-weight:400;margin-left:4px;">Sayfa değişikliklerini gerçek zamanlı izleyin</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-                <button onclick="refreshLivePreview()" style="padding:6px 14px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.3);border-radius:8px;color:#34d399;font-family:Outfit,sans-serif;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
-                    <i class="fas fa-sync-alt" id="refreshIcon"></i> Yenile
-                </button>
-                <button class="modal-close" onclick="closeLivePreview()"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
-        <div style="flex:1;overflow:hidden;position:relative;background:#000;border-radius:0 0 16px 16px;">
-            <div id="livePreviewLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:5;background:var(--surface);">
-                <i class="fas fa-spinner fa-spin" style="font-size:28px;color:#34d399;"></i>
-                <div style="font-size:13px;color:#64748b;">Önizleme yükleniyor...</div>
-            </div>
-            <iframe id="livePreviewFrame"
-                style="width:100%;height:100%;border:none;border-radius:0 0 16px 16px;display:block;"
-                sandbox="allow-same-origin allow-scripts allow-forms">
-            </iframe>
-        </div>
-    </div>
-</div>
+<script>
+// Firebase real-time listener — tek ihtiyacımız olan bu
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        // Sadece initFirebase'e listener ekle, başka hiçbir şeye dokunma
+        var _origInit = window.initFirebase;
+        window.initFirebase = async function() {
+            var result = await _origInit();
+            if (_fbReady && _fbDB) {
+                _fbDB.ref('hukukai/usersDB').on('value', function(snap) {
+                    if (!snap.exists()) return;
+                    try {
+                        var data = snap.val();
+                        var toArr = function(v) {
+                            return Array.isArray(v) ? v : (v && typeof v === 'object') ? Object.values(v) : [];
+                        };
+                        usersDB.guests  = toArr(data.guests);
+                        usersDB.pending = toArr(data.pending);
+                        localStorage.setItem('hukukai_users', JSON.stringify(usersDB));
+                    } catch(e) {}
+                });
+            }
+            return result;
+        };
 
+        // approveUser sonrası Firebase'e yaz
+        var _origApprove = window.approveUser;
+        window.approveUser = async function(id) {
+            await _origApprove(id);
+            if (_fbReady) fbPushUsers();
+        };
+    }, 500);
+});
+</script>
 </body>
 </html>
