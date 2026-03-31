@@ -1337,7 +1337,7 @@
 
 <!-- GİRİŞ/KAYIT MODALİ (landing içi) -->
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
-    <div id="lpModalCard" style="width:100%;max-width:460px;background:linear-gradient(145deg,#13131f,#0d0d18);border:1px solid rgba(201,168,76,.25);border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;animation:lpModalIn .35s cubic-bezier(.34,1.56,.64,1);">
+    <div id="lpModalCard" style="width:100%;max-width:460px;background:linear-gradient(145deg,#13131f,#0d0d18);border:1px solid rgba(201,168,76,.25);border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;animation:lpModalIn .35s cubic-bezier(.34,1.56,.64,1);position:relative;">
         <!-- ÜSTTÜR -->
         <div style="height:3px;background:linear-gradient(90deg,#c9a84c,#8b1a1a,#c9a84c);"></div>
         <!-- BAŞLIK -->
@@ -1514,6 +1514,36 @@
             </form>
 
         </div>
+
+        <!-- KAYIT BAŞARI EKRANI (başlangıçta gizli) -->
+        <div id="regSuccessScreen" style="display:none;position:absolute;inset:0;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;z-index:20;overflow-y:auto;">
+            <div style="height:3px;background:linear-gradient(90deg,#f59e0b,#c9a84c);border-radius:24px 24px 0 0;"></div>
+            <div style="padding:36px 28px;text-align:center;">
+                <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:ringPulse 2s infinite;">
+                    <i class="fas fa-clock" style="font-size:32px;color:#f59e0b;"></i>
+                </div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#e8e4da;margin-bottom:6px;">Talebiniz Alındı!</div>
+                <div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:16px;">Hesabınız İnceleniyor</div>
+                <div style="font-size:13px;color:#8a8070;line-height:1.8;margin-bottom:20px;">
+                    Merhaba <strong id="regSuccessName" style="color:#e8e4da;"></strong>,<br>
+                    Kaydınız başarıyla alındı. Yönetici en kısa sürede hesabınızı onaylayacak.<br><br>
+                    Onay bildirimi <strong id="regSuccessEmail" style="color:#c9a84c;"></strong> adresine gönderilecektir.
+                </div>
+                <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;margin-bottom:20px;">
+                    <div style="font-size:11px;color:#8a8070;margin-bottom:4px;">Ortalama onay süresi</div>
+                    <div style="font-size:22px;font-weight:800;color:#f59e0b;">24 Saat</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <button onclick="hideRegSuccess()" style="padding:12px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                        <i class="fas fa-sign-in-alt"></i> Onaylandım, Giriş Yap
+                    </button>
+                    <button onclick="closeLpModal()" style="padding:10px;background:transparent;border:1px solid rgba(201,168,76,.2);border-radius:10px;color:#8a8070;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                        <i class="fas fa-arrow-left"></i> Kapat
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- ALT ROZETLER -->
         <div style="padding:0 28px 20px;display:flex;gap:8px;justify-content:center;">
             <div style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.1);border-radius:20px;font-size:10px;color:#4a4535;"><i class="fas fa-lock" style="color:#c9a84c;"></i> 256-bit Şifreleme</div>
@@ -2772,6 +2802,9 @@ function closeLpModal() {
     if (!overlay) return;
     overlay.style.display = 'none';
     document.body.style.overflow = '';
+    // Başarı ekranını sıfırla
+    var s = document.getElementById('regSuccessScreen');
+    if (s) s.style.display = 'none';
 }
 function setLpTab(tab) {
     const loginTab = document.getElementById('lpTab_login');
@@ -3399,9 +3432,20 @@ async function handleSubscriberLogin() {
     const origHTML = btn ? btn.innerHTML : '';
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Giriş yapılıyor...'; }
 
-    // Firebase aktifse son kullanıcı listesini çek (cross-device giriş için kritik)
+    // Firebase bağlantısını garantiye al ve güncel kullanıcı listesini çek
+    if (!_fbReady) {
+        try { await initFirebase(); } catch(e) {}
+    }
     if (_fbReady) {
-        try { await fbPullUsers(); } catch(e) {}
+        try {
+            const pulled = await fbPullUsers();
+            if (!pulled) {
+                // Firebase'e ulaşamadık, bağlantıyı sıfırla ve tekrar dene
+                _fbReady = false; _fbDB = null;
+                try { await initFirebase(); } catch(e2) {}
+                if (_fbReady) await fbPullUsers().catch(()=>{});
+            }
+        } catch(e) {}
     }
 
     try {
@@ -3556,46 +3600,22 @@ async function handleRegister() {
 }
 
 function showPendingApprovalScreen(fullName, email) {
-    // Modal içeriğini silmek yerine üstüne overlay göster
-    // Böylece "Giriş Yap" tıklanınca setLpTab formları hâlâ DOM'da bulur
-    var existing = document.getElementById('pendingApprovalOverlay');
-    if (existing) existing.remove();
-
-    var overlay = document.createElement('div');
-    overlay.id = 'pendingApprovalOverlay';
-    overlay.style.cssText = 'position:absolute;inset:0;z-index:10;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;overflow:hidden;';
-    overlay.innerHTML = `
-        <div style="height:3px;background:linear-gradient(90deg,#f59e0b,#c9a84c);"></div>
-        <div style="padding:36px 28px;text-align:center;">
-            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:ringPulse 2s infinite;">
-                <i class="fas fa-clock" style="font-size:32px;color:#f59e0b;"></i>
-            </div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#e8e4da;margin-bottom:6px;">Talebiniz Alındı!</div>
-            <div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:16px;">Hesabınız İnceleniyor</div>
-            <div style="font-size:13px;color:#8a8070;line-height:1.8;margin-bottom:20px;">
-                Merhaba <strong style="color:#e8e4da;">${fullName}</strong>,<br>
-                Kaydınız başarıyla alındı. Yönetici en kısa sürede hesabınızı onaylayacak.<br><br>
-                Onay bildirimi <strong style="color:#c9a84c;">${email}</strong> adresine gönderilecektir.
-            </div>
-            <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:14px;margin-bottom:20px;">
-                <div style="font-size:11px;color:#8a8070;margin-bottom:4px;">Ortalama onay süresi</div>
-                <div style="font-size:22px;font-weight:800;color:#f59e0b;">24 Saat</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-                <button onclick="(function(){var o=document.getElementById('pendingApprovalOverlay');if(o)o.remove();setLpTab('login');})()" style="padding:12px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
-                    <i class="fas fa-sign-in-alt"></i> Onaylandım, Giriş Yap
-                </button>
-                <button onclick="closeLpModal()" style="padding:10px;background:transparent;border:1px solid rgba(201,168,76,.2);border-radius:10px;color:#8a8070;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
-                    <i class="fas fa-arrow-left"></i> Kapat
-                </button>
-            </div>
-        </div>`;
-
-    var card = document.getElementById('lpModalCard');
-    if (!card) return;
-    card.style.position = 'relative';
-    card.appendChild(overlay);
+    // Ad ve e-postayı başarı ekranına yaz
+    var nameEl  = document.getElementById('regSuccessName');
+    var emailEl = document.getElementById('regSuccessEmail');
+    if (nameEl)  nameEl.textContent  = fullName;
+    if (emailEl) emailEl.textContent = email;
+    // Başarı ekranını göster
+    var screen = document.getElementById('regSuccessScreen');
+    if (screen) screen.style.display = 'block';
 }
+
+function hideRegSuccess() {
+    var screen = document.getElementById('regSuccessScreen');
+    if (screen) screen.style.display = 'none';
+    setLpTab('login');
+}
+window.hideRegSuccess = hideRegSuccess;
 
 function showLoginError(type, msg) {
     const err = document.getElementById(type + 'Error');
@@ -3939,16 +3959,17 @@ async function initFirebase() {
             // SDK henüz yüklenmediyse biraz bekle
             const loaded = await waitForFirebaseSDK(8000);
             if (!loaded) {
-                console.info('Firebase SDK yüklenemedi — localStorage modu aktif.');
+                console.log('Firebase SDK yüklenemedi — localStorage modu aktif.');
                 return false;
             }
         }
-        if (firebase.apps.length === 0) {
-            _fbApp = firebase.initializeApp(cfg);
-        } else {
-            _fbApp = firebase.app();
-        }
-        _fbDB   = firebase.database();
+        // Uygulama zaten başlatılmışsa önce sil, temiz başlat
+        try {
+            var existingApp = firebase.apps.find(function(a){ return a.name === '[DEFAULT]'; });
+            if (existingApp) { await existingApp.delete(); }
+        } catch(e) {}
+        _fbApp = firebase.initializeApp(cfg);
+        _fbDB   = firebase.database(_fbApp);
         _fbReady = true;
         console.log('✅ Firebase bağlantısı kuruldu');
         updateFirebaseBadge(true);
