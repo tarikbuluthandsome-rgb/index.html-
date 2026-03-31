@@ -34,10 +34,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ═══ Firebase Realtime Database SDK ═══ -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<!-- ══════════════════════════════════════ -->
+    <!-- ═══ Firebase Realtime Database SDK — çoklu CDN fallback ═══ -->
+<script>
+(function() {
+    var CDNs = [
+        ['https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+         'https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js'],
+        ['https://cdn.jsdelivr.net/npm/firebase@9.23.0/compat/app/index.cjs.js',
+         'https://cdn.jsdelivr.net/npm/firebase@9.23.0/compat/database/index.cjs.js'],
+        ['https://unpkg.com/firebase@9.23.0/compat/app/index.cjs.js',
+         'https://unpkg.com/firebase@9.23.0/compat/database/index.cjs.js']
+    ];
+    function loadScript(src, cb, fallback) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = cb;
+        s.onerror = fallback || function(){};
+        document.head.appendChild(s);
+    }
+    function tryLoad(idx) {
+        if (idx >= CDNs.length) return; // hepsi başarısız
+        loadScript(CDNs[idx][0], function() {
+            loadScript(CDNs[idx][1], function() {
+                console.log('Firebase SDK yüklendi (CDN ' + idx + ')');
+            }, function() { tryLoad(idx + 1); });
+        }, function() { tryLoad(idx + 1); });
+    }
+    tryLoad(0);
+})();
+</script>
+<!-- ══════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
@@ -3411,7 +3437,14 @@ async function handleSubscriberLogin() {
 
     if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
 
-    // API çevrimdışı → localStorage'a bak
+    // API çevrimdışı → önce Firebase'den güncel veriyi al, sonra localStorage'a bak
+    if (!_fbReady) {
+        // Firebase henüz başlatılmamışsa şimdi başlat
+        try { await initFirebase(); } catch(e) {}
+    }
+    if (_fbReady) {
+        try { await fbPullUsers(); } catch(e) {}
+    }
     const pending = usersDB.pending.find(u => u.username === username || u.email === username);
     if (pending) {
         if (pending.status === 'pending') { if (pb) pb.style.display = 'block'; return; }
@@ -3523,9 +3556,15 @@ async function handleRegister() {
 }
 
 function showPendingApprovalScreen(fullName, email) {
-    const card = document.getElementById('lpModalCard');
-    if (!card) return;
-    card.innerHTML = `
+    // Modal içeriğini silmek yerine üstüne overlay göster
+    // Böylece "Giriş Yap" tıklanınca setLpTab formları hâlâ DOM'da bulur
+    var existing = document.getElementById('pendingApprovalOverlay');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'pendingApprovalOverlay';
+    overlay.style.cssText = 'position:absolute;inset:0;z-index:10;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;overflow:hidden;';
+    overlay.innerHTML = `
         <div style="height:3px;background:linear-gradient(90deg,#f59e0b,#c9a84c);"></div>
         <div style="padding:36px 28px;text-align:center;">
             <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:ringPulse 2s infinite;">
@@ -3543,7 +3582,7 @@ function showPendingApprovalScreen(fullName, email) {
                 <div style="font-size:22px;font-weight:800;color:#f59e0b;">24 Saat</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-                <button onclick="setLpTab('login')" style="padding:12px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                <button onclick="(function(){var o=document.getElementById('pendingApprovalOverlay');if(o)o.remove();setLpTab('login');})()" style="padding:12px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
                     <i class="fas fa-sign-in-alt"></i> Onaylandım, Giriş Yap
                 </button>
                 <button onclick="closeLpModal()" style="padding:10px;background:transparent;border:1px solid rgba(201,168,76,.2);border-radius:10px;color:#8a8070;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
@@ -3551,6 +3590,11 @@ function showPendingApprovalScreen(fullName, email) {
                 </button>
             </div>
         </div>`;
+
+    var card = document.getElementById('lpModalCard');
+    if (!card) return;
+    card.style.position = 'relative';
+    card.appendChild(overlay);
 }
 
 function showLoginError(type, msg) {
@@ -3853,11 +3897,34 @@ let _fbApp    = null;
 let _fbDB     = null;
 let _fbReady  = false;
 
-/** Admin panelinden kaydedilen Firebase config'i oku */
+/** Admin panelinden kaydedilen Firebase config'i oku — localStorage yoksa gömülü config'i kullan */
+const _EMBEDDED_FB_CFG = {
+    apiKey:      "AIzaSyAsyMBmuL0SMI5kHY-1PDIU_Brtpxu-sjY",
+    authDomain:  "hukukai-pro.firebaseapp.com",
+    databaseURL: "https://hukukai-pro-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:   "hukukai-pro",
+    storageBucket:"hukukai-pro.firebasestorage.app",
+    messagingSenderId:"727867677710",
+    appId:       "1:727867677710:web:a05c138529f5351fab305f"
+};
 function getFirebaseConfig() {
     try {
-        return JSON.parse(localStorage.getItem('hukukai_firebase_config') || 'null');
-    } catch(e) { return null; }
+        var saved = JSON.parse(localStorage.getItem('hukukai_firebase_config') || 'null');
+        if (saved && saved.apiKey && saved.databaseURL) return saved;
+    } catch(e) {}
+    // Gömülü config'i localStorage'a kaydet ki admin paneli de görsün
+    try { localStorage.setItem('hukukai_firebase_config', JSON.stringify(_EMBEDDED_FB_CFG)); } catch(e) {}
+    return _EMBEDDED_FB_CFG;
+}
+
+/** Firebase SDK'nın yüklenmesini bekle — max 5 sn */
+async function waitForFirebaseSDK(maxMs) {
+    var waited = 0;
+    while (typeof firebase === 'undefined' && waited < maxMs) {
+        await new Promise(function(r){ setTimeout(r, 150); });
+        waited += 150;
+    }
+    return typeof firebase !== 'undefined';
 }
 
 /** Firebase bağlantısını başlat */
@@ -3869,8 +3936,12 @@ async function initFirebase() {
     }
     try {
         if (typeof firebase === 'undefined') {
-            console.warn('Firebase SDK yüklenmedi.');
-            return false;
+            // SDK henüz yüklenmediyse biraz bekle
+            const loaded = await waitForFirebaseSDK(8000);
+            if (!loaded) {
+                console.info('Firebase SDK yüklenemedi — localStorage modu aktif.');
+                return false;
+            }
         }
         if (firebase.apps.length === 0) {
             _fbApp = firebase.initializeApp(cfg);
@@ -3939,7 +4010,7 @@ async function fbPullUsers() {
 
 /** Firebase bağlantısını test et */
 async function testFirebaseConnection(cfg) {
-    if (typeof firebase === 'undefined') return { ok: false, msg: 'Firebase SDK yüklenmedi.' };
+    if (typeof firebase === 'undefined') return { ok: false, msg: 'Firebase SDK yüklenemedi.' };
     try {
         const testApp = firebase.apps.length === 0
             ? firebase.initializeApp(cfg, 'test_' + Date.now())
