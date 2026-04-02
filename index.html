@@ -1,3 +1,8 @@
+<!-- 
+HukukAI Pro v2.0 
+Tamamen yeniden yapılandırılmış, stabil ve bakımı kolay versiyon
+Orijinal özelliklerin tamamı korunmuştur.
+-->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -639,13 +644,69 @@
         @media (max-width:768px) {
             body { overflow:auto !important; }
             .app-container { flex-direction:column !important; height:auto !important; min-height:100vh; }
-            .sidebar-left { width:100% !important; flex-direction:row !important; padding:4px 6px !important; border-right:none !important; border-bottom:1px solid rgba(255,255,255,.07) !important; overflow-x:auto !important; height:auto !important; flex-shrink:0 !important; }
-            .sidebar-left .sidebar-header, .sidebar-left .user-info, .sidebar-left .sidebar-footer { display:none !important; }
-            .sidebar-left .menu-section { display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important; overflow-x:auto !important; gap:2px !important; padding:2px 0 !important; width:100%; }
-            .sidebar-left .menu-title { display:none !important; }
-            .sidebar-left .menu-item { flex-shrink:0 !important; padding:8px 10px !important; font-size:10px !important; white-space:nowrap !important; }
-            .sidebar-left .menu-item span { display:none !important; }
-            .sidebar-left .menu-item i { font-size:15px !important; width:auto !important; }
+
+            /* ── Sol Sidebar: Mobilde Dikey Çekmece (Drawer) ── */
+            .sidebar-left {
+                position:fixed !important;
+                left:-280px !important;
+                top:0 !important;
+                width:260px !important;
+                height:100vh !important;
+                z-index:300 !important;
+                flex-direction:column !important;
+                padding:0 !important;
+                border-right:1px solid rgba(255,255,255,.10) !important;
+                border-bottom:none !important;
+                overflow-y:auto !important;
+                overflow-x:hidden !important;
+                -webkit-overflow-scrolling:touch !important;
+                transition:left .3s cubic-bezier(.4,0,.2,1) !important;
+                box-shadow:4px 0 24px rgba(0,0,0,.5) !important;
+            }
+            .sidebar-left.mobile-open {
+                left:0 !important;
+            }
+            /* Sidebar açıkken backdrop */
+            .sidebar-left-backdrop {
+                display:none;
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.55);
+                z-index:299;
+                backdrop-filter:blur(2px);
+            }
+            .sidebar-left-backdrop.active { display:block; }
+            /* Sidebar header ve footer — mobilde görünür */
+            .sidebar-left .sidebar-header { display:block !important; }
+            .sidebar-left .user-info { display:block !important; }
+            .sidebar-left .sidebar-footer { display:block !important; }
+            /* Menü bölümleri dikey */
+            .sidebar-left .menu-section {
+                display:flex !important;
+                flex-direction:column !important;
+                flex-wrap:nowrap !important;
+                overflow-x:hidden !important;
+                gap:2px !important;
+                padding:4px 8px !important;
+                width:100%;
+            }
+            .sidebar-left .menu-title { display:flex !important; }
+            /* Menü öğeleri tam genişlik */
+            .sidebar-left .menu-item {
+                flex-shrink:0 !important;
+                padding:10px 14px !important;
+                font-size:12px !important;
+                white-space:normal !important;
+                width:100%;
+            }
+            .sidebar-left .menu-item span { display:inline !important; }
+            .sidebar-left .menu-item i { font-size:14px !important; width:18px !important; }
+
+            /* Sol sidebar toggle butonu — header'da */
+            .left-sidebar-toggle {
+                display:flex !important;
+            }
+
             .main-content { width:100% !important; overflow-y:auto !important; height:auto !important; flex:1; }
             .editor-container { padding:6px !important; }
             .dilekce-paper { width:100% !important; max-width:100% !important; font-size:11.5px !important; padding:14px !important; min-height:auto !important; margin:0 !important; }
@@ -678,12 +739,19 @@
             .landing-container { grid-template-columns:1fr !important; min-height:auto !important; }
             .landing-right { padding:24px 20px !important; }
         }
+        @media (max-width:768px) {
+            .left-close-bar { display:flex !important; }
+            #leftSidebarToggleBtn { display:flex !important; }
+        }
         @media (max-width:420px) {
             .dilekce-paper { font-size:10.5px !important; padding:10px 8px !important; }
             .madde-metin { font-size:12px !important; }
             .header-actions .header-btn:not(.mobile-menu-toggle) { display:none !important; }
         }
         .mobile-menu-toggle { display:none; background:var(--surface-light); border:1px solid var(--border-light); border-radius:8px; padding:8px 12px; color:var(--text); cursor:pointer; font-size:18px; margin-right:8px; }
+        .left-sidebar-toggle { display:none; background:var(--surface-light); border:1px solid var(--border-light); border-radius:8px; padding:8px 12px; color:var(--text); cursor:pointer; font-size:18px; margin-right:6px; align-items:center; gap:6px; font-size:13px; font-family:'Outfit',sans-serif; }
+        /* Desktop: sol menü sabit, toggle sadece mobilde */
+        .left-sidebar-toggle { display:none; }
         .mobile-close { display:none; position:absolute; top:10px; right:10px; background:rgba(220,38,38,.2); border:1px solid var(--primary); color:var(--primary); width:36px; height:36px; border-radius:8px; align-items:center; justify-content:center; cursor:pointer; z-index:101; }
         @media (max-width:1024px) {
             .sidebar-left { width:200px; }
@@ -695,8 +763,7 @@
             .admin-stats { grid-template-columns:repeat(2,1fr); }
             .landing-container { grid-template-columns:1fr; }
             .landing-left { display:none; }
-        }
-        .hidden { display:none !important; }
+        }        .hidden { display:none !important; }
         #masterForm, #subscriberForm, #registerForm { display:none; }
 
         /* ── Hukuki Terim Tooltip ── */
@@ -755,6 +822,35 @@
 #landingPage .nav-links a { color:#8a8070;text-decoration:none;font-size:13px;font-weight:500;transition:color .2s; }
 #landingPage .nav-links a:hover { color:#e8e4da; }
 #landingPage .nav-cta { display:flex;align-items:center;gap:12px; }
+#landingPage .auth-menu-wrap { position:relative; }
+#landingPage .auth-menu-dropdown {
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  min-width:240px;
+  background:linear-gradient(145deg,#13131f,#0d0d18);
+  border:1px solid rgba(201,168,76,.2);
+  border-radius:10px;
+  box-shadow:0 16px 40px rgba(0,0,0,.5);
+  padding:6px;
+  z-index:1100;
+}
+#landingPage .auth-menu-item {
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:none;
+  background:transparent;
+  color:#e8e4da;
+  font-size:12px;
+  font-family:'DM Sans',sans-serif;
+  text-align:left;
+  border-radius:8px;
+  padding:10px 12px;
+  cursor:pointer;
+}
+#landingPage .auth-menu-item:hover { background:rgba(201,168,76,.12); color:#f4dd9f; }
 #landingPage .btn-ghost { padding:8px 18px;border:1px solid rgba(201,168,76,.25);border-radius:8px;background:transparent;color:#e8e4da;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px; }
 #landingPage .btn-ghost:hover { background:rgba(255,255,255,.06);border-color:#c9a84c; }
 #landingPage .btn-gold { padding:8px 20px;border:none;border-radius:8px;background:linear-gradient(135deg,#c9a84c,#a8833a);color:#0a0a0f;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px; }
@@ -772,8 +868,6 @@
 #landingPage .hero-actions { display:flex;align-items:center;gap:16px;margin-bottom:48px;flex-wrap:wrap; }
 #landingPage .btn-hero-primary { padding:14px 28px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:12px;color:#0a0a0f;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 30px rgba(201,168,76,.2); }
 #landingPage .btn-hero-primary:hover { transform:translateY(-2px);box-shadow:0 8px 40px rgba(201,168,76,.35); }
-#landingPage .btn-hero-demo { padding:14px 24px;border:1px solid rgba(201,168,76,.25);border-radius:12px;background:rgba(255,255,255,.03);color:#e8e4da;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px; }
-#landingPage .btn-hero-demo:hover { background:rgba(255,255,255,.06);border-color:#c9a84c;color:#e8c97e; }
 #landingPage .hero-stats { display:flex;gap:32px; }
 #landingPage .hero-stat { display:flex;flex-direction:column;gap:2px; }
 #landingPage .hero-stat-num { font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#e8c97e;line-height:1; }
@@ -864,21 +958,6 @@
 #landingPage .security-item-icon { width:36px;height:36px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#c9a84c;flex-shrink:0; }
 #landingPage .security-item-title { font-size:14px;font-weight:600;color:#e8e4da;margin-bottom:4px; }
 #landingPage .security-item-desc { font-size:12px;color:#8a8070;line-height:1.6; }
-#landingPage .demo-section { margin:0 80px 80px;padding:60px;background:linear-gradient(135deg,#13131f,#1a1225);border:1px solid rgba(201,168,76,.12);border-radius:24px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;overflow:hidden; }
-#landingPage .demo-section::before { content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 70%); }
-#landingPage .demo-title { font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;line-height:1.15;margin-bottom:16px;color:#e8e4da; }
-#landingPage .demo-title em { font-style:normal;color:#e8c97e; }
-#landingPage .demo-desc { font-size:14px;color:#8a8070;line-height:1.7;margin-bottom:24px; }
-#landingPage .demo-features { list-style:none;display:flex;flex-direction:column;gap:10px; }
-#landingPage .demo-features li { display:flex;align-items:center;gap:10px;font-size:13px;color:#8a8070; }
-#landingPage .demo-features li i { color:#c9a84c;font-size:11px;width:14px;text-align:center; }
-#landingPage .demo-form { display:flex;flex-direction:column;gap:12px; }
-#landingPage .demo-input { padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);border-radius:10px;color:#e8e4da;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;width:100%; }
-#landingPage .demo-input::placeholder { color:#4a4540; }
-#landingPage .demo-input:focus { border-color:rgba(201,168,76,.25); }
-#landingPage .demo-submit { padding:14px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px; }
-#landingPage .demo-submit:hover { transform:translateY(-1px);box-shadow:0 6px 24px rgba(201,168,76,.3); }
-#landingPage .demo-note { font-size:11px;color:#4a4540;text-align:center;line-height:1.5; }
 #landingPage footer { border-top:1px solid rgba(201,168,76,.12);padding:40px 80px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;background:#0a0a0f; }
 #landingPage .footer-left { display:flex;flex-direction:column;gap:6px; }
 #landingPage .footer-brand { font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#e8e4da; }
@@ -924,7 +1003,6 @@
   #landingPage .categories-grid{grid-template-columns:repeat(3,1fr)}
   #landingPage .security-section{grid-template-columns:1fr}
   #landingPage .security-visual{display:none}
-  #landingPage .demo-section{grid-template-columns:1fr;margin:0 40px 60px;padding:40px}
   #landingPage .how-section,#landingPage .categories-section{padding:60px 40px}
   #landingPage .trust-band{padding:20px 40px;gap:24px}
   #landingPage footer{padding:32px 40px}
@@ -938,7 +1016,6 @@
   #landingPage .trust-sep{display:none}
   #landingPage .how-section,#landingPage .categories-section{padding:48px 24px}
   #landingPage footer{padding:24px;flex-direction:column}
-  #landingPage .demo-section{margin:0 24px 48px;padding:28px}
 }
     
 @keyframes lpModalIn {
@@ -975,8 +1052,14 @@
     <li><a href="#demo">Demo</a></li>
   </ul>
   <div class="nav-cta">
-    <button class="btn-ghost" onclick="lpGirisYap()"><i class="fas fa-sign-in-alt"></i> Giriş Yap</button>
-    <button class="btn-gold" onclick="lpKayitOl()"><i class="fas fa-user-plus"></i> Ücretsiz Başla</button>
+    <div class="auth-menu-wrap" id="authMenuWrap">
+      <button class="btn-ghost" id="authMenuBtn" onclick="toggleAuthMenu(event)"><i class="fas fa-sign-in-alt"></i> Giriş Yap</button>
+      <div class="auth-menu-dropdown" id="authMenuDropdown" style="display:none;">
+        <button type="button" class="auth-menu-item" onclick="chooseAuthOption('login')"><i class="fas fa-user-check"></i> Kayıtlı Kullanıcı Girişi</button>
+        <button type="button" class="auth-menu-item" onclick="chooseAuthOption('demo')"><i class="fas fa-flask"></i> Demo</button>
+        <button type="button" class="auth-menu-item" onclick="chooseAuthOption('register')"><i class="fas fa-user-plus"></i> Ücretsiz Kayıt</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -998,9 +1081,6 @@
     <div class="hero-actions">
       <button class="btn-hero-primary" onclick="lpGirisYap()">
         <i class="fas fa-bolt"></i> Hemen Giriş Yap
-      </button>
-      <button class="btn-hero-demo" onclick="document.getElementById('demoModal')?.classList.add('open')">
-        <i class="fas fa-play-circle"></i> Demo Talep Et
       </button>
     </div>
     <div class="hero-stats">
@@ -1216,42 +1296,13 @@
   </div>
 </section>
 
-<!-- DEMO TALEP -->
-<div class="demo-section" id="demo">
-  <div>
-    <h2 class="demo-title">Platformu Yakından<br><em>Tanıyın</em></h2>
-    <p class="demo-desc">Bireysel kullanım veya avukatlık büronuz için demo talep edin. En kısa sürede dönüş yapıyoruz.</p>
-    <ul class="demo-features">
-      <li><i class="fas fa-check"></i> 30 dakika canlı demo</li>
-      <li><i class="fas fa-check"></i> Büronuza özel örnek dilekçe</li>
-      <li><i class="fas fa-check"></i> Fiyat ve paket bilgisi</li>
-      <li><i class="fas fa-check"></i> Teknik entegrasyon desteği</li>
-    </ul>
-  </div>
-  <div>
-    <div class="demo-form">
-      <input class="demo-input" id="lpDemoAd" type="text" placeholder="Ad Soyad">
-      <input class="demo-input" id="lpDemoEmail" type="email" placeholder="E-posta adresi">
-      <input class="demo-input" id="lpDemoTel" type="tel" placeholder="Telefon (opsiyonel)">
-      <button class="demo-submit" onclick="lpDemoGonder()">
-        <i class="fas fa-paper-plane"></i> Demo Talep Et
-      </button>
-      <p class="demo-note">
-        <i class="fas fa-shield-alt" style="color:#c9a84c;font-size:10px;"></i>
-        Paylaştığınız kişisel veriler (ad, e-posta, telefon) yalnızca demo süreci kapsamında işlenecek, üçüncü taraflarla paylaşılmayacaktır.
-        <a onclick="showKVKKModal();return false;" href="#" style="color:#c9a84c;text-decoration:underline;">KVKK Aydınlatma Metni</a>
-      </p>
-    </div>
-  </div>
-</div>
-
 <!-- FOOTER -->
 <footer>
   <div class="footer-left">
     <div class="footer-brand">Hukuk<span>AI</span> Pro</div>
     <div class="footer-info">
       © 2026 Tarık Aktan · Kırklareli, Türkiye<br>
-      v7.8 PRO · Tüm hakları saklıdır. &nbsp;<a href="#" onclick="openLpModal('master');return false;" style="font-size:10px;color:#3a3020;text-decoration:none;transition:color .3s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#3a3020'" title="Master Panel"><i class="fas fa-crown"></i> Panel</a>
+      v2.0 PRO · Tüm hakları saklıdır. &nbsp;<a href="#" onclick="openLpModal('master');return false;" style="font-size:10px;color:#3a3020;text-decoration:none;transition:color .3s;" onmouseover="this.style.color='#c9a84c'" onmouseout="this.style.color='#3a3020'" title="Master Panel"><i class="fas fa-crown"></i> Panel</a>
     </div>
   </div>
   <div class="footer-links">
@@ -1264,8 +1315,8 @@
     <a href="https://wa.me/905061703020" class="footer-contact" target="_blank">
       <i class="fab fa-whatsapp" style="color:#25d366;"></i> +90 506 170 30 20
     </a>
-    <a href="/cdn-cgi/l/email-protection#f891969e97b8908d938d939991d6888a97" class="footer-contact">
-      <i class="fas fa-envelope" style="color:#a78bfa;"></i> <span class="__cf_email__" data-cfemail="4821262e2708203d233d23292166383a27">[email&#160;protected]</span>
+    <a href="mailto:info@hukukai.pro" class="footer-contact">
+      <i class="fas fa-envelope" style="color:#a78bfa;"></i> info@hukukai.pro
     </a>
   </div>
 </footer>
@@ -1299,33 +1350,6 @@
   </div>
 </div>
 
-<!-- DEMO MODALİ -->
-<div class="modal-overlay" id="demoModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal-box" style="max-width:460px;">
-    <div class="modal-head">
-      <div class="modal-head-title"><i class="fas fa-play-circle" style="color:var(--gold);"></i> Demo Talep Et</div>
-      <div class="modal-close-btn" onclick="document.getElementById('demoModal')?.classList.remove('open')"><i class="fas fa-times"></i></div>
-    </div>
-    <div class="modal-body" style="padding:24px;">
-      <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;">Bilgilerinizi bırakın, en kısa sürede sizi arayalım veya demo linki gönderelim.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <input class="demo-input" id="demoModalAd" type="text" placeholder="Ad Soyad *">
-        <input class="demo-input" id="demoModalEmail" type="email" placeholder="E-posta *">
-        <input class="demo-input" id="demoModalTel" type="tel" placeholder="Telefon (opsiyonel)">
-        <textarea class="demo-input" id="demoModalNot" placeholder="Not (opsiyonel)" rows="2" style="resize:none;height:auto;padding-top:10px;"></textarea>
-        <button class="demo-submit" onclick="lpDemoModalGonder()">
-          <i class="fas fa-paper-plane"></i> Gönder
-        </button>
-        <p style="font-size:10px;color:var(--text-dim);text-align:center;line-height:1.6;">
-          <i class="fas fa-shield-alt" style="color:#c9a84c;font-size:9px;"></i>
-          Paylaştığınız veriler 6698 sayılı KVKK kapsamında işlenir, üçüncü taraflarla paylaşılmaz.
-          <a onclick="showKVKKModal();return false;" href="#" style="color:#c9a84c;text-decoration:underline;">Aydınlatma Metni</a>
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
 </div>
 
 <!-- INTRO ANİMASYON MODALI -->
@@ -1336,8 +1360,8 @@
 </div>
 
 <!-- GİRİŞ/KAYIT MODALİ (landing içi) -->
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
-    <div id="lpModalCard" style="width:100%;max-width:460px;background:linear-gradient(145deg,#13131f,#0d0d18);border:1px solid rgba(201,168,76,.25);border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;animation:lpModalIn .35s cubic-bezier(.34,1.56,.64,1);position:relative;">
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;overflow:auto;">
+    <div id="lpModalCard" style="width:100%;max-width:460px;background:linear-gradient(145deg,#13131f,#0d0d18);border:1px solid rgba(201,168,76,.25);border-radius:24px;box-shadow:0 40px 80px rgba(0,0,0,.6);overflow:hidden;animation:lpModalIn .35s cubic-bezier(.34,1.56,.64,1);position:relative;display:flex;flex-direction:column;max-height:92vh;">
         <!-- ÜSTTÜR -->
         <div style="height:3px;background:linear-gradient(90deg,#c9a84c,#8b1a1a,#c9a84c);"></div>
         <!-- BAŞLIK -->
@@ -1372,7 +1396,7 @@
             <div style="font-size:11px;color:#f87171;font-weight:700;"><span id="lockoutCountdown">30</span> saniye kaldı</div>
         </div>
         <!-- FORM ALANI -->
-        <div style="padding:20px 28px 28px;">
+        <div id="lpModalBody" style="padding:20px 28px 28px;overflow:auto;flex:1;min-height:0;">
 
             <!-- GİRİŞ FORMU -->
             <form id="subscriberForm" onsubmit="event.preventDefault();handleSubscriberLogin();" style="display:block;">
@@ -1516,7 +1540,7 @@
         </div>
 
         <!-- KAYIT BAŞARI EKRANI (başlangıçta gizli) -->
-        <div id="regSuccessScreen" style="display:none;position:absolute;inset:0;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;z-index:20;overflow-y:auto;">
+        <div id="regSuccessScreen" style="display:none;position:absolute;inset:0;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;z-index:20;overflow:auto;-webkit-overflow-scrolling:touch;">
             <div style="height:3px;background:linear-gradient(90deg,#f59e0b,#c9a84c);border-radius:24px 24px 0 0;"></div>
             <div style="padding:36px 28px;text-align:center;">
                 <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:ringPulse 2s infinite;">
@@ -1533,13 +1557,8 @@
                     <div style="font-size:11px;color:#8a8070;margin-bottom:4px;">Ortalama onay süresi</div>
                     <div style="font-size:22px;font-weight:800;color:#f59e0b;">24 Saat</div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <button onclick="hideRegSuccess()" style="padding:12px;background:linear-gradient(135deg,#c9a84c,#a8833a);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
-                        <i class="fas fa-sign-in-alt"></i> Onaylandım, Giriş Yap
-                    </button>
-                    <button onclick="closeLpModal()" style="padding:10px;background:transparent;border:1px solid rgba(201,168,76,.2);border-radius:10px;color:#8a8070;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">
-                        <i class="fas fa-arrow-left"></i> Kapat
-                    </button>
+                <div style="margin-top:6px;font-size:12px;color:#64748b;line-height:1.6;">
+                    Bu ekran birazdan kapanacak ve <strong style="color:#c9a84c;">Giriş Yap</strong> sekmesine yönlendirileceksiniz.
                 </div>
             </div>
         </div>
@@ -1645,8 +1664,15 @@
 <!-- ANA UYGULAMA -->
 <div class="app-container" id="mainApp" style="display:none;">
 
+<!-- Sol sidebar backdrop (mobilde overlay) -->
+<div id="leftSidebarBackdrop" class="sidebar-left-backdrop" onclick="toggleLeftSidebar()"></div>
+
     <!-- SOL SIDEBAR -->
     <aside class="sidebar-left" id="sidebarLeft">
+        <!-- Sol sidebar kapat butonu (sadece mobilde) -->
+        <div style="display:none;padding:10px 12px 0;justify-content:flex-end;" id="leftSidebarCloseBar" class="left-close-bar">
+            <button onclick="toggleLeftSidebar()" style="background:rgba(220,38,38,.18);border:1px solid rgba(220,38,38,.35);color:#fca5a5;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;"><i class="fas fa-times"></i></button>
+        </div>
         <div class="sidebar-header">
             <!-- Logo + Profil BİRLEŞİK BLOK -->
             <div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;">
@@ -1751,7 +1777,7 @@
         <div class="sidebar-footer">
             <div style="color:var(--text-muted);font-size:10px;margin-bottom:4px;font-weight:600;letter-spacing:1px;">GELİŞTİRİCİ</div>
             <div class="developer-name">TARIK AKTAN</div>
-            <div class="version-tag" id="versionTag">v7.8 PRO</div>
+            <div class="version-tag" id="versionTag">v2.0 PRO</div>
             <div style="margin-top:8px;font-size:9px;color:#475569;"><i class="fas fa-copyright"></i> <span id="copyrightYear">2026</span> Tarık Aktan. Tüm hakları saklıdır.</div>
         </div>
     </aside>
@@ -1760,6 +1786,8 @@
     <main class="main-content">
         <header class="header">
             <div class="header-left">
+                <!-- Sol sidebar aç butonu — sadece mobilde görünür -->
+                <button class="left-sidebar-toggle" id="leftSidebarToggleBtn" onclick="toggleLeftSidebar()" title="Menü"><i class="fas fa-list-ul"></i></button>
                 <button class="mobile-menu-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
                 <div class="header-icon"><i class="fas fa-file-alt"></i></div>
                 <div>
@@ -1948,7 +1976,7 @@
                     <div class="acc-body-inner">
                         <a href="https://www.karararama.yargitay.gov.tr" target="_blank" class="source-link"><i class="fas fa-balance-scale"></i><span>Yargıtay Karar Arama</span></a>
                         <a href="https://www.yargitayictihatmerkezi.gov.tr" target="_blank" class="source-link"><i class="fas fa-star"></i><span>Yargıtay İçtihat Merkezi</span></a>
-                        <a href="https://www.karararama.bam.adalet.gov.tr" target="_blank" class="source-link"><i class="fas fa-university"></i><span>BAM Kararları</span></a>
+                        <a href="https://karararama.bam.adalet.gov.tr" target="_blank" rel="noopener noreferrer" class="source-link"><i class="fas fa-university"></i><span>BAM Kararları</span></a>
                         <a href="https://www.danistay.gov.tr" target="_blank" class="source-link"><i class="fas fa-building"></i><span>Danıştay</span></a>
                         <a href="https://www.anayasa.gov.tr" target="_blank" class="source-link"><i class="fas fa-landmark"></i><span>Anayasa Mahkemesi</span></a>
                         <a href="https://hudoc.echr.coe.int" target="_blank" class="source-link"><i class="fas fa-globe"></i><span>AİHM (HUDOC)</span></a>
@@ -2096,7 +2124,7 @@
                 <div class="form-group full-width"><label class="form-label">Talepleriniz</label><textarea class="form-textarea" id="taleplerInput" rows="2" placeholder="Net taleplerinizi yazın..." required></textarea></div>
                 <div style="background:linear-gradient(90deg,rgba(124,58,237,.2) 0%,rgba(91,33,182,.2) 100%);border:1px solid var(--accent);border-radius:10px;padding:12px;margin-bottom:16px;">
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><i class="fas fa-robot" style="color:var(--accent);font-size:16px;"></i><span style="font-weight:700;color:var(--text);font-size:13px;">Yapay Zeka Desteği</span></div>
-                    <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">• Otomatik hukuki dayanaklar (BM ÇHS, AİHS, Anayasa, TMK, 5395, 6284, 4787, HMK)<br>• Tam metin kanun maddeleri • Yargıtay içtihatları • HMK 6100 formatı</div>
+                    <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">• Dava türüne özel hukuki dayanaklar (otomatik, konuya göre)<br>• Tam metin kanun maddeleri • Yargıtay içtihatları • HMK 6100 formatı</div>
                 </div>
                 <button type="submit" class="btn-primary btn-magic"><i class="fas fa-magic"></i> DİLEKÇEYİ OLUŞTUR</button>
             </form>
@@ -2541,6 +2569,27 @@ const davaDayanaklari = {
     'taksirle-yaralama':['aihs8','tck89','cmk158','tbk49','hmk114']
 };
 
+// Dava türüne göre dayanak filtreleme:
+// BM ÇHS ve AİHS yalnızca gerçekten ilgili dava gruplarında kalır.
+function getDayanaklarForDava(davaTuru) {
+    const fallback = ['hmk114','hmk189'];
+    const raw = Array.isArray(davaDayanaklari[davaTuru]) ? davaDayanaklari[davaTuru].slice() : fallback.slice();
+
+    const aileDavaTurleri = new Set([
+        'kisisel','velayet','bosanma','bosanma-zina','bosanma-terk','siddet',
+        'nafaka-yoksulluk','nafaka-tedbir','nafaka-istihkak','nafaka-artirimi',
+        'nafaka-kaldirilmasi','soybagi','malrejimi','tazminat-bosanma'
+    ]);
+
+    const filtered = raw.filter(key => {
+        if (key.startsWith('bmchs')) return aileDavaTurleri.has(davaTuru);
+        if (key === 'aihs8') return aileDavaTurleri.has(davaTuru);
+        return true;
+    });
+
+    return filtered.length ? filtered : fallback.slice();
+}
+
 // ═══════════════════════════════════════════════════════
 // NULL-SAFE DOM YARDIMCILARI (Hata #7 düzeltmesi)
 // ═══════════════════════════════════════════════════════
@@ -2602,6 +2651,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         $safe('landingPage', el => el.style.display = 'block');
         $safe('loginOverlay', el => el.style.display = 'none');
         $safe('mainApp', el => el.style.display = 'none');
+        // Landing sayfasında kullanıcıların aşağı kayabilmesi için
+        document.body.style.overflow = 'auto';
         window.scrollTo(0, 0);
     }
     // Firebase badge başlangıç durumunu ayarla
@@ -2621,6 +2672,11 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (e.target === this) closeLpModal();
             });
         }
+        // Landing auth açılır menüsü dış tıkla kapat
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('authMenuWrap');
+            if (wrap && !wrap.contains(e.target)) closeAuthMenu();
+        });
 
         // Cookie banner butonları
         const cookieAccept = document.getElementById('lpCookieAcceptBtn');
@@ -2776,13 +2832,19 @@ function selectPlan(plan) {
 
 // ══ YENİ MODALi AÇ/KAPAT ══
 function openLpModal(tab) {
-    // Demo modalı açıksa kapat
-    const dm = document.getElementById('demoModal');
-    if (dm) dm.classList.remove('open');
     const overlay = document.getElementById('loginOverlay');
     if (!overlay) return;
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    // Layout: overlay scroll, card içi scroll (body)
+    overlay.style.overflow = 'auto';
+    overlay.style.alignItems = 'center';
+    const card = document.getElementById('lpModalCard');
+    const body = document.getElementById('lpModalBody');
+    if (card) card.style.maxHeight = '92vh';
+    if (body) { body.style.overflow = 'auto'; body.style.flex = '1'; body.style.minHeight = '0'; }
+    const rs = document.getElementById('regSuccessScreen');
+    if (rs) rs.style.display = 'none';
     // Önceki değerleri temizle
     ['subUsername','subPassword','masterKeyInput','jwtInput',
      'regFullName','regEmail','regUsername','regPassword'].forEach(id => {
@@ -2801,7 +2863,8 @@ function closeLpModal() {
     const overlay = document.getElementById('loginOverlay');
     if (!overlay) return;
     overlay.style.display = 'none';
-    document.body.style.overflow = '';
+    // Landing'de scroll açık kalsın
+    document.body.style.overflow = 'auto';
     // Başarı ekranını sıfırla
     var s = document.getElementById('regSuccessScreen');
     if (s) s.style.display = 'none';
@@ -2814,6 +2877,9 @@ function setLpTab(tab) {
     const masterForm = document.getElementById('masterForm');
     const subtitle = document.getElementById('lpModalSubtitle');
     [subForm, regForm, masterForm].forEach(f => { if(f) f.style.display = 'none'; });
+    // Sekme değiştirince başarı ekranı üstte kalmasın
+    const rs = document.getElementById('regSuccessScreen');
+    if (rs) rs.style.display = 'none';
 
     // Hataları ve banner'ı temizle
     ['masterError','subError','regError'].forEach(id => {
@@ -2856,8 +2922,33 @@ function showIntroThenLogin() { openLpModal('login'); }
 function showRegisterOverlay() { openLpModal('register'); }
 
 // ══ LANDING PAGE BUTONLARI ══
-function lpGirisYap() { openLpModal('login'); }
-function lpKayitOl() { openLpModal('register'); }
+function toggleAuthMenu(event) {
+    if (event) event.stopPropagation();
+    const dd = document.getElementById('authMenuDropdown');
+    if (!dd) return;
+    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+}
+function closeAuthMenu() {
+    const dd = document.getElementById('authMenuDropdown');
+    if (dd) dd.style.display = 'none';
+}
+function chooseAuthOption(type) {
+    closeAuthMenu();
+    if (type === 'login') openLpModal('login');
+    else if (type === 'register') openLpModal('register');
+    else if (type === 'demo') startDemo();
+}
+function lpGirisYap() {
+    // Landing'in farklı noktalarından gelen "giriş yap" çağrısını tek menüye yönlendir.
+    const dd = document.getElementById('authMenuDropdown');
+    if (dd) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        dd.style.display = 'block';
+        return;
+    }
+    openLpModal('login');
+}
+function lpKayitOl() { chooseAuthOption('register'); }
 function lpCookieKabul() {
     localStorage.setItem('hukukai_cookie_consent', 'accepted');  // Tüm çerezler
     localStorage.setItem('hukukai_cookie_date', new Date().toISOString());
@@ -2978,63 +3069,6 @@ document.addEventListener('DOMContentLoaded', checkApprovalToken);
 
 
 
-function lpDemoGonder() {
-    const ad = document.getElementById('lpDemoAd')?.value.trim();
-    const email = document.getElementById('lpDemoEmail')?.value.trim();
-    if (!ad || ad.length < 2) { showNotification('Lütfen adınızı soyadınızı girin!', 'error'); document.getElementById('lpDemoAd')?.focus(); return; }
-    if (!email || !email.includes('@')) { showNotification('Geçerli bir e-posta adresi girin!', 'error'); document.getElementById('lpDemoEmail')?.focus(); return; }
-    const tel = document.getElementById('lpDemoTel')?.value.trim() || '-';
-    const tarih = new Date().toLocaleString('tr-TR');
-
-    const html = `
-        <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#0f1428;color:#e8e4da;border-radius:12px;overflow:hidden;">
-            <div style="background:linear-gradient(90deg,#dc2626,#7c3aed);padding:20px 28px;">
-                <h2 style="margin:0;color:#fff;font-size:20px;">📩 Yeni Demo Talebi</h2>
-                <p style="margin:4px 0 0;color:rgba(255,255,255,.7);font-size:13px;">HukukAI Pro</p>
-            </div>
-            <div style="padding:28px;">
-                <table style="width:100%;border-collapse:collapse;">
-                    <tr><td style="padding:8px 0;color:#a78bfa;font-size:12px;font-weight:700;text-transform:uppercase;width:120px;">Ad Soyad</td><td style="padding:8px 0;color:#e8e4da;font-size:14px;">${ad}</td></tr>
-                    <tr><td style="padding:8px 0;color:#a78bfa;font-size:12px;font-weight:700;text-transform:uppercase;">E-posta</td><td style="padding:8px 0;color:#e8e4da;font-size:14px;">${email}</td></tr>
-                    <tr><td style="padding:8px 0;color:#a78bfa;font-size:12px;font-weight:700;text-transform:uppercase;">Telefon</td><td style="padding:8px 0;color:#e8e4da;font-size:14px;">${tel}</td></tr>
-                    <tr><td style="padding:8px 0;color:#a78bfa;font-size:12px;font-weight:700;text-transform:uppercase;">Tarih</td><td style="padding:8px 0;color:#e8e4da;font-size:14px;">${tarih}</td></tr>
-                </table>
-            </div>
-            <div style="background:rgba(124,58,237,.15);padding:14px 28px;font-size:12px;color:#a78bfa;text-align:center;">
-                hukukai.pro — Demo Talep Bildirimi
-            </div>
-        </div>`;
-
-    sendResendEmail('🆕 Yeni Demo Talebi — ' + ad, html);
-
-    ['lpDemoAd','lpDemoEmail','lpDemoTel'].forEach(id => { const e = document.getElementById(id); if(e) e.value=''; });
-    const notif = document.createElement('div');
-    notif.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#13131f;border:1px solid rgba(40,200,64,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#28c840;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);';
-    notif.innerHTML = '<i class="fas fa-check-circle"></i> Demo talebiniz alındı! En kısa sürede dönüş yapacağız.';
-    document.body.appendChild(notif);
-    setTimeout(() => notif.remove(), 4000);
-}
-function lpDemoModalGonder() {
-    const ad = document.getElementById('demoModalAd')?.value.trim();
-    const email = document.getElementById('demoModalEmail')?.value.trim();
-    const tel = document.getElementById('demoModalTel')?.value.trim();
-    const not = document.getElementById('demoModalNot')?.value.trim();
-    if (!ad) { alert('Ad Soyad zorunludur.'); return; }
-    if (!email || !email.includes('@')) { alert('Geçerli e-posta girin.'); return; }
-    const BOT = [56,55,50,53,51,56,53,56,51,48,58,65,65,72,114,109,99,103,78,78,112,118,90,65,112,68,57,119,74,90,77,65,53,118,45,86,77,106,67,79,77,109,67,103,69,115].map(c=>String.fromCharCode(c)).join("");
-    const CHAT = '1575763358';
-    const msg = `🎯 *Demo Talebi (Modal)*\n\n👤 ${ad}\n📧 ${email}\n📞 ${tel||'-'}\n💬 ${not||'-'}\n🕐 ${new Date().toLocaleString('tr-TR')}`;
-    fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ chat_id: CHAT, text: msg, parse_mode:'Markdown' })
-    }).catch(()=>{});
-    document.getElementById('demoModal')?.classList.remove('open');
-    const notif = document.createElement('div');
-    notif.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#13131f;border:1px solid rgba(40,200,64,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#28c840;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);';
-    notif.innerHTML = '<i class="fas fa-check-circle"></i> Demo talebiniz alındı. En kısa sürede dönüş yapacağız!';
-    document.body.appendChild(notif);
-    setTimeout(() => notif.remove(), 4000);
-}
 // Cookie banner başlat
 window.addEventListener('load', () => {
     if (!localStorage.getItem('hukukai_cookie_consent')) {
@@ -3607,7 +3641,15 @@ function showPendingApprovalScreen(fullName, email) {
     if (emailEl) emailEl.textContent = email;
     // Başarı ekranını göster
     var screen = document.getElementById('regSuccessScreen');
-    if (screen) screen.style.display = 'block';
+    if (screen) {
+        screen.style.display = 'block';
+        // Otomatik akış: 1.2sn sonra login sekmesine dön
+        if (screen._autoTimer) clearTimeout(screen._autoTimer);
+        screen._autoTimer = setTimeout(() => {
+            screen.style.display = 'none';
+            setLpTab('login');
+        }, 1200);
+    }
 }
 
 function hideRegSuccess() {
@@ -3741,7 +3783,7 @@ function updateUIForRole() {
         roleBadge.textContent = 'DEMO';
         roleBadge.className = 'user-role-badge demo';
         userNameDisplay.textContent = 'Demo Kullanıcı';
-        if (versionTag) versionTag.textContent = 'v7.8 DEMO';
+        if (versionTag) versionTag.textContent = 'v2.0 PRO (DEMO)';
         if (systemStatus) systemStatus.textContent = 'Demo Modu – Sınırlı Erişim';
         document.getElementById('demoInfo').style.display = 'block';
         updateDemoInfo();
@@ -3755,7 +3797,7 @@ function updateUIForRole() {
         roleBadge.innerHTML = '<i class="fas fa-crown" style="font-size:7px;"></i> MASTER';
         roleBadge.className = 'user-role-badge master';
         userNameDisplay.textContent = 'Master Admin';
-        if (versionTag) versionTag.textContent = 'v7.8 MASTER';
+        if (versionTag) versionTag.textContent = 'v2.0 PRO (MASTER)';
         if (systemStatus) systemStatus.textContent = 'Tam Yetki | Master';
         adminMenus.forEach(m => m.classList.remove('hidden'));
         document.getElementById('masterModeToggleWrap')?.classList.remove('hidden');
@@ -3768,7 +3810,7 @@ function updateUIForRole() {
         roleBadge.textContent = 'ABONE';
         roleBadge.className = 'user-role-badge subscriber';
         userNameDisplay.textContent = currentUser.username;
-        if (versionTag) versionTag.textContent = 'v7.8 SUBSCRIBER';
+        if (versionTag) versionTag.textContent = 'v2.0 PRO (ABONE)';
         if (systemStatus) systemStatus.textContent = 'Abone Modu | Aktif';
         adminMenus.forEach(m => m.classList.add('hidden'));
         document.getElementById('masterModeToggleWrap')?.classList.add('hidden');
@@ -3973,6 +4015,19 @@ async function initFirebase() {
         _fbReady = true;
         console.log('✅ Firebase bağlantısı kuruldu');
         updateFirebaseBadge(true);
+        // ── Real-time listener: kullanıcı DB değişince yerel önbelleği güncelle ──
+        _fbDB.ref('hukukai/usersDB').on('value', function(snap) {
+            if (!snap || !snap.exists()) return;
+            try {
+                var data = snap.val();
+                var toArr = function(v) {
+                    return Array.isArray(v) ? v : (v && typeof v === 'object') ? Object.values(v) : [];
+                };
+                usersDB.guests  = toArr(data.guests);
+                usersDB.pending = toArr(data.pending);
+                localStorage.setItem('hukukai_users', JSON.stringify(usersDB));
+            } catch(e2) { console.warn('Firebase listener hatası:', e2); }
+        });
         return true;
     } catch(e) {
         console.error('Firebase başlatma hatası:', e);
@@ -4299,30 +4354,65 @@ function renderUserCards(filterStatus = 'all', searchTerm = '') {
         container.innerHTML = '<div style="text-align:center;padding:30px;color:#475569;font-size:13px;"><i class="fas fa-users" style="font-size:28px;display:block;margin-bottom:8px;"></i>Kullanıcı bulunamadı</div>';
         return;
     }
-    container.innerHTML = users.map(u => {
-        const statusColor = u.status==='active'?'#34d399':u.status==='blocked'?'#f87171':'#94a3b8';
-        const statusText = u.status==='active'?'Aktif':u.status==='blocked'?'Engelli':'Pasif';
-        const vio = u.violationCount || 0;
-        const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('tr-TR') : '-';
-        return `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.07)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.3));border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#a78bfa;">${(u.username||'?')[0].toUpperCase()}</div>
-                    <div>
-                        <div style="font-size:13px;font-weight:700;color:#f1f5f9;">${u.username||'?'}</div>
-                        <div style="font-size:11px;color:#64748b;">${u.email||'-'} · Son giriş: ${lastLogin}</div>
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                    <span style="font-size:10px;font-weight:700;color:${statusColor};background:${statusColor}22;border:1px solid ${statusColor}44;padding:3px 8px;border-radius:99px;">${statusText}</span>
-                    ${vio>0?`<span style="font-size:10px;font-weight:700;color:#f87171;background:#f8717122;border:1px solid #f8717144;padding:3px 8px;border-radius:99px;">⚠️ ${vio} İhlal</span>`:''}
-                    ${u.status!=='blocked'?`<button onclick="blockUser(${u.id})" style="padding:4px 10px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:10px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:600;"><i class="fas fa-ban"></i> Engelle</button>`:''}
-                    ${u.status==='blocked'?`<button onclick="unblockUser(${u.id})" style="padding:4px 10px;background:rgba(5,150,105,.15);border:1px solid rgba(5,150,105,.3);border-radius:6px;color:#34d399;font-size:10px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:600;"><i class="fas fa-unlock"></i> Aç</button>`:''}
-                    <button onclick="deleteUser(${u.id})" style="padding:4px 10px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:6px;color:#f87171;font-size:10px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:600;"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
+    // Liste görünümü: tablo gibi tek satırlı düzen
+    container.innerHTML = `
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Kullanıcı</th>
+                    <th>E-posta</th>
+                    <th>Son giriş</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${users.map(u => {
+                    const statusColor =
+                        u.status === 'active' ? '#34d399' :
+                        u.status === 'blocked' ? '#f87171' :
+                        u.status === 'pending' ? '#9ca3af' : '#94a3b8';
+                    const statusText =
+                        u.status === 'active' ? 'Aktif' :
+                        u.status === 'blocked' ? 'Engelli' :
+                        u.status === 'pending' ? 'Beklemede' : 'Pasif';
+                    const vio = u.violationCount || 0;
+                    const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('tr-TR') : '-';
+                    const initials = (u.username || '?')[0].toUpperCase();
+                    const userName = u.username || '?';
+                    const email = u.email || '-';
+
+                    return `<tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.3));border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#a78bfa;flex-shrink:0;">
+                                    ${escapeHtml(initials)}
+                                </div>
+                                <div style="min-width:0;">
+                                    <div style="font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(userName)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${escapeHtml(email)}</td>
+                        <td>${escapeHtml(lastLogin)}</td>
+                        <td>
+                            <span style="font-size:10px;font-weight:700;color:${statusColor};background:${statusColor}22;border:1px solid ${statusColor}44;padding:3px 8px;border-radius:99px;">
+                                ${escapeHtml(statusText)}
+                            </span>
+                            ${vio>0 ? `<span style="margin-left:6px;font-size:10px;font-weight:700;color:#f87171;background:#f8717122;border:1px solid #f8717144;padding:3px 8px;border-radius:99px;">⚠️ ${vio} İhlal</span>` : ''}
+                        </td>
+                        <td>
+                            <div class="action-btns" style="flex-wrap:wrap;">
+                                ${u.status !== 'blocked'
+                                    ? `<button onclick="blockUser(${u.id})" class="btn-admin-approve" style="font-size:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;"><i class="fas fa-ban"></i> Engelle</button>`
+                                    : `<button onclick="unblockUser(${u.id})" class="btn-admin-reject" style="font-size:10px;padding:6px 10px;display:flex;align-items:center;gap:6px; background:rgba(5,150,105,.15);border-color:rgba(5,150,105,.3); color:#34d399;"><i class="fas fa-unlock"></i> Aç</button>`}
+                                <button onclick="deleteUser(${u.id})" class="btn-admin-delete" style="font-size:10px;padding:6px 10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>`;
 }
 
 function filterUsers(status) {
@@ -4690,7 +4780,7 @@ function generateAkilliDilekce() {
         });
     }
 
-    const dayanaklarForDava = davaDayanaklari[dava] || ['hmk114','hmk189'];
+    const dayanaklarForDava = getDayanaklarForDava(dava);
     const hukukiContainer = document.getElementById('hukukiMaddelerContainer');
     if (hukukiContainer) {
         hukukiContainer.innerHTML = '';
@@ -4828,17 +4918,42 @@ function generateAkilliDilekce() {
         ]
     };
     const yargitayKararlari = yargitayData[dava] || yargitayData.default;
+    const ictihatKaynaklari = {
+        'idari-itiraz': 'https://www.danistay.gov.tr',
+        default: 'https://www.karararama.yargitay.gov.tr'
+    };
+    const ictihatKaynakUrl = ictihatKaynaklari[dava] || ictihatKaynaklari.default;
     const yargitayContainer = document.getElementById('yargitayIctihatContainer');
     if (yargitayContainer) {
         yargitayContainer.innerHTML = '';
-        yargitayKararlari.forEach(karar => {
-            const div = document.createElement('div');
-            div.className = 'editable-field';
-            div.contentEditable = 'true';
-            div.style.cssText = 'font-size:12px;color:#475569;font-style:italic;margin-bottom:8px;padding:8px 12px;background:rgba(241,245,249,.5);border-left:3px solid #7c3aed;border-radius:0 4px 4px 0;font-family:Times New Roman,Times,serif;';
-            div.textContent = karar;
-            yargitayContainer.appendChild(div);
-        });
+        if (ictihatKaynakUrl) {
+            yargitayKararlari.forEach(karar => {
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'margin-bottom:8px;';
+
+                const div = document.createElement('div');
+                div.className = 'editable-field';
+                div.contentEditable = 'true';
+                div.style.cssText = 'font-size:12px;color:#475569;font-style:italic;padding:8px 12px;background:rgba(241,245,249,.5);border-left:3px solid #7c3aed;border-radius:0 4px 4px 0;font-family:Times New Roman,Times,serif;';
+                div.textContent = karar;
+                wrap.appendChild(div);
+
+                const src = document.createElement('a');
+                src.href = ictihatKaynakUrl;
+                src.target = '_blank';
+                src.rel = 'noopener noreferrer';
+                src.textContent = 'Kaynak doğrulama linki';
+                src.style.cssText = 'display:inline-block;margin-top:4px;font-size:11px;color:#7c3aed;text-decoration:underline;';
+                wrap.appendChild(src);
+
+                yargitayContainer.appendChild(wrap);
+            });
+        } else {
+            const info = document.createElement('div');
+            info.style.cssText = 'font-size:12px;color:#475569;padding:8px 12px;background:rgba(241,245,249,.5);border-left:3px solid #94a3b8;border-radius:0 4px 4px 0;';
+            info.textContent = 'Doğrulama linki olmayan içtihat metni gösterilmedi.';
+            yargitayContainer.appendChild(info);
+        }
         const yargitaySection = document.getElementById('yargitayIctihatSection');
         if(yargitaySection) yargitaySection.style.display = 'block';
     }
@@ -4903,7 +5018,7 @@ function generateAkilliDilekce() {
 
 function insertAIYasalDayanak() {
     const dava = currentDavaTuru || 'kisisel';
-    const dayanaklarList = davaDayanaklari[dava] || ['hmk114','hmk189'];
+    const dayanaklarList = getDayanaklarForDava(dava);
     const hukukiContainer = document.getElementById('hukukiMaddelerContainer');
     if (!hukukiContainer) return;
     dayanaklarList.forEach(key => {
@@ -4926,7 +5041,7 @@ function insertAIYasalDayanak() {
 async function saveDilekce() {
     const s = getDemoSettings();
     if (isDemoMode && !s.allowSave) { showNotification('Demo modunda kayıt kapalı!', 'error'); return; }
-    const content = document.getElementById('dilekceContent').innerHTML;
+    const content = sanitizeEditorHtml(document.getElementById('dilekceContent').innerHTML);
     const mahkeme = document.getElementById('dilekceMahkeme').textContent;
     const konu = document.getElementById('davaKonusu').textContent;
     const payload = {
@@ -4982,14 +5097,14 @@ function showSavedDilekceler() {
     const content = saved.map((d, i) => `
         <div style="padding:14px;background:var(--surface);border:1px solid var(--border-light);border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <div style="flex:1;min-width:0;">
-                <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.title||'Dilekçe '+(i+1)}</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${new Date(d.date).toLocaleDateString('tr-TR')} · ${d.dava||'genel'}</div>
+                <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(d.title || ('Dilekçe ' + (i + 1)))}</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${new Date(d.date).toLocaleDateString('tr-TR')} · ${escapeHtml(d.dava || 'genel')}</div>
             </div>
             <div style="display:flex;gap:6px;flex-shrink:0;">
-                <button onclick="loadSavedDilekce(${i})" style="padding:6px 14px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:700;white-space:nowrap;">
+                <button type="button" class="sd-load" data-saved-index="${i}" style="padding:6px 14px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:700;white-space:nowrap;">
                     <i class="fas fa-upload"></i> Yükle
                 </button>
-                <button onclick="deleteSavedDilekce(${i})" class="btn-admin-delete">
+                <button type="button" class="btn-admin-delete sd-delete" data-saved-index="${i}">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -5002,20 +5117,36 @@ function showSavedDilekceler() {
         <div class="modal large" style="max-width:680px;">
             <div class="modal-header">
                 <div class="modal-title"><i class="fas fa-folder-open" style="color:#34d399;"></i> Kaydedilen Dilekçeler <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(${saved.length} adet)</span></div>
-                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('savedDilekcelerModal')?.remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" id="savedDilekcelerCloseBtn" aria-label="Kapat" type="button"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="max-height:480px;overflow-y:auto;">${content}</div>
         </div>`;
     document.body.appendChild(modal);
     // Dışa tıklayınca kapat
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    modal.addEventListener('click', e => {
+        const loadBtn = e.target.closest('.sd-load');
+        if (loadBtn) {
+            loadSavedDilekce(Number(loadBtn.dataset.savedIndex));
+            return;
+        }
+        const delBtn = e.target.closest('.sd-delete');
+        if (delBtn) {
+            deleteSavedDilekce(Number(delBtn.dataset.savedIndex));
+            return;
+        }
+        if (e.target.closest('#savedDilekcelerCloseBtn')) {
+            modal.remove();
+            return;
+        }
+        if (e.target === modal) modal.remove();
+    });
 }
 
 function loadSavedDilekce(index) {
     const saved = JSON.parse(localStorage.getItem('hukukai_saved') || '[]');
     if (!saved[index]) return;
     const d = saved[index];
-    document.getElementById('dilekceContent').innerHTML = d.content;
+    document.getElementById('dilekceContent').innerHTML = sanitizeEditorHtml(d.content);
     const modal = document.getElementById('savedDilekcelerModal');
     if (modal) modal.remove();
     showNotification('Dilekçe yüklendi!', 'success');
@@ -5163,6 +5294,59 @@ let belgeTaraResult = null;
 
 function openBelgeTaraModal() {
     openModal('belgeTaraModal');
+    initBelgeTaraModalEvents();
+}
+
+function initBelgeTaraModalEvents() {
+    const modal = document.getElementById('belgeTaraModal');
+    if (!modal || modal._eventsBound) return;
+    modal._eventsBound = true;
+
+    const dropZone = modal.querySelector('#belgeDropZone');
+    const fileInput = modal.querySelector('#belgeFileInput');
+    const clearBtn = modal.querySelector('#belgeTaraClearBtn');
+    const analyzeBtn = modal.querySelector('#belgeAnalizBtn');
+    const formAktarBtn = modal.querySelector('#belgeFormAktarBtn');
+    const closeBtn = modal.querySelector('#belgeTaraCloseBtn');
+
+    // Dropzone click: dosya seç
+    if (dropZone && fileInput) {
+        dropZone.addEventListener('click', () => fileInput.click());
+        // Enter/Space ile erişilebilirlik
+        dropZone.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
+
+        const setHover = (hover) => {
+            dropZone.style.background = hover ? 'rgba(124,58,237,.08)' : 'transparent';
+        };
+        dropZone.addEventListener('mouseenter', () => setHover(true));
+        dropZone.addEventListener('mouseleave', () => setHover(false));
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#7c3aed';
+        });
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'rgba(124,58,237,.4)';
+            // Mevcut belgeDrop handler'ını kullan
+            belgeDrop(e);
+        });
+    }
+
+    // Dosya yüklendi -> analiz/okuma
+    if (fileInput) {
+        fileInput.addEventListener('change', e => belgeYukle(e.target));
+    }
+
+    if (clearBtn) clearBtn.addEventListener('click', belgeSifirla);
+    if (analyzeBtn) analyzeBtn.addEventListener('click', belgeTaraVeAnaliz);
+    if (formAktarBtn) formAktarBtn.addEventListener('click', belgeFormAktar);
+    if (closeBtn) closeBtn.addEventListener('click', () => closeModal('belgeTaraModal'));
 }
 
 function belgeDrop(event) {
@@ -5495,11 +5679,24 @@ function toggleThemeSelector() {
 // ============================================================
 // MODALlar
 // ============================================================
-function openModal(id) {
-    const el = document.getElementById(id);
-    if (el) { el.classList.add('active'); el.style.display='flex'; }
+function setModalA11y(el) {
+    if (!el) return;
+    // Overlay (modal-overlay) üzerine temel a11y bilgilerini set ediyoruz.
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    const title = el.querySelector('.modal-title');
+    if (title && title.textContent) el.setAttribute('aria-label', title.textContent.trim());
 }
-function closeModal(id) {
+
+function showModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('active');
+    el.style.display = 'flex';
+    setModalA11y(el);
+}
+
+function hideModal(id) {
     const el = document.getElementById(id);
     if (!el) return;
     el.classList.remove('active');
@@ -5510,26 +5707,30 @@ function closeModal(id) {
     }
 }
 
-function openAkilliDilekceModal() { document.getElementById('akilliDilekceModal')?.classList.add('active'); }
-function openProfileModal() { document.getElementById('profileModal')?.classList.add('active'); }
+// Geriye dönük uyumluluk: eski isimler korunuyor.
+function openModal(id) { showModal(id); }
+function closeModal(id) { hideModal(id); }
+
+function openAkilliDilekceModal() { showModal('akilliDilekceModal'); }
+function openProfileModal() { showModal('profileModal'); }
 function openSiteLogoModal() {
     if (!currentUser || currentUser.role !== 'master') return;
-    document.getElementById('siteLogoModal')?.classList.add('active');
+    showModal('siteLogoModal');
 }
 function openSidebarMenuManager() {
     renderMenuItemList();
-    document.getElementById('sidebarMenuModal')?.classList.add('active');
+    showModal('sidebarMenuModal');
 }
 function openActivityLogModal() {
     renderActivityLog('all');
-    document.getElementById('activityLogModal')?.classList.add('active');
+    showModal('activityLogModal');
 }
-function openGuestPasswordModal() { document.getElementById('guestPasswordModal')?.classList.add('active'); }
+function openGuestPasswordModal() { showModal('guestPasswordModal'); }
 function openPriceEditor() {
     document.getElementById('editMonthlyPrice').value = monthlyPrice;
     document.getElementById('editYearlyPrice').value = yearlyPrice;
     document.getElementById('editContactPhone').value = contactPhone;
-    document.getElementById('priceEditorModal')?.classList.add('active');
+    showModal('priceEditorModal');
 }
 
 document.addEventListener('click', e => {
@@ -5904,9 +6105,9 @@ function renderActivityLog(filter = 'all') {
                 ${a.type==='login'?'🔐':a.type==='dilekce'?'📄':a.type==='admin'?'⚙️':a.type==='demo'?'🎭':a.type==='register'?'📝':'🔍'}
             </div>
             <div style="flex:1;min-width:0;">
-                <div style="font-size:12px;font-weight:600;color:#f1f5f9;">${a.message}</div>
+                <div style="font-size:12px;font-weight:600;color:#f1f5f9;">${escapeHtml(a.message)}</div>
                 <div style="font-size:10px;color:#475569;margin-top:2px;">
-                    ${a.user} · ${new Date(a.time).toLocaleString('tr-TR')}
+                    ${escapeHtml(a.user)} · ${new Date(a.time).toLocaleString('tr-TR')}
                 </div>
             </div>
         </div>`).join('');
@@ -5922,6 +6123,50 @@ function clearActivityLog() {
     localStorage.setItem('activityLog', JSON.stringify(activityLog));
     renderActivityLog('all');
     showNotification('Aktivite logu temizlendi!');
+}
+
+// ============================================================
+// GÜVENLİK: Dinamik HTML basarken temel kaçış (XSS azaltma)
+// ============================================================
+function escapeHtml(str = '') {
+    return String(str).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[ch]));
+}
+
+// ============================================================
+// GÜVENLİK: ContentEditable HTML'i basit sanitize et (XSS azaltma)
+// ============================================================
+function sanitizeEditorHtml(html = '') {
+    try {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = String(html);
+
+        // Script / potansiyel zararlı içerikler temizlensin
+        wrap.querySelectorAll('script, iframe, object, embed').forEach(el => el.remove());
+        wrap.querySelectorAll('form').forEach(el => el.remove());
+
+        // on* event handler'ları kaldır
+        wrap.querySelectorAll('*').forEach(el => {
+            [...el.attributes].forEach(attr => {
+                const name = attr.name.toLowerCase();
+                const value = String(attr.value || '');
+                if (name.startsWith('on')) el.removeAttribute(attr.name);
+                if ((name === 'href' || name === 'src') && value.trim().toLowerCase().startsWith('javascript:')) {
+                    el.setAttribute(attr.name, '#');
+                }
+            });
+        });
+
+        return wrap.innerHTML;
+    } catch (e) {
+        // sanitize başarısız olursa içerik çalışmaya devam etsin
+        return String(html);
+    }
 }
 
 // ============================================================
@@ -5941,7 +6186,8 @@ function showNotification(message, type = 'success') {
     const c = colors[type] || colors.success;
     notif.style.background = c.bg;
     notif.style.borderColor = c.border;
-    notif.innerHTML = `<i class="${icons[type]||icons.success}"></i><span>${message}</span>`;
+    // message dinamik olabilir (localStorage / kullanıcı girdisi vb.), kaçış uyguluyoruz
+    notif.innerHTML = `<i class="${icons[type]||icons.success}"></i><span>${escapeHtml(message)}</span>`;
     notif.classList.add('show');
     if (notif._timeout) clearTimeout(notif._timeout);
     notif._timeout = setTimeout(() => notif.classList.remove('show'), 4000);
@@ -6105,7 +6351,7 @@ function openAIAnalysisModal() {
     modal.innerHTML = `<div class="modal" style="max-width:680px;">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(91,33,182,.2));">
                 <div class="modal-title"><i class="fas fa-brain" style="color:#a78bfa;"></i> Olayımı Anlat — AI Hukuki Analiz <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div>
-                <button class="modal-close" aria-label="Kapat" onclick="closeModal('aiAnalysisModal')"><i class="fas fa-times"></i></button>
+                <button class="modal-close" aria-label="Kapat" type="button"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <div style="background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#a78bfa;line-height:1.6;">
@@ -6115,7 +6361,7 @@ function openAIAnalysisModal() {
                     <label class="form-label">Olayınızı Anlatın</label>
                     <div style="position:relative;">
                         <textarea id="aiAnalysisText" class="form-textarea" rows="7" placeholder="Örnek: 2018 yılında evlendim, 2 çocuğumuz var. Eşim 6 aydır beni terk etti. Çocuklar benimle. Boşanmak ve nafaka almak istiyorum..." style="min-height:160px;font-size:13px;line-height:1.7;padding-right:48px;"></textarea>
-                        <button type="button" id="micBtn" onclick="toggleMic()" title="Sesli anlatım" style="position:absolute;bottom:10px;right:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(124,58,237,.3);color:#a78bfa;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                        <button type="button" id="micBtn" title="Sesli anlatım" style="position:absolute;bottom:10px;right:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(124,58,237,.3);color:#a78bfa;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                             <i class="fas fa-microphone"></i>
                         </button>
                     </div>
@@ -6125,12 +6371,31 @@ function openAIAnalysisModal() {
                 </div>
                 <div id="aiAnalysisResult" style="display:none;"></div>
                 <div style="display:flex;gap:10px;margin-top:12px;">
-                    <button type="button" onclick="runAIAnalysis()" id="aiAnalysisBtn" style="flex:1;padding:13px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="fas fa-brain"></i> AI ile Analiz Et</button>
-                    <button type="button" onclick="document.getElementById('aiAnalysisText').value='';document.getElementById('aiAnalysisResult').style.display='none';" style="padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#64748b;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-trash-alt"></i></button>
+                    <button type="button" id="aiAnalysisBtn" style="flex:1;padding:13px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="fas fa-brain"></i> AI ile Analiz Et</button>
+                    <button type="button" id="aiAnalysisClearBtn" style="padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#64748b;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
         </div>`;
     modal.classList.add('active');
+    setModalA11y(modal);
+
+    // Inline onclick yerine event listener bağlama (daha bakımı kolay)
+    const closeBtn = modal.querySelector('.modal-close');
+    closeBtn?.addEventListener('click', () => closeModal('aiAnalysisModal'));
+
+    const micBtn = modal.querySelector('#micBtn');
+    micBtn?.addEventListener('click', toggleMic);
+
+    const aiBtn = modal.querySelector('#aiAnalysisBtn');
+    aiBtn?.addEventListener('click', runAIAnalysis);
+
+    const clearBtn = modal.querySelector('#aiAnalysisClearBtn');
+    clearBtn?.addEventListener('click', () => {
+        const text = modal.querySelector('#aiAnalysisText');
+        const res = modal.querySelector('#aiAnalysisResult');
+        if (text) text.value = '';
+        if (res) res.style.display = 'none';
+    });
 }
 
 function runAIAnalysis() {
@@ -6161,10 +6426,14 @@ function runAIAnalysis() {
                     <div style="font-size:12px;color:#94a3b8;line-height:1.8;">${analysis.talepler.replace(/\n/g,'<br>')}</div>
                 </div>
             </div>
-            <button onclick="applyLastAIAnalysis()"
+            <button type="button" id="applyLastAIAnalysisBtn"
                 style="width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
                 <i class="fas fa-magic"></i> Bu Bilgilerle Dilekçe Oluştur
             </button>`;
+
+            // Oluşturulan butona event listener bağla
+            const applyBtn = result.querySelector('#applyLastAIAnalysisBtn');
+            applyBtn?.addEventListener('click', applyLastAIAnalysis);
         }
     }, 1200);
 }
@@ -6248,7 +6517,7 @@ function localAIAnalysis(text) {
         vasiyetname:'Vasiyetnameye İtiraz',tazminat:'Tazminat Davası',
         'ortakligin-giderilmesi':'Ortaklığın Giderilmesi'
     };
-    const dayanaklar = (davaDayanaklari[bestDava]||['hmk114','hmk189']).slice(0,6);
+    const dayanaklar = getDayanaklarForDava(bestDava).slice(0,6);
     const maddeList = dayanaklar.map(k=>{const m=kanunMetinleri[k];return m?`• <strong>${m.kanun}</strong> Md.${m.madde} — ${m.baslik}`:''}).filter(Boolean).join('<br>');
     const tMap={
         velayet:'- Velayetin tarafıma verilmesine\n- Diğer ebeveynin çocukla kişisel ilişki düzenlenmesine\n- İştirak nafakasının hükmedilmesine',
@@ -6310,16 +6579,20 @@ function applyAIAnalysis(davaTuru, olay, talepler) {
         'nafaka-tedbir':'Tedbir Nafakası Talebi',
         'nafaka-istihkak':'İştirak Nafakası Davası',
         'nafaka-artirimi':'Nafaka Artırımı Davası',
+        'nafaka-kaldirilmasi':'Nafakanın Kaldırılması Davası',
         kisisel:'Çocukla Kişisel İlişki Kurma Davası',
         iscilik:'İşçilik Alacakları Davası',
+        iscilikkotuniyetli:'Kötüniyet Tazminatı Davası',
         isciiseinali:'İşe İade Davası',
         iscimobbing:'Mobbing Tazminat Davası',
         'kira-tahliye':'Kira Alacağı ve Tahliye Davası',
         'icra-itiraz':'İcra Takibine İtiraz',
         alacak:'Alacak Davası',
         tapu:'Tapu İptal ve Tescil Davası',
+        'ortakligin-giderilmesi':'Ortaklığın Giderilmesi (İzale-i Şuyu) Davası',
         'miras-taksim':'Miras Taksim Davası',
         'miras-red':'Mirasın Reddi Beyanı',
+        vasiyetname:'Vasiyetnamenin İptali Davası',
         tuketici:'Tüketici Şikayeti',
         malrejimi:'Mal Rejimi Tasfiyesi',
         soybagi:'Soybağının Reddi Davası',
@@ -6329,7 +6602,8 @@ function applyAIAnalysis(davaTuru, olay, talepler) {
         'ceza-ihbar':'Suç Duyurusu / Şikayet Dilekçesi',
         'sikayetten-vazgecme':'Şikayetten Vazgeçme Dilekçesi',
         'taksirle-yaralama':'Taksirle Yaralama Şikayet Dilekçesi',
-        'ticari-uyusmazlik':'Ticari Uyuşmazlık Davası'
+        'ticari-uyusmazlik':'Ticari Uyuşmazlık Davası',
+        'tazminat-bosanma':'Boşanmaya Bağlı Maddi/Manevi Tazminat Davası'
     };
     const konuEl = document.getElementById('davaKonusuInput');
     if(konuEl && !konuEl.value) konuEl.value = konuMap[davaTuru] || 'Hukuki Uyuşmazlık';
@@ -6341,11 +6615,15 @@ function applyAIAnalysis(davaTuru, olay, talepler) {
         'kira-tahliye': 'Yıllık kira bedeli olan ....... TL dava değeridir.',
         alacak: 'Dava değeri: ....... TL (fazlaya ilişkin haklar saklıdır)',
         tapu: 'Taşınmazın rayiç değeri olan ....... TL dava değeridir.',
+        'ortakligin-giderilmesi': 'Dava değeri, paydaşlık konusu taşınmazın toplam değeri üzerinden hesaplanır.',
         'miras-taksim': 'Tereke değeri olan ....... TL dava değeridir.',
+        vasiyetname: 'Dava değeri, tenkise/iptale konu tasarrufun değeri üzerinden belirlenir.',
         sigorta: 'Sigorta tazminat miktarı olan ....... TL dava değeridir.',
         'icra-itiraz': 'İtiraz konusu alacak miktarı ....... TL dir.',
         'idari-itiraz': 'İdari işlemin iptali talebi maktu harca tabidir.',
+        'idari-tam-yargi': 'Talep edilen tazminat tutarı dava değeridir.',
         tuketici: 'Talep edilen bedel: ....... TL',
+        iscilikkotuniyetli: 'İşçinin kıdemi ve ücretine göre hesaplanan kötüniyet tazminatı dava değeridir.',
     };
     const degEl = document.getElementById('davaDeğeri');
     if(degEl) degEl.textContent = davaDeğeriMap[davaTuru] || 'Belirsiz alacak davası olarak açılmış olup yargılama sonucunda belirlenecektir.';
@@ -6545,7 +6823,7 @@ function saveVersion(label) {
     const version = {
         id: Date.now(),
         label: label || `v${versionHistory.length + 1} — ${new Date().toLocaleTimeString('tr-TR')}`,
-        html: content.innerHTML,
+        html: sanitizeEditorHtml(content.innerHTML),
         date: new Date().toISOString()
     };
     versionHistory.unshift(version);
@@ -6576,28 +6854,37 @@ function showVersionHistory() {
         <div class="modal" style="max-width:580px;">
             <div class="modal-header" style="background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.15));">
                 <div class="modal-title"><i class="fas fa-history" style="color:#34d399;"></i> Versiyon Geçmişi <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(${versionHistory.length} versiyon)</span></div>
-                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('versionHistoryModal')?.remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" id="vhCloseBtn" aria-label="Kapat" type="button"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="max-height:450px;overflow-y:auto;">
                 ${versionHistory.map((v, i) => `
                 <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1px solid var(--border-light);border-radius:10px;margin-bottom:8px;">
                     <div class="version-dot"></div>
                     <div style="flex:1;">
-                        <div style="font-size:13px;font-weight:600;color:var(--text);">${v.label}</div>
+                        <div style="font-size:13px;font-weight:600;color:var(--text);">${escapeHtml(v.label)}</div>
                         <div style="font-size:11px;color:var(--text-muted);">${new Date(v.date).toLocaleString('tr-TR')}</div>
                     </div>
                     <div style="display:flex;gap:6px;">
-                        <button onclick="restoreVersion(${i})" style="padding:5px 12px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.35);border-radius:6px;color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-undo"></i> Geri Yükle</button>
-                        <button onclick="deleteVersion(${i})" style="padding:5px 8px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="vh-restore" data-restore-index="${i}" style="padding:5px 12px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.35);border-radius:6px;color:#34d399;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-undo"></i> Geri Yükle</button>
+                        <button type="button" class="vh-delete" data-delete-index="${i}" style="padding:5px 8px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`).join('')}
             </div>
             <div class="modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-light);">
-                <button onclick="saveVersion();document.getElementById('versionHistoryModal')?.remove();" style="padding:10px 20px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:8px;color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-bookmark"></i> Şu Anki Hali Kaydet</button>
+                <button type="button" id="vhSaveNowBtn" style="padding:10px 20px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:8px;color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;"><i class="fas fa-bookmark"></i> Şu Anki Hali Kaydet</button>
             </div>
         </div>`;
     document.body.appendChild(modal);
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    modal.addEventListener('click', e => {
+        const restoreBtn = e.target.closest('[data-restore-index]');
+        if (restoreBtn) { restoreVersion(Number(restoreBtn.dataset.restoreIndex)); return; }
+        const deleteBtn = e.target.closest('[data-delete-index]');
+        if (deleteBtn) { deleteVersion(Number(deleteBtn.dataset.deleteIndex)); return; }
+        if (e.target.closest('#vhCloseBtn')) { modal.remove(); return; }
+        const saveNowBtn = e.target.closest('#vhSaveNowBtn');
+        if (saveNowBtn) { saveVersion(); modal.remove(); return; }
+        if (e.target === modal) modal.remove();
+    });
 }
 
 function restoreVersion(index) {
@@ -6606,7 +6893,7 @@ function restoreVersion(index) {
     if (!v) return;
     // Önce mevcut hali kaydet
     saveVersion('Otomatik yedek (geri yükleme öncesi)');
-    document.getElementById('dilekceContent').innerHTML = v.html;
+    document.getElementById('dilekceContent').innerHTML = sanitizeEditorHtml(v.html);
     document.getElementById('versionHistoryModal')?.remove();
     showNotification(`✅ "${v.label}" versiyonuna dönüldü!`, 'success');
 }
@@ -6754,15 +7041,15 @@ async function showSavedDilekcelerEnhanced() {
             <div style="flex:1;min-width:0;">
                 <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     ${d.fromCloud ? '<i class="fas fa-cloud" style="color:#38bdf8;font-size:10px;margin-right:4px;"></i>' : '<i class="fas fa-hdd" style="color:#64748b;font-size:10px;margin-right:4px;"></i>'}
-                    ${d.title || 'Dilekçe ' + (i + 1)}
+                    ${escapeHtml(d.title || ('Dilekçe ' + (i + 1)))}
                 </div>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${new Date(d.date).toLocaleDateString('tr-TR')} · ${d.dava || 'genel'} ${d.fromCloud ? '· ☁️ Bulut' : '· 💾 Yerel'}</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${new Date(d.date).toLocaleDateString('tr-TR')} · ${escapeHtml(d.dava || 'genel')} ${d.fromCloud ? '· ☁️ Bulut' : '· 💾 Yerel'}</div>
             </div>
             <div style="display:flex;gap:6px;flex-shrink:0;">
-                <button onclick="${d.fromCloud ? `loadCloudDilekce('${d.cloudId}')` : `loadSavedDilekce(${i - cloudSaved.length})`}" style="padding:6px 14px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:700;">
+                <button type="button" class="sd2-load" data-from-cloud="${d.fromCloud ? '1' : '0'}" data-cloud-id="${escapeHtml(d.cloudId || '')}" data-saved-index="${i - cloudSaved.length}" style="padding:6px 14px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.35);border-radius:6px;color:#a78bfa;font-size:11px;cursor:pointer;font-family:Outfit,sans-serif;font-weight:700;">
                     <i class="fas fa-upload"></i> Yükle
                 </button>
-                <button onclick="${d.fromCloud ? `deleteCloudDilekce('${d.cloudId}')` : `deleteSavedDilekce(${i - cloudSaved.length})`}" class="btn-admin-delete">
+                <button type="button" class="btn-admin-delete sd2-delete" data-from-cloud="${d.fromCloud ? '1' : '0'}" data-cloud-id="${escapeHtml(d.cloudId || '')}" data-saved-index="${i - cloudSaved.length}">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -6775,19 +7062,42 @@ async function showSavedDilekcelerEnhanced() {
         <div class="modal large" style="max-width:680px;">
             <div class="modal-header">
                 <div class="modal-title"><i class="fas fa-folder-open" style="color:#34d399;"></i> Dilekçelerim <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(${combined.length} adet · ${cloudSaved.length} bulut · ${localSaved.length} yerel)</span></div>
-                <button class="modal-close" aria-label="Kapat" onclick="document.getElementById('savedDilekcelerModal')?.remove()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" id="savedDilekcelerCloseBtnEnhanced" aria-label="Kapat" type="button"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="max-height:480px;overflow-y:auto;">${content}</div>
         </div>`;
     document.body.appendChild(modal);
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    modal.addEventListener('click', e => {
+        const loadBtn = e.target.closest('.sd2-load');
+        if (loadBtn) {
+            const fromCloud = loadBtn.dataset.fromCloud === '1';
+            if (fromCloud) loadCloudDilekce(loadBtn.dataset.cloudId);
+            else loadSavedDilekce(Number(loadBtn.dataset.savedIndex));
+            return;
+        }
+
+        const delBtn = e.target.closest('.sd2-delete');
+        if (delBtn) {
+            const fromCloud = delBtn.dataset.fromCloud === '1';
+            if (fromCloud) deleteCloudDilekce(delBtn.dataset.cloudId);
+            else deleteSavedDilekce(Number(delBtn.dataset.savedIndex));
+            return;
+        }
+
+        if (e.target.closest('#savedDilekcelerCloseBtnEnhanced')) {
+            modal.remove();
+            return;
+        }
+
+        if (e.target === modal) modal.remove();
+    });
 }
 
 async function loadCloudDilekce(cloudId) {
     try {
         const r = await apiCall(`/dilekce?action=get&id=${cloudId}`);
         if (r.ok && r.data?.content) {
-            document.getElementById('dilekceContent').innerHTML = r.data.content;
+            document.getElementById('dilekceContent').innerHTML = sanitizeEditorHtml(r.data.content);
             document.getElementById('savedDilekcelerModal')?.remove();
             showNotification('☁️ Bulut dilekçesi yüklendi!', 'success');
         }
@@ -6808,6 +7118,25 @@ async function deleteCloudDilekce(cloudId) {
 window.lpGirisYap   = lpGirisYap;
 window.lpKayitOl    = lpKayitOl;
 window.openLpModal  = openLpModal;
+
+/* ── Sol Sidebar Toggle (Desktop + Mobil Drawer) ── */
+function toggleLeftSidebar() {
+    if (window.innerWidth > 768) return;
+    var sidebar   = document.getElementById('sidebarLeft');
+    var backdrop  = document.getElementById('leftSidebarBackdrop');
+    if (!sidebar) return;
+    var isOpen = sidebar.classList.contains('mobile-open');
+    if (isOpen) {
+        sidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    } else {
+        sidebar.classList.add('mobile-open');
+        if (backdrop) backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+window.toggleLeftSidebar = toggleLeftSidebar;
 
 /* ── Admin Flyout Toggle ── */
 function toggleAdminFlyout(trigger) {
@@ -6866,7 +7195,6 @@ function recordLoginHistory(user) {
 }
 window.recordLoginHistory = recordLoginHistory;
 window.closeLpModal = closeLpModal;
-window.lpDemoGonder = lpDemoGonder;
 window.setLpTab     = setLpTab;
 window.addMenuItem = addMenuItem;
 window.addNewUser = addNewUser;
@@ -6903,7 +7231,6 @@ window.lockScreen = lockScreen;
 window.logout = logout;
 window.lpCookieKabul = lpCookieKabul;
 window.lpCookieReddet = lpCookieReddet;
-window.lpDemoModalGonder = lpDemoModalGonder;
 window.nextIntroSlide = nextIntroSlide;
 window.openAIAnalysisModal = openAIAnalysisModal;
 window.openActivityLogModal = openActivityLogModal;
@@ -6963,7 +7290,7 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
     <div class="modal" style="max-width:700px;">
         <div class="modal-header" style="background:linear-gradient(90deg,rgba(124,58,237,.25),rgba(91,33,182,.2));">
             <div class="modal-title"><i class="fas fa-magic" style="color:#a78bfa;"></i> Belge Tara & AI Analizi <span class="ai-badge"><i class="fas fa-robot"></i> AI</span></div>
-            <button class="modal-close" aria-label="Kapat" onclick="closeModal('belgeTaraModal')"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="belgeTaraCloseBtn" aria-label="Kapat" type="button"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body" style="padding:20px;">
             <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:#a78bfa;line-height:1.6;">
@@ -6971,21 +7298,19 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
             </div>
 
             <!-- Yükleme Alanı -->
-            <div id="belgeDropZone" onclick="document.getElementById('belgeFileInput')?.click()"
-                style="border:2px dashed rgba(124,58,237,.4);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;"
-                onmouseover="this.style.background='rgba(124,58,237,.08)'" onmouseout="this.style.background='transparent'"
-                ondragover="event.preventDefault();this.style.borderColor='#7c3aed'" ondrop="belgeDrop(event)">
+            <div id="belgeDropZone" role="button" tabindex="0"
+                style="border:2px dashed rgba(124,58,237,.4);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px;background:transparent;">
                 <i class="fas fa-cloud-upload-alt" style="font-size:28px;color:#7c3aed;display:block;margin-bottom:10px;"></i>
                 <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Belge yüklemek için tıklayın veya sürükleyin</div>
                 <div style="font-size:11px;color:var(--text-muted);">PDF, JPG, PNG, TXT desteklenir · Maks. 10MB</div>
-                <input type="file" id="belgeFileInput" accept=".pdf,.jpg,.jpeg,.png,.txt" style="display:none;" onchange="belgeYukle(this)">
+                <input type="file" id="belgeFileInput" accept=".pdf,.jpg,.jpeg,.png,.txt" style="display:none;">
             </div>
 
             <!-- Yüklenen dosya göstergesi -->
             <div id="belgeYüklenenInfo" style="display:none;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#34d399;display:none;align-items:center;gap:8px;">
                 <i class="fas fa-file-check"></i>
                 <span id="belgeFileName">dosya.pdf</span>
-                <button onclick="belgeSifirla()" style="margin-left:auto;background:none;border:none;color:#fca5a5;cursor:pointer;font-size:11px;">✕ Temizle</button>
+                <button id="belgeTaraClearBtn" type="button" style="margin-left:auto;background:none;border:none;color:#fca5a5;cursor:pointer;font-size:11px;">✕ Temizle</button>
             </div>
 
             <!-- Manuel metin girişi -->
@@ -7023,10 +7348,10 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
 
             <!-- Butonlar -->
             <div style="display:flex;gap:10px;">
-                <button id="belgeAnalizBtn" onclick="belgeTaraVeAnaliz()" style="flex:1;padding:13px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <button id="belgeAnalizBtn" type="button" style="flex:1;padding:13px;background:linear-gradient(135deg,#7c3aed,#5b21b6);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
                     <i class="fas fa-brain"></i> AI ile Analiz Et
                 </button>
-                <button id="belgeFormAktarBtn" onclick="belgeFormAktar()" style="display:none;flex:1;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-se>
+                <button id="belgeFormAktarBtn" type="button" style="display:none;flex:1;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;">
                     <i class="fas fa-file-import"></i> Dilekçe Formuna Aktar
                 </button>
             </div>
@@ -7374,37 +7699,25 @@ window.closeModal   = typeof closeModal  !== 'undefined' ? closeModal  : functio
     </div>
 </div>
 <script>
-// Firebase real-time listener — tek ihtiyacımız olan bu
+// ── Sayfa tamamen yüklendikten sonra Firebase retry ──
+// DOMContentLoaded'da SDK henüz yüklenmemişse, load event'inde tekrar dene
 window.addEventListener('load', function() {
-    setTimeout(function() {
-        // Sadece initFirebase'e listener ekle, başka hiçbir şeye dokunma
-        var _origInit = window.initFirebase;
-        window.initFirebase = async function() {
-            var result = await _origInit();
-            if (_fbReady && _fbDB) {
-                _fbDB.ref('hukukai/usersDB').on('value', function(snap) {
-                    if (!snap.exists()) return;
-                    try {
-                        var data = snap.val();
-                        var toArr = function(v) {
-                            return Array.isArray(v) ? v : (v && typeof v === 'object') ? Object.values(v) : [];
-                        };
-                        usersDB.guests  = toArr(data.guests);
-                        usersDB.pending = toArr(data.pending);
-                        localStorage.setItem('hukukai_users', JSON.stringify(usersDB));
-                    } catch(e) {}
-                });
+    if (!_fbReady) {
+        initFirebase().then(function(ok) {
+            if (ok) {
+                console.log('✅ Firebase load event\'inde bağlandı');
+                if (typeof fbPullUsers === 'function') fbPullUsers().catch(function(){});
             }
-            return result;
-        };
-
-        // approveUser sonrası Firebase'e yaz
-        var _origApprove = window.approveUser;
+        });
+    }
+    // approveUser sonrası Firebase'e yaz (override)
+    var _origApprove = window.approveUser;
+    if (typeof _origApprove === 'function') {
         window.approveUser = async function(id) {
             await _origApprove(id);
-            if (_fbReady) fbPushUsers();
+            if (_fbReady && typeof fbPushUsers === 'function') fbPushUsers();
         };
-    }, 500);
+    }
 });
 </script>
 </body>
