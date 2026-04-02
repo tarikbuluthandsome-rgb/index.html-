@@ -395,7 +395,10 @@ Orijinal özelliklerin tamamı korunmuştur.
         .profile-avatar-container:hover .profile-avatar-hover { opacity:1; pointer-events:auto; cursor:pointer; }
         .clock { font-family:'Courier New',monospace; font-size:13px; color:var(--primary); font-weight:700; background:var(--surface); padding:4px 10px; border-radius:4px; border:1px solid var(--border); }
         .hero-section { background:linear-gradient(135deg,var(--surface) 0%,var(--surface-light) 100%); border-bottom:1px solid var(--border); padding:12px 24px; }
-        .editor-toolbar { background:linear-gradient(90deg,var(--surface-light) 0%,var(--border-light) 100%); padding:8px 16px; border-bottom:1px solid var(--border-light); display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+        .editor-toolbar-wrap { background:linear-gradient(90deg,var(--surface-light) 0%,var(--border-light) 100%); border-bottom:1px solid var(--border-light); }
+        .editor-toolbar { background:transparent; padding:8px 16px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+        .editor-paste-hint { display:flex; align-items:center; gap:10px; padding:0 16px 10px; font-size:11px; color:var(--text-muted); font-family:'Outfit',sans-serif; line-height:1.45; flex-wrap:wrap; }
+        .editor-paste-hint strong { color:var(--text); font-weight:600; }
         .toolbar-btn { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:4px; padding:6px 10px; color:var(--text); font-size:11px; cursor:pointer; display:flex; align-items:center; gap:4px; transition:all .2s; font-family:'Outfit',sans-serif; }
         .toolbar-btn:hover { background:var(--primary); border-color:var(--primary); }
         .toolbar-separator { width:1px; height:20px; background:rgba(255,255,255,.2); margin:0 4px; }
@@ -639,7 +642,7 @@ Orijinal özelliklerin tamamı korunmuştur.
         /* Toast bildirimi */
         .toast-base { position:fixed;bottom:24px;right:24px;background:#13131f;border:1px solid rgba(40,200,64,.3);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#28c840;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5); }
 
-        @media print { body * { visibility:hidden; } .dilekce-paper,.dilekce-paper * { visibility:visible; } .dilekce-paper { position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; } .editor-toolbar,.action-bar,.header,.sidebar-left,.sidebar-right,.hero-section { display:none !important; } .editor-container { padding:0; background:white; } }
+        @media print { body * { visibility:hidden; } .dilekce-paper,.dilekce-paper * { visibility:visible; } .dilekce-paper { position:absolute; left:0; top:0; width:100%; margin:0; box-shadow:none; } .editor-toolbar-wrap,.action-bar,.header,.sidebar-left,.sidebar-right,.hero-section { display:none !important; } .editor-container { padding:0; background:white; } }
 
         @media (max-width:768px) {
             body { overflow:auto !important; }
@@ -712,6 +715,7 @@ Orijinal özelliklerin tamamı korunmuştur.
             .dilekce-paper { width:100% !important; max-width:100% !important; font-size:11.5px !important; padding:14px !important; min-height:auto !important; margin:0 !important; }
             .dilekce-content { padding:16px !important; }
             .editor-toolbar { flex-wrap:wrap !important; gap:3px !important; padding:6px !important; }
+            .editor-paste-hint { padding:0 8px 8px !important; font-size:10px !important; gap:6px !important; }
             .toolbar-btn { padding:5px 7px !important; font-size:10px !important; }
             .toolbar-btn span { display:none !important; }
             .action-bar { flex-wrap:wrap !important; gap:5px !important; padding:6px !important; }
@@ -1042,7 +1046,7 @@ Orijinal özelliklerin tamamı korunmuştur.
 <!-- NAVBAR -->
 <nav>
   <a href="#" class="nav-logo">
-    <div class="nav-logo-icon"><i class="fas fa-gavel" style="color:#fff;font-size:14px;"></i></div>
+    <div class="nav-logo-icon"><i class="fas fa-scale-balanced" style="color:#fff;font-size:14px;" aria-hidden="true"></i></div>
     <div class="nav-logo-text">Hukuk<span>AI</span> Pro</div>
   </a>
   <ul class="nav-links">
@@ -1676,8 +1680,8 @@ Orijinal özelliklerin tamamı korunmuştur.
         <div class="sidebar-header">
             <!-- Logo + Profil BİRLEŞİK BLOK -->
             <div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;">
-                <div class="site-logo" id="siteLogo" onclick="openSiteLogoModal()" style="flex-shrink:0;">
-                    <i class="fas fa-gavel" id="siteLogoIcon"></i>
+                <div class="site-logo" id="siteLogo" onclick="openSiteLogoModal()" style="flex-shrink:0;" title="Site logosu — terazi (adalet); tıklayarak resim yükleyebilirsiniz">
+                    <i class="fas fa-scale-balanced" id="siteLogoIcon" aria-hidden="true"></i>
                     <img id="siteLogoImg" style="display:none;width:100%;height:100%;object-fit:cover;">
                     <div class="logo-hover-text"><i class="fas fa-camera"></i></div>
                 </div>
@@ -1827,6 +1831,7 @@ Orijinal özelliklerin tamamı korunmuştur.
         
         
 
+        <div class="editor-toolbar-wrap">
         <div class="editor-toolbar">
             <button class="toolbar-btn" onclick="formatDoc('bold')"><i class="fas fa-bold"></i></button>
             <button class="toolbar-btn" onclick="formatDoc('italic')"><i class="fas fa-italic"></i></button>
@@ -1836,15 +1841,22 @@ Orijinal özelliklerin tamamı korunmuştur.
             <button class="toolbar-btn" onclick="formatDoc('justifyCenter')"><i class="fas fa-align-center"></i></button>
             <button class="toolbar-btn" onclick="formatDoc('justifyRight')"><i class="fas fa-align-right"></i></button>
             <div class="toolbar-separator"></div>
+            <button type="button" class="toolbar-btn" onclick="pasteDilekcePlain()" title="Panodaki metni düz metin olarak yapıştır (HTTPS gerekir)"><i class="fas fa-paste"></i> Panodan yapıştır</button>
+            <div class="toolbar-separator"></div>
             <button class="toolbar-btn" onclick="insertAIYasalDayanak()" style="background:var(--accent);border-color:var(--accent);"><i class="fas fa-book-open"></i> Yasal Dayanak</button>
             <button class="toolbar-btn" onclick="showVersionHistory()" style="background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#34d399;" title="Versiyon Geçmişi"><i class="fas fa-history"></i> Geçmiş</button>
             <button class="toolbar-btn" onclick="saveVersion()" style="background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d;" title="Versiyonu Kaydet"><i class="fas fa-bookmark"></i></button>
             <button class="toolbar-btn" onclick="shareWhatsApp()" style="background:rgba(37,211,102,.2);border-color:rgba(37,211,102,.4);color:#25d366;" title="WhatsApp ile paylaş"><i class="fab fa-whatsapp"></i> WhatsApp</button>
         </div>
+        <div class="editor-paste-hint" role="note">
+            <i class="fas fa-info-circle" style="opacity:.85;flex-shrink:0;"></i>
+            <span>Dışarıdan kopyalanan metni imleç yerine <strong>Ctrl+V</strong> veya dilekçe üzerinde <strong>sağ tık → Yapıştır</strong> ile ekleyin; biçim (kalın, tablo, link) otomatik <strong>düz metin</strong> olur.</span>
+        </div>
+        </div>
 
         <div class="editor-container" id="editorContainer">
             <div class="dilekce-paper" id="dilekcePaper">
-                <div class="dilekce-content" id="dilekceContent" contenteditable="true">
+                <div class="dilekce-content" id="dilekceContent" contenteditable="true" title="Yapıştırma: Ctrl+V veya sağ tık → Yapıştır; HTML düz metne çevrilir.">
                     <div class="dilekce-header"><div class="mahkeme-title" id="dilekceMahkeme">[MAHKEME ADI] AİLE MAHKEMESİ HAKİMLİĞİNE</div><div style="font-size:12px;color:#64748b;margin-top:4px;">Dosya No: [Mahkeme tarafından verilecektir]</div></div>
                     <div class="dilekce-section"><div class="section-label">DAVACI</div><div class="editable-field" contenteditable="true" id="davaciBilgi" style="margin-bottom:8px;"><strong>Ad Soyad:</strong> <span id="davaciAd">......................................................</span><br><strong>T.C. Kimlik No:</strong> <span id="davaciTc">....................................</span><br><strong>Adres:</strong> <span id="davaciAdres">..................................................</span><br><strong>Telefon:</strong> <span id="davaciTel">....................................</span></div></div>
                     <div class="dilekce-section"><div class="section-label">DAVALI</div><div class="editable-field" contenteditable="true" id="davalıBilgi"><strong>Ad Soyad:</strong> <span id="davalıAd">......................................................</span><br><strong>T.C. Kimlik No:</strong> <span id="davalıTc">....................................</span><br><strong>Adres:</strong> <span id="davalıAdres">..................................................</span><br><strong>Telefon:</strong> <span id="davalıTel">....................................</span></div></div>
@@ -1868,7 +1880,7 @@ Orijinal özelliklerin tamamı korunmuştur.
                     <div class="dilekce-section"><div class="section-label">DELİLLER</div><div id="delillerListesi"><div class="delil-item editable-field" contenteditable="true">1. Nüfus kayıt örneği</div><div class="delil-item editable-field" contenteditable="true">2. Boşanma kararı (varsa)</div><div class="delil-item editable-field" contenteditable="true">3. Tanık beyanları</div><div class="delil-item editable-field" contenteditable="true">4. [Diğer deliller]</div><div class="delil-item editable-field" contenteditable="true">5. Her türlü yasal delil (HMK md. 189 vd.)</div></div></div>
                     <div class="dilekce-section" id="yargitayIctihatSection" style="display:none;">
                         <div class="section-label" style="color:#7c3aed;border-bottom-color:#7c3aed;">YARGITAY İÇTİHATLARI</div>
-                        <div id="yargitayIctihatContainer"></div>
+                        <div id="yargitayIctihatContainer" contenteditable="false"></div>
                     </div>
                     <div class="sonuc-box"><div class="section-label" style="color:var(--primary);border-bottom-color:var(--primary);">SONUÇ VE TALEP</div><p style="margin-bottom:12px;font-size:13px;">Yukarıda arz ve izah olunan nedenlerle;</p><ol style="padding-left:20px;margin-bottom:12px;" id="taleplerListesi"><li class="editable-field" contenteditable="true" style="margin-bottom:8px;">[Ana talep maddesi]</li><li class="editable-field" contenteditable="true" style="margin-bottom:8px;">Yargılama giderleri ile vekalet ücretinin davalıya yükletilmesine,</li><li class="editable-field" contenteditable="true">Hüküm verilmesini saygılarımla talep ederim.</li></ol></div>
                     <div class="dilekce-section" id="kaynakSection" style="display:none;margin-top:20px;padding:12px;background:#f8f9fa;border:1px solid #e2e8f0;border-radius:8px;">
@@ -1974,7 +1986,7 @@ Orijinal özelliklerin tamamı korunmuştur.
                 </div>
                 <div class="acc-body">
                     <div class="acc-body-inner">
-                        <a href="https://www.karararama.yargitay.gov.tr" target="_blank" class="source-link"><i class="fas fa-balance-scale"></i><span>Yargıtay Karar Arama</span></a>
+                        <a href="https://karararama.yargitay.gov.tr" target="_blank" class="source-link"><i class="fas fa-balance-scale"></i><span>Yargıtay Karar Arama</span></a>
                         <a href="https://www.yargitayictihatmerkezi.gov.tr" target="_blank" class="source-link"><i class="fas fa-star"></i><span>Yargıtay İçtihat Merkezi</span></a>
                         <a href="https://karararama.bam.adalet.gov.tr" target="_blank" rel="noopener noreferrer" class="source-link"><i class="fas fa-university"></i><span>BAM Kararları</span></a>
                         <a href="https://www.danistay.gov.tr" target="_blank" class="source-link"><i class="fas fa-building"></i><span>Danıştay</span></a>
@@ -2156,7 +2168,7 @@ Orijinal özelliklerin tamamı korunmuştur.
         <div class="modal-header"><div class="modal-title"><i class="fas fa-image"></i> Site Logosu Değiştir</div><button class="modal-close" aria-label="Kapat" onclick="closeModal('siteLogoModal')"><i class="fas fa-times"></i></button></div>
         <div class="modal-body" style="text-align:center;">
             <div class="profile-photo-large" id="siteLogoPreview" style="border-radius:12px;">
-                <i class="fas fa-gavel" id="siteLogoPreviewIcon" style="font-size:60px;color:var(--text-muted);"></i>
+                <i class="fas fa-scale-balanced" id="siteLogoPreviewIcon" style="font-size:60px;color:var(--text-muted);" aria-hidden="true"></i>
                 <img id="siteLogoPreviewImg" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;">
             </div>
             <div class="upload-area" onclick="document.getElementById('siteLogoFileUpload')?.click()">
@@ -2700,6 +2712,21 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
 
+        // Dilekçe içindeki içtihat kaynak linkleri: contenteditable içinde tarayıcı <a> tıklamasını yutabiliyor; delegasyon + window.open
+        const dilekceContentEl = document.getElementById('dilekceContent');
+        if (dilekceContentEl) {
+            dilekceContentEl.addEventListener('click', function(e) {
+                const a = e.target.closest && e.target.closest('a.ictihat-kaynak-link');
+                if (!a || !dilekceContentEl.contains(a)) return;
+                e.preventDefault();
+                e.stopPropagation();
+                try {
+                    window.open(a.href, '_blank', 'noopener,noreferrer');
+                } catch (err) {
+                    window.location.href = a.href;
+                }
+            });
+        }
 
         // ESC tuşu ile modal kapatma
         document.addEventListener('keydown', function(e) {
@@ -4920,9 +4947,16 @@ function generateAkilliDilekce() {
     const yargitayKararlari = yargitayData[dava] || yargitayData.default;
     const ictihatKaynaklari = {
         'idari-itiraz': 'https://www.danistay.gov.tr',
-        default: 'https://www.karararama.yargitay.gov.tr'
+        default: 'https://karararama.yargitay.gov.tr'
     };
     const ictihatKaynakUrl = ictihatKaynaklari[dava] || ictihatKaynaklari.default;
+    const parseYargitayEK = (metin) => {
+        // Beklenen format (örnek): "2021/5230 E., 2022/1897 K."
+        const m = (metin || '').match(/(\d{4}\/\d+)\s*E\.\s*,\s*(\d{4}\/\d+)\s*K\./);
+        if (!m) return null;
+        const daire = (metin.match(/^Yargıtay\s+([^,]+),/) || [])[1];
+        return { esas: m[1], karar: m[2], daire: daire ? daire.trim() : '' };
+    };
     const yargitayContainer = document.getElementById('yargitayIctihatContainer');
     if (yargitayContainer) {
         yargitayContainer.innerHTML = '';
@@ -4938,13 +4972,45 @@ function generateAkilliDilekce() {
                 div.textContent = karar;
                 wrap.appendChild(div);
 
-                const src = document.createElement('a');
-                src.href = ictihatKaynakUrl;
-                src.target = '_blank';
-                src.rel = 'noopener noreferrer';
-                src.textContent = 'Kaynak doğrulama linki';
-                src.style.cssText = 'display:inline-block;margin-top:4px;font-size:11px;color:#7c3aed;text-decoration:underline;';
-                wrap.appendChild(src);
+                const ek = parseYargitayEK(karar);
+                const esasNo = ek?.esas;
+                const kararNo = ek?.karar;
+                const daireAd = ek?.daire || '';
+
+                // karararama.yargitay.gov.tr araması POST ile çalışır; GET ?esas=...&karar=... "Request method GET not supported" döndürür.
+                const resmiBase = ictihatKaynakUrl.replace(/\/$/, '');
+                const resmiAramaUrl = resmiBase + '/';
+
+                const srcResmi = document.createElement('a');
+                srcResmi.href = resmiAramaUrl;
+                srcResmi.target = '_blank';
+                srcResmi.rel = 'noopener noreferrer';
+                srcResmi.className = 'ictihat-kaynak-link';
+                if (esasNo && kararNo) {
+                    srcResmi.textContent = 'Yargıtay Karar Arama (E/K sitede girilir)';
+                    srcResmi.title = 'Açılan sayfada Esas ve Karar numarası alanlarına şu değerleri yazın: Esas ' + esasNo + ', Karar ' + kararNo + '.';
+                } else {
+                    srcResmi.textContent = 'Resmi doğrulama';
+                    srcResmi.title = '';
+                }
+                srcResmi.style.cssText = 'display:inline-block;margin-top:4px;font-size:11px;color:#7c3aed;text-decoration:underline;cursor:pointer;position:relative;z-index:2;margin-right:10px;';
+                wrap.appendChild(srcResmi);
+
+                if (esasNo && kararNo) {
+                    const q = daireAd
+                        ? ('Yargıtay ' + daireAd + ' ' + esasNo + ' E ' + kararNo + ' K')
+                        : ('Yargıtay ' + esasNo + ' E ' + kararNo + ' K');
+                    const googleUrl = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+                    const srcGoogle = document.createElement('a');
+                    srcGoogle.href = googleUrl;
+                    srcGoogle.target = '_blank';
+                    srcGoogle.rel = 'noopener noreferrer';
+                    srcGoogle.className = 'ictihat-kaynak-link';
+                    srcGoogle.textContent = "Web'de ara (E/K)";
+                    srcGoogle.title = "Google'da Yargıtay + daire + Esas/Karar ile arama (site: kısıtı yok).";
+                    srcGoogle.style.cssText = 'display:inline-block;margin-top:4px;font-size:11px;color:#7c3aed;text-decoration:underline;cursor:pointer;position:relative;z-index:2;';
+                    wrap.appendChild(srcGoogle);
+                }
 
                 yargitayContainer.appendChild(wrap);
             });
@@ -5541,6 +5607,24 @@ function fallbackCopy(text) {
 function formatDoc(command) {
     document.execCommand(command, false, null);
     document.getElementById('dilekceContent')?.focus();
+}
+
+/** Panodan düz metin yapıştır (Clipboard API; kullanıcı tıklaması gerekir — file:// bazen çalışmaz) */
+function pasteDilekcePlain() {
+    const editor = document.getElementById('dilekceContent');
+    if (!editor) return;
+    editor.focus();
+    const insert = (text) => {
+        const t = String(text == null ? '' : text).replace(/\r\n/g, '\n');
+        document.execCommand('insertText', false, t);
+    };
+    if (navigator.clipboard && typeof navigator.clipboard.readText === 'function') {
+        navigator.clipboard.readText().then(insert).catch(() => {
+            showNotification('Panoya erişilemedi (HTTPS veya tarayıcı izni gerekir). Dilekçede Ctrl+V veya sağ tık → Yapıştır kullanın.', 'warning');
+        });
+    } else {
+        showNotification('Bu ortamda pano okunamıyor. Ctrl+V veya sağ tık → Yapıştır kullanın.', 'info');
+    }
 }
 
 function initEditorContextMenu() {
@@ -6229,7 +6313,11 @@ function initDevToolsProtection() {
             handleDevToolsDetected();
         }
     });
-    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => {
+        const paper = document.getElementById('dilekcePaper');
+        if (paper && paper.contains(e.target)) return;
+        e.preventDefault();
+    });
 }
 
 function handleDevToolsDetected() {
