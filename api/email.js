@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const { subject, html, to } = req.body;
+    const { subject, html, htmlBody, to } = req.body;
     if (!process.env.RESEND_API_KEY)
         return res.status(200).json({ success: false, reason: 'Resend yapılandırılmamış.' });
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
                 from: process.env.EMAIL_FROM || 'HukukAI Pro <noreply@hukukai.pro>',
                 to:      to      || process.env.EMAIL_TO || 'tarikbuluthandsome@hotmail.com',
                 subject: subject || 'Yeni Bildirim',
-                html:    html    || '<p>Bildirim</p>'
+                html: html || htmlBody || '<p>Bildirim</p>'
             })
         });
         const data = await response.json();
