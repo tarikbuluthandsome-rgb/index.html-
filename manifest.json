@@ -1,0 +1,17 @@
+{
+  "name": "HukukAI Pro",
+  "short_name": "HukukAI",
+  "description": "T.C. Hukuk Asistanı – Yapay Zeka Destekli Hukuki Belge Sistemi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#dc2626",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
