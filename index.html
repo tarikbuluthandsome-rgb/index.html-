@@ -2992,6 +2992,17 @@ function lpCookieReddet() {
 // RESEND E-POSTA BİLDİRİM SİSTEMİ
 // ============================================================
 async function sendResendEmail(subject, htmlBody, toOverride) {
+    try {
+        const res = await fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subject, htmlBody, to: toOverride || 'info@hukukai.pro' })
+        });
+        return res.ok;
+    } catch(e) {
+        return false;
+    }
+}
     // ⚠️ GÜVENLİK UYARISI: API anahtarı istemci taraflı kodda BULUNMAMALIDIR.
     // Bu fonksiyon sadece sunucu taraflı API anahtarı ile çalışır.
     // Tarayıcıdan çağrıldığında CORS engeli nedeniyle sessizce başarısız olur.
@@ -3019,12 +3030,10 @@ async function sendResendEmail(subject, htmlBody, toOverride) {
 
 // ── Merkezi Telegram Bildirim Gönderici ──
 function sendTelegramMsg(text) {
-    const BOT  = [56,55,50,53,51,56,53,56,51,48,58,65,65,72,114,109,99,103,78,78,112,118,90,65,112,68,57,119,74,90,77,65,53,118,45,86,77,106,67,79,77,109,67,103,69,115].map(c=>String.fromCharCode(c)).join('');
-    const CHAT = '1575763358';
-    fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
+    fetch('/api/telegram', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT, text, parse_mode: 'Markdown' })
+        body: JSON.stringify({ text })
     }).catch(() => {});
 }
 
