@@ -3003,30 +3003,7 @@ async function sendResendEmail(subject, htmlBody, toOverride) {
         return false;
     }
 }
-    // ⚠️ GÜVENLİK UYARISI: API anahtarı istemci taraflı kodda BULUNMAMALIDIR.
-    // Bu fonksiyon sadece sunucu taraflı API anahtarı ile çalışır.
-    // Tarayıcıdan çağrıldığında CORS engeli nedeniyle sessizce başarısız olur.
-    // Gerçek deployment'ta bu fonksiyon bir backend proxy üzerinden çağrılmalıdır.
-    try {
-        const toArr = toOverride ? [toOverride] : ['info@hukukai.pro'];
-        const res = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': [66,101,97,114,101,114,32,114,101,95,69,107,99,104,116,54,109,77,95,76,112,57,81,82,109,86,68,56,69,74,72,105,105,106,87,122,97,89,112,50,74,88,67].map(c=>String.fromCharCode(c)).join("")
-            },
-            body: JSON.stringify({
-                from: 'HukukAI Pro <onboarding@resend.dev>',
-                to: toArr,
-                subject: subject,
-                html: htmlBody
-            })
-        });
-        return res.ok;
-    } catch(e) {
-        return false;
-    }
-}
+  
 
 // ── Merkezi Telegram Bildirim Gönderici ──
 function sendTelegramMsg(text) {
