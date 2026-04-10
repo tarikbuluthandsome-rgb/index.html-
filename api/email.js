@@ -4,13 +4,9 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
     const { subject, html, htmlBody, to, type, username } = req.body;
-
     if (!process.env.RESEND_API_KEY)
         return res.status(200).json({ success: false, reason: 'Resend yapılandırılmamış.' });
-
-    // Onay maili şablonu
     let finalHtml = html || htmlBody || '<p>Bildirim</p>';
     if (type === 'approval') {
         finalHtml = `
@@ -21,6 +17,7 @@ export default async function handler(req, res) {
             <div style="padding:28px;">
                 <p>Merhaba <strong>${username || 'Kullanıcı'}</strong>,</p>
                 <p style="color:#94a3b8;">HukukAI Pro hesabınız yönetici tarafından onaylandı. Artık giriş yapabilirsiniz.</p>
+                <p style="color:#94a3b8;">Kayıt olurken belirlediğiniz şifre ile giriş yapabilirsiniz.</p>
                 <div style="text-align:center;margin:24px 0;">
                     <a href="https://hukukai.pro" style="background:linear-gradient(90deg,#7c3aed,#dc2626);color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
                         Giriş Yap →
@@ -30,7 +27,6 @@ export default async function handler(req, res) {
             <div style="background:rgba(124,58,237,.15);padding:14px 28px;font-size:12px;color:#a78bfa;text-align:center;">hukukai.pro</div>
         </div>`;
     }
-
     try {
         const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
