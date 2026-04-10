@@ -3772,6 +3772,11 @@ function showMainApp() {
     if (ma) ma.style.display = 'flex';
     document.body.style.overflow = '';
     // Cookie banner'ı kapat
+    // Online durumu Firebase'e yaz
+    setUserOnline();
+    window.addEventListener('beforeunload', setUserOffline);
+    setInterval(updateUserPresence, 30000);
+    
     const cb = document.getElementById('lpCookieBanner');
     if (cb) cb.style.display = 'none';
 }
@@ -4255,26 +4260,32 @@ function openFullAdminPanel() {
 function renderOnlineUsers() {
     const container = document.getElementById('onlineUsersList');
     if (!container) return;
-    const sessions = JSON.parse(sessionStorage.getItem('hukukai_sessions') || '[]');
-    const guests = usersDB.guests || [];
-    // Show currently logged-in users (active sessions in last hour)
-    const now = Date.now();
-    const activeUsers = guests.filter(u => u.lastLogin && (now - new Date(u.lastLogin).getTime()) < 3600000);
-    if (activeUsers.length === 0) {
-        container.innerHTML = '<div style="font-size:12px;color:#475569;text-align:center;padding:16px;"><i class="fas fa-moon"></i><br>Şu an aktif kullanıcı yok</div>';
-        return;
-    }
-    container.innerHTML = activeUsers.map(u => {
-        const ago = Math.round((now - new Date(u.lastLogin).getTime()) / 60000);
-        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">' +
-            '<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;">' + (u.fullName||u.username||'?')[0].toUpperCase() + '</div>' +
-            '<div style="flex:1;min-width:0;">' +
-                '<div style="font-size:12px;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (u.fullName||u.username) + '</div>' +
-                '<div style="font-size:10px;color:#64748b;">' + (ago < 1 ? 'az önce' : ago + ' dk önce') + '</div>' +
-            '</div>' +
-            '<span style="width:7px;height:7px;background:#4ade80;border-radius:50%;flex-shrink:0;"></span>' +
-        '</div>';
-    }).join('');
+
+    container.innerHTML = '<div style="font-size:12px;color:#475569;text-align:center;padding:16px;"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>';
+
+    loadOnlineUsers(function(users) {
+        if (!users.length) {
+            container.innerHTML = '<div style="font-size:12px;color:#475569;text-align:center;padding:16px;"><i class="fas fa-moon"></i><br>Şu an aktif kullanıcı yok</div>';
+            return;
+        }
+        container.innerHTML = users.map(u => {
+            const ago = Math.round((Date.now() - (u.lastSeen || Date.now())) / 60000);
+            const roleColor = u.role === 'master' ? '#fcd34d' : '#a78bfa';
+            const initial = (u.username || '?')[0].toUpperCase();
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0;">${initial}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:12px;font-weight:700;color:#e2e8f0;">${escapeHtml(u.username || 'Anonim')}</div>
+                    <div style="font-size:10px;color:#64748b;display:flex;align-items:center;gap:6px;">
+                        <span style="color:${roleColor};">${u.role || 'guest'}</span>
+                        · ${u.device || '💻'}
+                        · ${ago < 1 ? 'şimdi' : ago + ' dk önce'}
+                    </div>
+                </div>
+                <span style="width:8px;height:8px;background:#4ade80;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px #4ade80;"></span>
+            </div>`;
+        }).join('');
+    });
 }
 
 function switchAdminTab(tab) {
@@ -4348,6 +4359,14 @@ function updateHeaderMiniStats() {
     const hdrPending = document.getElementById('hdrPendingCount');
     if (hdrUser) hdrUser.textContent = usersDB.guests.length;
     if (hdrPending) hdrPending.textContent = usersDB.pending.length;
+
+    // ✅ YENİ: Online sayısını Firebase'den al
+    if (_fbReady && _fbDB) {
+        _fbDB.ref('hukukai/presence').once('value', function(snap) {
+            const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+            if (hdrUser) hdrUser.textContent = count + ' online / ' + usersDB.guests.length;
+        });
+    }
 }
 
 function renderUserCards(filterStatus = 'all', searchTerm = '') {
@@ -6194,10 +6213,50 @@ function clearActivityLog() {
     renderActivityLog('all');
     showNotification('Aktivite logu temizlendi!');
 }
-
+// ============================================================
+// ONLINE PRESENCE SİSTEMİ
+// ============================================================
+function getUserPresenceKey() {
+    if (!currentUser) return null;
+    const name = currentUser.username || currentUser.role || 'anonim';
+    return name.replace(/[.#$\[\]]/g, '_');
+}
+function setUserOnline() {
+    if (!_fbReady || !_fbDB || !currentUser) return;
+    const key = getUserPresenceKey();
+    if (!key) return;
+    _fbDB.ref('hukukai/presence/' + key).set({
+        username: currentUser.username || 'Anonim',
+        role: currentUser.role || 'guest',
+        online: true,
+        lastSeen: Date.now(),
+        device: navigator.userAgent.includes('Mobile') ? '📱 Mobil' : '💻 Masaüstü'
+    });
+    _fbDB.ref('hukukai/presence/' + key).onDisconnect().remove();
+}
+function setUserOffline() {
+    if (!_fbReady || !_fbDB || !currentUser) return;
+    const key = getUserPresenceKey();
+    if (!key) return;
+    _fbDB.ref('hukukai/presence/' + key).remove();
+}
+function updateUserPresence() {
+    if (!_fbReady || !_fbDB || !currentUser) return;
+    const key = getUserPresenceKey();
+    if (!key) return;
+    _fbDB.ref('hukukai/presence/' + key + '/lastSeen').set(Date.now());
+}
+function loadOnlineUsers(callback) {
+    if (!_fbReady || !_fbDB) { callback([]); return; }
+    _fbDB.ref('hukukai/presence').on('value', function(snap) {
+        if (!snap || !snap.exists()) { callback([]); return; }
+        callback(Object.values(snap.val() || {}));
+    });
+}
 // ============================================================
 // GÜVENLİK: Dinamik HTML basarken temel kaçış (XSS azaltma)
 // ============================================================
+ 
 function escapeHtml(str = '') {
     return String(str).replace(/[&<>"']/g, ch => ({
         '&': '&amp;',
