@@ -1545,7 +1545,7 @@ Orijinal özelliklerin tamamı korunmuştur.
         </div>
 
         <!-- KAYIT BAŞARI EKRANI (başlangıçta gizli) -->
-        <div id="regSuccessScreen" style="display:none;position:absolute;inset:0;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;z-index:20;overflow:auto;-webkit-overflow-scrolling:touch;">
+        <div id="regSuccessScreen" style="display:none;position:absolute;inset:0;background:linear-gradient(145deg,#13131f,#0d0d18);border-radius:24px;z-index:100;overflow:auto;-webkit-overflow-scrolling:touch;">
             <div style="height:3px;background:linear-gradient(90deg,#f59e0b,#c9a84c);border-radius:24px 24px 0 0;"></div>
             <div style="padding:36px 28px;text-align:center;">
                 <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(217,119,6,.1));border:2px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:ringPulse 2s infinite;">
@@ -3656,7 +3656,10 @@ function showPendingApprovalScreen(fullName, email) {
     // Başarı ekranını göster
     var screen = document.getElementById('regSuccessScreen');
     if (screen) {
-        screen.style.display = 'block';
+        screen.style.display = 'flex';
+        screen.style.flexDirection = 'column';
+        screen.style.alignItems = 'center';
+        screen.style.justifyContent = 'center';
         // Otomatik akış: 1.2sn sonra login sekmesine dön
         if (screen._autoTimer) clearTimeout(screen._autoTimer);
         screen._autoTimer = setTimeout(() => {
