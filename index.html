@@ -6622,12 +6622,6 @@ async function runAIAnalysis() {
                 <i class="fas fa-magic"></i> Bu Bilgilerle Dilekçe Oluştur
             </button>`;
 
-            // Oluşturulan butona event listener bağla
-            const applyBtn = result.querySelector('#applyLastAIAnalysisBtn');
-            applyBtn?.addEventListener('click', applyLastAIAnalysis);
-        }
-    }, 1200);
-}
 
 function applyLastAIAnalysis() {
     const a = window._lastAIAnalysis;
