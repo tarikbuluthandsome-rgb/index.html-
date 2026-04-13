@@ -6534,14 +6534,63 @@ function openAIAnalysisModal() {
     });
 }
 
-function runAIAnalysis() {
+async function runAIAnalysis() {
     const text = document.getElementById('aiAnalysisText')?.value?.trim();
-    if (!text || text.length < 20) { showNotification('Lütfen daha detaylı bir açıklama yazın!','error'); return; }
+    if (!text || text.length < 20) { showNotification('Lütfen daha detaylı bir açıklama yazın!', 'error'); return; }
     const btn = document.getElementById('aiAnalysisBtn');
     const result = document.getElementById('aiAnalysisResult');
-    if (btn) { btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> AI Analiz Yapıyor...'; }
-    setTimeout(() => {
-        const analysis = localAIAnalysis(text);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Analiz Yapıyor...'; }
+
+    let analysis;
+    try {
+        const response = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+        });
+        const data = await response.json();
+        if (data.success) {
+            analysis = data.result;
+            const dayanaklar = getDayanaklarForDava(analysis.davaTuru).slice(0, 6);
+            analysis.maddeList = dayanaklar.map(k => {
+                const m = kanunMetinleri[k];
+                return m ? '• <strong>' + m.kanun + '</strong> Md.' + m.madde + ' — ' + m.baslik : '';
+            }).filter(Boolean).join('<br>');
+        } else {
+            throw new Error('API hatası');
+        }
+    } catch(e) {
+        analysis = localAIAnalysis(text);
+        showNotification('Yerel analiz kullanılıyor...', 'warning');
+    }
+
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-brain"></i> AI ile Analiz Et'; }
+    if (result) {
+        window._lastAIAnalysis = { davaTuru: analysis.davaTuru, olay: text, talepler: analysis.talepler };
+        result.style.display = 'block';
+        var ozetHtml = analysis.ozet
+            ? '<div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#a78bfa;"><i class="fas fa-info-circle"></i> ' + analysis.ozet + '</div>'
+            : '';
+        var acilHtml = analysis.aciliyet === 'yüksek'
+            ? '<span style="margin-left:8px;background:rgba(220,38,38,.3);color:#fca5a5;font-size:10px;padding:2px 8px;border-radius:99px;">⚠️ ACİL</span>'
+            : '';
+        result.innerHTML =
+            '<div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.3);border-radius:12px;padding:16px;margin-bottom:12px;">' +
+                '<div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:10px;"><i class="fas fa-check-circle"></i> AI Analiz Tamamlandı</div>' +
+                ozetHtml +
+                '<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Tespit Edilen Dava</div>' +
+                '<div style="background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;font-size:13px;color:#a78bfa;font-weight:700;">' + analysis.davaLabel + acilHtml + '</div></div>' +
+                '<div style="margin-bottom:10px;"><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Yasal Dayanaklar</div>' +
+                '<div style="font-size:12px;color:#94a3b8;line-height:2;">' + analysis.maddeList + '</div></div>' +
+                '<div><div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Önerilen Talepler</div>' +
+                '<div style="font-size:12px;color:#94a3b8;line-height:1.8;">' + analysis.talepler.replace(/\n/g, '<br>') + '</div></div>' +
+            '</div>' +
+            '<button type="button" id="applyLastAIAnalysisBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">' +
+            '<i class="fas fa-magic"></i> Bu Bilgilerle Dilekçe Oluştur</button>';
+        const applyBtn = result.querySelector('#applyLastAIAnalysisBtn');
+        applyBtn?.addEventListener('click', applyLastAIAnalysis);
+    }
+}
         // Sonucu global'e kaydet — onclick içinde newline problemi olmadan çağırılacak
         window._lastAIAnalysis = { davaTuru: analysis.davaTuru, olay: text, talepler: analysis.talepler };
         if (btn) { btn.disabled=false; btn.innerHTML='<i class="fas fa-brain"></i> AI ile Analiz Et'; }
