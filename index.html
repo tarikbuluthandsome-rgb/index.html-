@@ -6534,70 +6534,46 @@ function openAIAnalysisModal() {
     });
 }
 
-async function runAIAnalysis() {
+function runAIAnalysis() {
     const text = document.getElementById('aiAnalysisText')?.value?.trim();
-    if (!text || text.length < 20) { showNotification('Lütfen daha detaylı bir açıklama yazın!', 'error'); return; }
+    if (!text || text.length < 20) { showNotification('Lütfen daha detaylı bir açıklama yazın!','error'); return; }
     const btn = document.getElementById('aiAnalysisBtn');
     const result = document.getElementById('aiAnalysisResult');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Analiz Yapıyor...'; }
-
-    let analysis;
-    try {
-        const response = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
-        });
-        const data = await response.json();
-        if (data.success) {
-            analysis = data.result;
-            // localAIAnalysis formatına uyumlu hale getir
-            const dayanaklar = getDayanaklarForDava(analysis.davaTuru).slice(0, 6);
-            analysis.maddeList = dayanaklar.map(k => {
-                const m = kanunMetinleri[k];
-                return m ? `• <strong>${m.kanun}</strong> Md.${m.madde} — ${m.baslik}` : '';
-            }).filter(Boolean).join('<br>');
-        } else {
-            throw new Error('API hatası');
-        }
-    } catch(e) {
-        // API başarısız olursa yerel analizi kullan
-        analysis = localAIAnalysis(text);
-        showNotification('Yerel analiz kullanılıyor...', 'warning');
-    }
-
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-brain"></i> AI ile Analiz Et'; }
-    if (result) {
+    if (btn) { btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> AI Analiz Yapıyor...'; }
+    setTimeout(() => {
+        const analysis = localAIAnalysis(text);
+        // Sonucu global'e kaydet — onclick içinde newline problemi olmadan çağırılacak
         window._lastAIAnalysis = { davaTuru: analysis.davaTuru, olay: text, talepler: analysis.talepler };
-        result.style.display = 'block';
-        result.innerHTML = `<div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.3);border-radius:12px;padding:16px;margin-bottom:12px;">
-            <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:10px;"><i class="fas fa-check-circle"></i> AI Analiz Tamamlandı</div>
-            ${analysis.ozet ? `<div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#a78bfa;"><i class="fas fa-info-circle"></i> ${analysis.ozet}</div>` : ''}
-            <div style="margin-bottom:10px;">
-                <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Tespit Edilen Dava</div>
-                <div style="background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;font-size:13px;color:#a78bfa;font-weight:700;">
-                    ${analysis.davaLabel}
-                    ${analysis.aciliyet === 'yüksek' ? '<span style="margin-left:8px;background:rgba(220,38,38,.3);color:#fca5a5;font-size:10px;padding:2px 8px;border-radius:99px;">⚠️ ACİL</span>' : ''}
+        if (btn) { btn.disabled=false; btn.innerHTML='<i class="fas fa-brain"></i> AI ile Analiz Et'; }
+        if (result) {
+            result.style.display = 'block';
+            result.innerHTML = `<div style="background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.3);border-radius:12px;padding:16px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:10px;"><i class="fas fa-check-circle"></i> AI Analiz Tamamlandı</div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Tespit Edilen Dava</div>
+                    <div style="background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);border-radius:8px;padding:10px;font-size:13px;color:#a78bfa;font-weight:700;">${analysis.davaLabel}</div>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Yasal Dayanaklar</div>
+                    <div style="font-size:12px;color:#94a3b8;line-height:2;">${analysis.maddeList}</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Önerilen Talepler</div>
+                    <div style="font-size:12px;color:#94a3b8;line-height:1.8;">${analysis.talepler.replace(/\n/g,'<br>')}</div>
                 </div>
             </div>
-            <div style="margin-bottom:10px;">
-                <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Yasal Dayanaklar</div>
-                <div style="font-size:12px;color:#94a3b8;line-height:2;">${analysis.maddeList}</div>
-            </div>
-            <div>
-                <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Önerilen Talepler</div>
-                <div style="font-size:12px;color:#94a3b8;line-height:1.8;">${analysis.talepler.replace(/\n/g,'<br>')}</div>
-            </div>
-        </div>
-        <button type="button" id="applyLastAIAnalysisBtn"
-            style="width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
-            <i class="fas fa-magic"></i> Bu Bilgilerle Dilekçe Oluştur
-        </button>`;
-        const applyBtn = result.querySelector('#applyLastAIAnalysisBtn');
-        applyBtn?.addEventListener('click', applyLastAIAnalysis);
-    }
+            <button type="button" id="applyLastAIAnalysisBtn"
+                style="width:100%;padding:13px;background:linear-gradient(135deg,#dc2626,#991b1b);border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:Outfit,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <i class="fas fa-magic"></i> Bu Bilgilerle Dilekçe Oluştur
+            </button>`;
+
+            // Oluşturulan butona event listener bağla
+            const applyBtn = result.querySelector('#applyLastAIAnalysisBtn');
+            applyBtn?.addEventListener('click', applyLastAIAnalysis);
+        }
+    }, 1200);
 }
-        
+
 function applyLastAIAnalysis() {
     const a = window._lastAIAnalysis;
     if (!a) return;
@@ -6607,50 +6583,32 @@ function applyLastAIAnalysis() {
 function localAIAnalysis(text) {
     const t = text.toLowerCase();
     const rules = [
-    // AİLE HUKUKU
-    {keys:['velayet','çocuğu al','velayeti ver','çocuk.*mahkeme','çocuk.*velayet','çocuğun velayeti','çocuk bende kalsın','çocuğu almak'],dava:'velayet'},
-    {keys:['boşanma','boşanmak','evlilik.*sona','ayrılmak.*eş','evlilik.*bitmek','eşimden ayrıl','boşanmak istiyorum','evliliğim bitti'],dava:'bosanma'},
-    {keys:['zina','aldatma','başkasıyla','ihanet','aldatt','eşimi aldatırken','sevgilisi var','başka biriyle'],dava:'bosanma-zina'},
-    {keys:['terk etti','evden ayrıldı','terk etmek','çekip gitti','evi terk','ortada yok','haber yok','kaçtı gitti'],dava:'bosanma-terk'},
-    {keys:['şiddet','dövme','tehdit','fiziksel.*zarar','koruma.*karar','uzaklaştırma','şiddet.*maruz','eşim beni dövüyor','dayak','şiddet görüyorum'],dava:'siddet'},
-    {keys:['nafaka','geçim.*para','çocuk.*geçim','yoksulluk.*nafaka','nafaka.*öde','para vermiyor','geçimimi sağlamıyor'],dava:'nafaka-yoksulluk'},
-    {keys:['çocukla.*görüşme','çocuğu.*görmek','kişisel.*ilişki','ziyaret.*çocuk','çocuğumu göremiyorum','çocuğuma kavuşmak'],dava:'kisisel'},
-    {keys:['mal rejimi','edinilmiş mal','evlilik.*mal','mallarda hak','mal paylaşımı','ortak mal'],dava:'malrejimi'},
-    {keys:['soybağı','babalık','dna','baba.*değil','babası belli değil','öz babası mı','babalık testi'],dava:'soybagi'},
-
-    // İŞ HUKUKU
-    {keys:['işten çıkar','kıdem tazminat','ihbar tazminat','iş sözleşme.*fesih','fazla mesai','yıllık izin','ücret.*ödenmed','maaş almıyorum','işveren ödemedi','sigortam yatmıyor','sgk'],dava:'iscilik'},
-    {keys:['işe iade','haksız fesih','iş.*geri dön','işten çıkarma.*geçersiz','sebepsiz işten çıkarıldım','gerekçesiz'],dava:'isciiseinali'},
-    {keys:['mobbing','işyeri.*baskı','psikolojik.*taciz','ayrımcılık.*işyeri','patron baskı','iş yerinde beni eziyor','yıldırma'],dava:'iscimobbing'},
-
-    // BORÇLAR / TİCARET
-    {keys:['kira','kiracı.*çıkar','tahliye','ev.*boşalt','kira.*ödenmed','kiracı çıkmıyor','ev sahibi çıkarıyor'],dava:'kira-tahliye'},
-    {keys:['icra','ödeme emri','haciz','icra.*itiraz','icra geldi','haciz koydular','mal varlığıma el koydular'],dava:'icra-itiraz'},
-    {keys:['alacak','borç.*ödeme','para.*alamadım','borçlu','senet','senedi','borcunu ödemiyor','verdiğim para','ödeme yapmıyor'],dava:'alacak'},
-    {keys:['tüketici','bozuk ürün','garanti','hizmet.*almadım','ayıplı','ürün çalışmıyor','para iade','satıcı değiştirmiyor'],dava:'tuketici'},
-    {keys:['sigorta.*tazminat','kaza.*sigorta','sigorta.*ödenmed','sigorta şirketi ödemedi','hasar tazminatı'],dava:'sigorta'},
-    {keys:['ticaret.*anlaşmazlık','ticari.*sözleşme','şirket.*alacak','fatura.*ödenmed','iş ortağı','ortaklık anlaşmazlık'],dava:'ticari-uyusmazlik'},
-
-    // TAŞINMAZ / MİRAS
-    {keys:['tapu','arsa','gayrimenkul.*devir','mülk.*tescil','tapu.*iptal','tapuyu üzerine geçirmiş','arazim','evin tapusu'],dava:'tapu'},
-    {keys:['miras.*reddet','mirası.*kabul etm','red.*miras','mirası reddediyorum','borçlu miras'],dava:'miras-red'},
-    {keys:['miras','veraset','öldü.*mal','tereke','mirasçı','babam öldü mal','annem vefat etti','miras payı'],dava:'miras-taksim'},
-    {keys:['vasiyetname','vasiyet','vasiyeti iptal','son istek'],dava:'vasiyetname'},
-    {keys:['ortaklık.*gider','izale','paylı mülkiyet','ortak taşınmaz','hissedar'],dava:'ortakligin-giderilmesi'},
-
-    // CEZA HUKUKU
-    {keys:['bıçak','bıçakladı','bıçaklandı','saldırı','dövdü','darp','yaraladı','vurdu','fiziksel saldırı','kavga','saldırdı','tekme','yumruk','silah','yaralandım','saldırıya uğradım'],dava:'ceza-ihbar'},
-    {keys:['hakaret','aşağıladı','tehdit etti','küfür','iftira','onur kırıcı','sosyal medya hakaret','rezil etti'],dava:'ceza-ihbar'},
-    {keys:['dolandırıcı','dolandırdı','kandırdı','sahte','hile','sahte belge','sahtekarlık'],dava:'ceza-ihbar'},
-    {keys:['hırsızlık','çaldı','gasp','soydu','mal kaçırdı','evden çaldı','cebimi kesti'],dava:'ceza-ihbar'},
-    {keys:['suç duyurusu','şikâyet','şikayet.*ceza','ihbar.*ceza','savcı','suç işlendi','ceza şikayeti'],dava:'ceza-ihbar'},
-    {keys:['şikayetten vazgeç','şikayetimi geri','davadan vazgeç'],dava:'sikayetten-vazgecme'},
-    {keys:['taksirle yaraland','trafik.*yaraland','kaza.*yaraland','ihmal.*yaraland','dikkatsizlik sonucu','kazayla yaraladı'],dava:'taksirle-yaralama'},
-
-    // İDARE HUKUKU
-    {keys:['idare.*iptal','idari işlem','belediye.*karar','kurum.*karar','idari.*itiraz','devlet kararı','resmi kurum haksızlık'],dava:'idari-itiraz'},
-    {keys:['idare.*tazminat','devlet.*zarar','kamu.*zarar','idari.*hata','devlet beni zarara uğrattı'],dava:'idari-tam-yargi'},
-];
+        {keys:['velayet','çocuğu al','velayeti ver','çocuk.*mahkeme','çocuk.*velayet'],dava:'velayet'},
+        {keys:['boşanma','boşanmak','evlilik.*sona','ayrılmak.*eş','evlilik.*bitmek'],dava:'bosanma'},
+        {keys:['zina','aldatma','başkasıyla','ihanet','aldatt'],dava:'bosanma-zina'},
+        {keys:['terk etti','evden ayrıldı','terk etmek','çekip gitti','evi terk'],dava:'bosanma-terk'},
+        {keys:['şiddet','dövme','tehdit','fiziksel.*zarar','koruma.*karar','uzaklaştırma','şiddet.*maruz'],dava:'siddet'},
+        {keys:['nafaka','geçim.*para','çocuk.*geçim','yoksulluk.*nafaka','nafaka.*öde'],dava:'nafaka-yoksulluk'},
+        {keys:['çocukla.*görüşme','çocuğu.*görmek','kişisel.*ilişki','ziyaret.*çocuk'],dava:'kisisel'},
+        {keys:['işten çıkar','kıdem tazminat','ihbar tazminat','iş sözleşme.*fesih','fazla mesai','yıllık izin','ücret.*ödenmed'],dava:'iscilik'},
+        {keys:['işe iade','haksız fesih','iş.*geri dön','işten çıkarma.*geçersiz'],dava:'isciiseinali'},
+        {keys:['mobbing','işyeri.*baskı','psikolojik.*taciz','ayrımcılık.*işyeri'],dava:'iscimobbing'},
+        {keys:['kira','kiracı.*çıkar','tahliye','ev.*boşalt','kira.*ödenmed'],dava:'kira-tahliye'},
+        {keys:['icra','ödeme emri','haciz','icra.*itiraz'],dava:'icra-itiraz'},
+        {keys:['alacak','borç.*ödeme','para.*alamadım','borçlu','senet','senedi'],dava:'alacak'},
+        {keys:['tapu','arsa','gayrimenkul.*devir','mülk.*tescil','tapu.*iptal'],dava:'tapu'},
+        {keys:['miras.*reddet','mirası.*kabul etm','red.*miras'],dava:'miras-red'},
+        {keys:['miras','veraset','öldü.*mal','tereke','mirasçı'],dava:'miras-taksim'},
+        {keys:['tüketici','bozuk ürün','garanti','hizmet.*almadım','ayıplı'],dava:'tuketici'},
+        {keys:['mal rejimi','edinilmiş mal','evlilik.*mal'],dava:'malrejimi'},
+        {keys:['soybağı','babalık','dna','baba.*değil'],dava:'soybagi'},
+        {keys:['sigorta.*tazminat','kaza.*sigorta','sigorta.*ödenmed'],dava:'sigorta'},
+        {keys:['idare.*iptal','idari işlem','belediye.*karar','kurum.*karar','idari.*itiraz'],dava:'idari-itiraz'},
+        {keys:['idare.*tazminat','devlet.*zarar','kamu.*zarar','idari.*hata'],dava:'idari-tam-yargi'},
+        {keys:['suç duyurusu','şikâyet','şikayet.*ceza','ihbar.*ceza','savcı'],dava:'ceza-ihbar'},
+        {keys:['taksirle yaraland','trafik.*yaraland','kaza.*yaraland','ihmal.*yaraland'],dava:'taksirle-yaralama'},
+        {keys:['ticaret.*anlaşmazlık','ticari.*sözleşme','şirket.*alacak','fatura.*ödenmed'],dava:'ticari-uyusmazlik'}
+    ];
     let bestDava=null, bestScore=0;
     rules.forEach(r => {
         const score = r.keys.filter(k=>{try{return new RegExp(k,'i').test(t)}catch(e){return t.includes(k)}}).length;
