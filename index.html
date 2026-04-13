@@ -6583,32 +6583,50 @@ function applyLastAIAnalysis() {
 function localAIAnalysis(text) {
     const t = text.toLowerCase();
     const rules = [
-        {keys:['velayet','çocuğu al','velayeti ver','çocuk.*mahkeme','çocuk.*velayet'],dava:'velayet'},
-        {keys:['boşanma','boşanmak','evlilik.*sona','ayrılmak.*eş','evlilik.*bitmek'],dava:'bosanma'},
-        {keys:['zina','aldatma','başkasıyla','ihanet','aldatt'],dava:'bosanma-zina'},
-        {keys:['terk etti','evden ayrıldı','terk etmek','çekip gitti','evi terk'],dava:'bosanma-terk'},
-        {keys:['şiddet','dövme','tehdit','fiziksel.*zarar','koruma.*karar','uzaklaştırma','şiddet.*maruz'],dava:'siddet'},
-        {keys:['nafaka','geçim.*para','çocuk.*geçim','yoksulluk.*nafaka','nafaka.*öde'],dava:'nafaka-yoksulluk'},
-        {keys:['çocukla.*görüşme','çocuğu.*görmek','kişisel.*ilişki','ziyaret.*çocuk'],dava:'kisisel'},
-        {keys:['işten çıkar','kıdem tazminat','ihbar tazminat','iş sözleşme.*fesih','fazla mesai','yıllık izin','ücret.*ödenmed'],dava:'iscilik'},
-        {keys:['işe iade','haksız fesih','iş.*geri dön','işten çıkarma.*geçersiz'],dava:'isciiseinali'},
-        {keys:['mobbing','işyeri.*baskı','psikolojik.*taciz','ayrımcılık.*işyeri'],dava:'iscimobbing'},
-        {keys:['kira','kiracı.*çıkar','tahliye','ev.*boşalt','kira.*ödenmed'],dava:'kira-tahliye'},
-        {keys:['icra','ödeme emri','haciz','icra.*itiraz'],dava:'icra-itiraz'},
-        {keys:['alacak','borç.*ödeme','para.*alamadım','borçlu','senet','senedi'],dava:'alacak'},
-        {keys:['tapu','arsa','gayrimenkul.*devir','mülk.*tescil','tapu.*iptal'],dava:'tapu'},
-        {keys:['miras.*reddet','mirası.*kabul etm','red.*miras'],dava:'miras-red'},
-        {keys:['miras','veraset','öldü.*mal','tereke','mirasçı'],dava:'miras-taksim'},
-        {keys:['tüketici','bozuk ürün','garanti','hizmet.*almadım','ayıplı'],dava:'tuketici'},
-        {keys:['mal rejimi','edinilmiş mal','evlilik.*mal'],dava:'malrejimi'},
-        {keys:['soybağı','babalık','dna','baba.*değil'],dava:'soybagi'},
-        {keys:['sigorta.*tazminat','kaza.*sigorta','sigorta.*ödenmed'],dava:'sigorta'},
-        {keys:['idare.*iptal','idari işlem','belediye.*karar','kurum.*karar','idari.*itiraz'],dava:'idari-itiraz'},
-        {keys:['idare.*tazminat','devlet.*zarar','kamu.*zarar','idari.*hata'],dava:'idari-tam-yargi'},
-        {keys:['suç duyurusu','şikâyet','şikayet.*ceza','ihbar.*ceza','savcı'],dava:'ceza-ihbar'},
-        {keys:['taksirle yaraland','trafik.*yaraland','kaza.*yaraland','ihmal.*yaraland'],dava:'taksirle-yaralama'},
-        {keys:['ticaret.*anlaşmazlık','ticari.*sözleşme','şirket.*alacak','fatura.*ödenmed'],dava:'ticari-uyusmazlik'}
-    ];
+    // AİLE HUKUKU
+    {keys:['velayet','çocuğu al','velayeti ver','çocuk.*mahkeme','çocuk.*velayet','çocuğun velayeti','çocuk bende kalsın','çocuğu almak'],dava:'velayet'},
+    {keys:['boşanma','boşanmak','evlilik.*sona','ayrılmak.*eş','evlilik.*bitmek','eşimden ayrıl','boşanmak istiyorum','evliliğim bitti'],dava:'bosanma'},
+    {keys:['zina','aldatma','başkasıyla','ihanet','aldatt','eşimi aldatırken','sevgilisi var','başka biriyle'],dava:'bosanma-zina'},
+    {keys:['terk etti','evden ayrıldı','terk etmek','çekip gitti','evi terk','ortada yok','haber yok','kaçtı gitti'],dava:'bosanma-terk'},
+    {keys:['şiddet','dövme','tehdit','fiziksel.*zarar','koruma.*karar','uzaklaştırma','şiddet.*maruz','eşim beni dövüyor','dayak','şiddet görüyorum'],dava:'siddet'},
+    {keys:['nafaka','geçim.*para','çocuk.*geçim','yoksulluk.*nafaka','nafaka.*öde','para vermiyor','geçimimi sağlamıyor'],dava:'nafaka-yoksulluk'},
+    {keys:['çocukla.*görüşme','çocuğu.*görmek','kişisel.*ilişki','ziyaret.*çocuk','çocuğumu göremiyorum','çocuğuma kavuşmak'],dava:'kisisel'},
+    {keys:['mal rejimi','edinilmiş mal','evlilik.*mal','mallarda hak','mal paylaşımı','ortak mal'],dava:'malrejimi'},
+    {keys:['soybağı','babalık','dna','baba.*değil','babası belli değil','öz babası mı','babalık testi'],dava:'soybagi'},
+
+    // İŞ HUKUKU
+    {keys:['işten çıkar','kıdem tazminat','ihbar tazminat','iş sözleşme.*fesih','fazla mesai','yıllık izin','ücret.*ödenmed','maaş almıyorum','işveren ödemedi','sigortam yatmıyor','sgk'],dava:'iscilik'},
+    {keys:['işe iade','haksız fesih','iş.*geri dön','işten çıkarma.*geçersiz','sebepsiz işten çıkarıldım','gerekçesiz'],dava:'isciiseinali'},
+    {keys:['mobbing','işyeri.*baskı','psikolojik.*taciz','ayrımcılık.*işyeri','patron baskı','iş yerinde beni eziyor','yıldırma'],dava:'iscimobbing'},
+
+    // BORÇLAR / TİCARET
+    {keys:['kira','kiracı.*çıkar','tahliye','ev.*boşalt','kira.*ödenmed','kiracı çıkmıyor','ev sahibi çıkarıyor'],dava:'kira-tahliye'},
+    {keys:['icra','ödeme emri','haciz','icra.*itiraz','icra geldi','haciz koydular','mal varlığıma el koydular'],dava:'icra-itiraz'},
+    {keys:['alacak','borç.*ödeme','para.*alamadım','borçlu','senet','senedi','borcunu ödemiyor','verdiğim para','ödeme yapmıyor'],dava:'alacak'},
+    {keys:['tüketici','bozuk ürün','garanti','hizmet.*almadım','ayıplı','ürün çalışmıyor','para iade','satıcı değiştirmiyor'],dava:'tuketici'},
+    {keys:['sigorta.*tazminat','kaza.*sigorta','sigorta.*ödenmed','sigorta şirketi ödemedi','hasar tazminatı'],dava:'sigorta'},
+    {keys:['ticaret.*anlaşmazlık','ticari.*sözleşme','şirket.*alacak','fatura.*ödenmed','iş ortağı','ortaklık anlaşmazlık'],dava:'ticari-uyusmazlik'},
+
+    // TAŞINMAZ / MİRAS
+    {keys:['tapu','arsa','gayrimenkul.*devir','mülk.*tescil','tapu.*iptal','tapuyu üzerine geçirmiş','arazim','evin tapusu'],dava:'tapu'},
+    {keys:['miras.*reddet','mirası.*kabul etm','red.*miras','mirası reddediyorum','borçlu miras'],dava:'miras-red'},
+    {keys:['miras','veraset','öldü.*mal','tereke','mirasçı','babam öldü mal','annem vefat etti','miras payı'],dava:'miras-taksim'},
+    {keys:['vasiyetname','vasiyet','vasiyeti iptal','son istek'],dava:'vasiyetname'},
+    {keys:['ortaklık.*gider','izale','paylı mülkiyet','ortak taşınmaz','hissedar'],dava:'ortakligin-giderilmesi'},
+
+    // CEZA HUKUKU
+    {keys:['bıçak','bıçakladı','bıçaklandı','saldırı','dövdü','darp','yaraladı','vurdu','fiziksel saldırı','kavga','saldırdı','tekme','yumruk','silah','yaralandım','saldırıya uğradım'],dava:'ceza-ihbar'},
+    {keys:['hakaret','aşağıladı','tehdit etti','küfür','iftira','onur kırıcı','sosyal medya hakaret','rezil etti'],dava:'ceza-ihbar'},
+    {keys:['dolandırıcı','dolandırdı','kandırdı','sahte','hile','sahte belge','sahtekarlık'],dava:'ceza-ihbar'},
+    {keys:['hırsızlık','çaldı','gasp','soydu','mal kaçırdı','evden çaldı','cebimi kesti'],dava:'ceza-ihbar'},
+    {keys:['suç duyurusu','şikâyet','şikayet.*ceza','ihbar.*ceza','savcı','suç işlendi','ceza şikayeti'],dava:'ceza-ihbar'},
+    {keys:['şikayetten vazgeç','şikayetimi geri','davadan vazgeç'],dava:'sikayetten-vazgecme'},
+    {keys:['taksirle yaraland','trafik.*yaraland','kaza.*yaraland','ihmal.*yaraland','dikkatsizlik sonucu','kazayla yaraladı'],dava:'taksirle-yaralama'},
+
+    // İDARE HUKUKU
+    {keys:['idare.*iptal','idari işlem','belediye.*karar','kurum.*karar','idari.*itiraz','devlet kararı','resmi kurum haksızlık'],dava:'idari-itiraz'},
+    {keys:['idare.*tazminat','devlet.*zarar','kamu.*zarar','idari.*hata','devlet beni zarara uğrattı'],dava:'idari-tam-yargi'},
+];
     let bestDava=null, bestScore=0;
     rules.forEach(r => {
         const score = r.keys.filter(k=>{try{return new RegExp(k,'i').test(t)}catch(e){return t.includes(k)}}).length;
